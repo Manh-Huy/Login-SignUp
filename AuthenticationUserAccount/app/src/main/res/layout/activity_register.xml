@@ -20,21 +20,21 @@
         android:orientation="vertical"
         android:gravity="center"
         android:layout_above="@id/card_view"
-        android:padding="0dp" >
+        android:padding="30dp" >
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/logo" />
 
-<!--        <TextView-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="CHILL MUSIC CORNER"-->
-<!--            android:textStyle="bold"-->
-<!--            android:fontFamily="sans-serif-medium"-->
-<!--            android:textSize="32sp"-->
-<!--            android:textColor="@color/white" />-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CHILL MUSIC CORNER"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="32sp"
+            android:textColor="@color/white" />
 
     </LinearLayout>
 
@@ -131,40 +131,7 @@
 
             <View
                 android:layout_width="wrap_content"
-                android:layout_height="10dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Or continue with"
-                android:layout_gravity="center"
-                android:alpha="0.7" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center" >
-
-                <ImageView
-                    android:id="@+id/signWithGoogle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="12dp"
-                    android:background="@drawable/google_icon" />
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="12dp"
-                    android:background="@drawable/facebook_icon" />
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="12dp"
-                    android:background="@drawable/github_icon" />
-            </LinearLayout>
+                android:layout_height="20dp" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

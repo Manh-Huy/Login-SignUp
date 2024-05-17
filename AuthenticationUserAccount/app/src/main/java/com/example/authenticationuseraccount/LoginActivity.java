@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -28,6 +29,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -94,16 +102,9 @@ public class LoginActivity extends AppCompatActivity {
                                         if (isFirstTimeLogin())
                                         {
                                             String signInMethod = "Email";
-                                            String userUid = null;
-                                            String userName = null;
-                                            String userEmail = null;
-                                            for (UserInfo profile : user.getProviderData()) {
-                                                userUid = profile.getUid();
-                                                userName = profile.getDisplayName();
-                                                userEmail = profile.getEmail();
-                                            }
-                                            Toast.makeText(getApplicationContext(), "UID: " + userUid + "\nName: " + userName + "\nEmail: " + userEmail + "\nsignInMethod: " + signInMethod, Toast.LENGTH_LONG).show();
-
+                                            User userInfo = getUserInfo(user, signInMethod);
+                                            addUser(userInfo);
+                                            Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: " + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: " + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
                                         }
 
                                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -164,17 +165,9 @@ public class LoginActivity extends AppCompatActivity {
                             if (isFirstTimeLogin())
                             {
                                 String signInMethod = "Google";
-                                String userUid = null;
-                                String userName = null;
-                                String userEmail = null;
-                                String userPhotoUrl = null;
-                                for (UserInfo profile : user.getProviderData()) {
-                                    userUid = profile.getUid();
-                                    userName = profile.getDisplayName();
-                                    userEmail = profile.getEmail();
-                                    userPhotoUrl = profile.getPhotoUrl().toString();
-                                }
-                                Toast.makeText(getApplicationContext(), "UID: " + userUid + "\nName: " + userName + "\nEmail: " + userEmail + "\nPhotoUrl: " + userPhotoUrl + "\nsignInMethod: " + signInMethod, Toast.LENGTH_LONG).show();
+                                User userInfo = getUserInfo(user, signInMethod);
+                                addUser(userInfo);
+                                Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: " + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: " + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
                             }
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
@@ -208,5 +201,45 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private User getUserInfo(FirebaseUser user, String signInMethod)
+    {
+        User userInfo = new User();
+//        for (UserInfo profile : user.getProviderData()) {
+//            userInfo.setUserID(profile.getUid());
+//            userInfo.setUsername(profile.getDisplayName());
+//            userInfo.setEmail(profile.getEmail());
+//            userInfo.setImageURL(profile.getPhotoUrl().toString());
+//            userInfo.setSignInMethod(signInMethod);
+//        }
+
+        userInfo.setUserID(user.getUid());
+        userInfo.setUsername(user.getDisplayName());
+        userInfo.setEmail(user.getEmail());
+        if (user.getPhotoUrl() != null)
+        {
+            userInfo.setImageURL(user.getPhotoUrl().toString());
+        }
+        else
+        {
+            userInfo.setImageURL("");
+        }
+        userInfo.setSignInMethod(signInMethod);
+        return userInfo;
+    }
+
+    private void addUser(User user)
+    {
+        ApiService.apiService.addUser(user).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                Toast.makeText(LoginActivity.this, "Call Api Success ", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+
+            }
+        });
+    }
 
 }

@@ -12,12 +12,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -31,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         Button btnSignOut = findViewById(R.id.btnSignout);
         Button btnSignOutWithGoogle = findViewById(R.id.btnSignOutWithGoogle);
         Button btnDisconnect = findViewById(R.id.btnDisconnect);
+
+        Button btnCalllAPI = findViewById(R.id.btnCallAPI);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -90,6 +101,27 @@ public class MainActivity extends AppCompatActivity {
                         });
 
                 startActivity(new Intent(MainActivity.this, StartActivity.class));
+            }
+        });
+
+        btnCalllAPI.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ApiService.apiService.callTestAPI().enqueue(new Callback<List<User>>() {
+                    @Override
+                    public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                        List<User> object = response.body();
+                        Gson gson = new Gson();
+                        if(object != null){
+                            Log.e("CallingApi", gson.toJson(object));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<User>> call, Throwable t) {
+
+                    }
+                });
             }
         });
 

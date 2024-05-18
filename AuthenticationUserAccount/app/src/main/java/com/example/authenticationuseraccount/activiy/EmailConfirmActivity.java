@@ -1,4 +1,4 @@
-package com.example.authenticationuseraccount;
+package com.example.authenticationuseraccount.activiy;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.example.authenticationuseraccount.R;
 
 public class EmailConfirmActivity extends AppCompatActivity {
 

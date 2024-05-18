@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SearchActivity">
+
+    <!-- Top Bar Layout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:background="@android:color/white"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/menuIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:src="@drawable/ic_menu"
+            app:tint="@android:color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/search_background"
+            android:iconifiedByDefault="false"
+            android:queryHint="Bạn muốn nghe gì"
+            app:layout_constraintStart_toEndOf="@id/menuIcon"
+            app:layout_constraintEnd_toStartOf="@id/micIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.0" />
+
+        <ImageView
+            android:id="@+id/micIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:src="@drawable/ic_mic"
+            app:tint="@android:color/black"
+            app:layout_constraintEnd_toStartOf="@id/cancelTextView"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/cancelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Huỷ"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintVertical_bias="1.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

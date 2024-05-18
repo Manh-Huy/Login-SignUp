@@ -1,4 +1,4 @@
-package com.example.authenticationuseraccount;
+package com.example.authenticationuseraccount.activiy;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -28,10 +29,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.UserInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -107,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                                             Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: " + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: " + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
                                         }
 
-                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                                         startActivity(intent);
                                         finish();
                                     } else {
@@ -169,7 +166,7 @@ public class LoginActivity extends AppCompatActivity {
                                 addUser(userInfo);
                                 Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: " + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: " + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
                             }
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                             finish();
                         } else {
                             // If sign in fails, display a message to the user.

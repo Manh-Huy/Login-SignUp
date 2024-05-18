@@ -1,4 +1,4 @@
-package com.example.authenticationuseraccount;
+package com.example.authenticationuseraccount.activiy;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;

@@ -17,7 +17,7 @@
             android:exported="false" />
         <activity
             android:name=".activiy.HomeActivity"
-            android:exported="false" />
+            android:exported="false" />[
         <activity
             android:name=".activiy.MainActivity"
             android:exported="false" />
@@ -31,7 +31,7 @@
             android:name=".activiy.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".activiy.StartActivity"
+            android:name=".activiy.LoginSignUpActivity"
             android:exported="false" />
         <activity
             android:name=".activiy.SplashScreenActivity"

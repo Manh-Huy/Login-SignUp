@@ -1,11 +1,11 @@
-package com.example.authenticationuseraccount.model.homepagemodel;
+package com.example.authenticationuseraccount.model;
 
-public class SuggestSong {
+public class Song {
     private int image;
     private String nameSong;
     private String artist;
 
-    public SuggestSong(int image, String nameSong, String artist) {
+    public Song(int image, String nameSong, String artist) {
         this.image = image;
         this.nameSong = nameSong;
         this.artist = artist;

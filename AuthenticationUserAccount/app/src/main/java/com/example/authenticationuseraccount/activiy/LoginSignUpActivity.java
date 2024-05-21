@@ -9,12 +9,12 @@ import android.widget.Button;
 
 import com.example.authenticationuseraccount.R;
 
-public class StartActivity extends AppCompatActivity {
+public class LoginSignUpActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        setContentView(R.layout.activity_loginsignup);
 
         Button btnLogin =findViewById(R.id.btnLogin);
         Button btnRegister = findViewById(R.id.btnRegister);
@@ -22,7 +22,7 @@ public class StartActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(StartActivity.this, LoginActivity.class);
+                Intent i = new Intent(LoginSignUpActivity.this, LoginActivity.class);
                 startActivity(i);
             }
         });
@@ -30,7 +30,7 @@ public class StartActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(StartActivity.this, RegisterActivity.class);
+                Intent i = new Intent(LoginSignUpActivity.this, RegisterActivity.class);
                 startActivity(i);
             }
         });

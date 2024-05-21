@@ -12,11 +12,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.BannerAdapter;
-import com.example.authenticationuseraccount.adapter.SuggestSongAdapter;
-import com.example.authenticationuseraccount.adapter.TopTrendingAdapter;
+import com.example.authenticationuseraccount.adapter.ThumbnailSongAdapter;
+import com.example.authenticationuseraccount.adapter.ThumbnailSongSmallAdapter;
+import com.example.authenticationuseraccount.model.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
-import com.example.authenticationuseraccount.model.homepagemodel.SuggestSong;
-import com.example.authenticationuseraccount.model.homepagemodel.TopTrending;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ public class HomeActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private CircleIndicator circleIndicator;
     private BannerAdapter bannerAdapter;
-    private RecyclerView suggestRecyclerView, playListRecyclerView, topTrendingRecyclerView, newReleaseRecyclerView;
+    private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend;
 
     private ImageView searchImageView;
 
@@ -47,43 +46,35 @@ public class HomeActivity extends AppCompatActivity {
         circleIndicator.setViewPager(viewPager);
         bannerAdapter.registerDataSetObserver(circleIndicator.getDataSetObserver());
 
-        //suggestRecyclerView
-        suggestRecyclerView = findViewById(R.id.suggestRecyclerView);
-        suggestRecyclerView.setHasFixedSize(true);
-        suggestRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        //Quick Pick recycle view
+        rcvQuickPick = findViewById(R.id.rcv_quick_pick);
+        rcvQuickPick.setHasFixedSize(true);
+        rcvQuickPick.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        List<SuggestSong> listSuggestSong = new ArrayList<>();
-        listSuggestSong.add(new SuggestSong(R.drawable.chungtacuahientai, "Chúng ta của hiện tại", "Sơn Tùng MTP"));
-        listSuggestSong.add(new SuggestSong(R.drawable.anhlangoailecuaem, "Anh là ngoại lệ của em", "Phương Ly"));
-        listSuggestSong.add(new SuggestSong(R.drawable.hoanghonnho, "Hoàng hôn nhớ", "Anh Tú"));
-        listSuggestSong.add(new SuggestSong(R.drawable.freeflowkhonghut, "Free Flow Không Hút", "Ricky Start"));
+        List<Song> listQuickPickSong = new ArrayList<>();
+        listQuickPickSong.add(new Song(R.drawable.chungtacuahientai, "Chúng ta của hiện tại", "Sơn Tùng MTP"));
+        listQuickPickSong.add(new Song(R.drawable.anhlangoailecuaem, "Anh là ngoại lệ của em", "Phương Ly"));
+        listQuickPickSong.add(new Song(R.drawable.hoanghonnho, "Hoàng hôn nhớ", "Anh Tú"));
 
-        SuggestSongAdapter suggestSongAdapter = new SuggestSongAdapter(listSuggestSong);
-        suggestRecyclerView.setAdapter(suggestSongAdapter);
+        ThumbnailSongSmallAdapter thumbnailSongSmallAdapter = new ThumbnailSongSmallAdapter(listQuickPickSong);
+        rcvQuickPick.setAdapter(thumbnailSongSmallAdapter);
 
-        //playListRecyclerView
-        playListRecyclerView = findViewById(R.id.playListRecyclerView);
-        playListRecyclerView.setHasFixedSize(true);
-        playListRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        //Listen Again recycle view
+        rcvListenAgain = findViewById(R.id.rcv_listen_again);
+        rcvListenAgain.setHasFixedSize(true);
+        rcvListenAgain.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        //topTrendingRecyclerView
-        topTrendingRecyclerView = findViewById(R.id.topTrendingRecyclerView);
-        topTrendingRecyclerView.setHasFixedSize(true);
-        topTrendingRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        ThumbnailSongAdapter listenAgainSongAdapter = new ThumbnailSongAdapter(getListSong());
+        rcvListenAgain.setAdapter(listenAgainSongAdapter);
 
-        List<TopTrending> listTopTrending = new ArrayList<>();
-        listTopTrending.add(new TopTrending(R.drawable.khoalybiet, "Khóa Ly Biệt", "Anh Tú"));
-        listTopTrending.add(new TopTrending(R.drawable.nauchoeman, "Nấu cho em ăn", "Đen Vâu"));
-        listTopTrending.add(new TopTrending(R.drawable.bandoi, "Bạn Đời", "Karik"));
-        listTopTrending.add(new TopTrending(R.drawable.suytnuathi, "Suýt nữa thì", "Andiez"));
+        //Recommend recycle view
+        rcvRecommend = findViewById(R.id.rcv_recommend);
+        rcvRecommend.setHasFixedSize(true);
+        rcvRecommend.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        TopTrendingAdapter topTrendingAdapter = new TopTrendingAdapter(listTopTrending);
-        topTrendingRecyclerView.setAdapter(topTrendingAdapter);
+        ThumbnailSongAdapter recommendSongAdapter = new ThumbnailSongAdapter(getListSong());
+        rcvRecommend.setAdapter(recommendSongAdapter);
 
-        //newReleaseRecyclerView
-        newReleaseRecyclerView = findViewById(R.id.newReleaseRecyclerView);
-        newReleaseRecyclerView.setHasFixedSize(true);
-        newReleaseRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // search Image View
         searchImageView = findViewById(R.id.searchIcon);
@@ -101,7 +92,15 @@ public class HomeActivity extends AppCompatActivity {
         list.add(new Banner(R.drawable.banner2));
         list.add(new Banner(R.drawable.banner3));
         list.add(new Banner(R.drawable.banner4));
+        return list;
+    }
 
+    private List<Song> getListSong(){
+        List<Song> list =new ArrayList<>();
+        list.add(new Song(R.drawable.khoalybiet, "Khóa Ly Biệt", "Anh Tú"));
+        list.add(new Song(R.drawable.nauchoeman, "Nấu cho em ăn", "Đen Vâu"));
+        list.add(new Song(R.drawable.bandoi, "Bạn Đời", "Karik"));
+        list.add(new Song(R.drawable.suytnuathi, "Suýt nữa thì", "Andiez"));
         return list;
     }
 }

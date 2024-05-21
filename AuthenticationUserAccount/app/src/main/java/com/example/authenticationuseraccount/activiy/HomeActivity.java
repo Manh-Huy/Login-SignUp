@@ -29,12 +29,21 @@ public class HomeActivity extends AppCompatActivity {
     private BannerAdapter bannerAdapter;
     private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend;
 
-    private ImageView searchImageView;
+    private ImageView searchImageView , imgMenuIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        imgMenuIcon = findViewById(R.id.menuIcon);
+        imgMenuIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomeActivity.this, LoginSignUpActivity.class);
+                startActivity(intent);
+            }
+        });
 
         // banner
         viewPager = findViewById(R.id.viewPager);
@@ -61,7 +70,7 @@ public class HomeActivity extends AppCompatActivity {
 
         //Listen Again recycle view
         rcvListenAgain = findViewById(R.id.rcv_listen_again);
-        rcvListenAgain.setHasFixedSize(true);
+        rcvListenAgain.setHasFixedSize(false);
         rcvListenAgain.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         ThumbnailSongAdapter listenAgainSongAdapter = new ThumbnailSongAdapter(getListSong());

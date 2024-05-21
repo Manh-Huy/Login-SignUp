@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "717924404137",
-    "project_id": "authentication-user-account",
-    "storage_bucket": "authentication-user-account.appspot.com"
+    "project_number": "561801477499",
+    "project_id": "nodejsapp-89f00",
+    "storage_bucket": "nodejsapp-89f00.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:717924404137:android:ab2a134efebe773076d2b8",
+        "mobilesdk_app_id": "1:561801477499:android:7174e5c4f918b1a6d711de",
         "android_client_info": {
           "package_name": "com.example.authenticationuseraccount"
         }
       },
       "oauth_client": [
         {
-          "client_id": "717924404137-lm5sqktfd0f1bb5821jt8809m47ab2c6.apps.googleusercontent.com",
+          "client_id": "561801477499-i2gkd0v0fnd478hmfi4lhpbjjnp7urgd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.authenticationuseraccount",
-            "certificate_hash": "3c4350cb874b3d5df4421fef16d6077e9c6e4e7f"
+            "certificate_hash": "ce6b071e0bf665e6b9498f222c151042ae8820f1"
           }
         },
         {
-          "client_id": "717924404137-2sk0s9iv99r1eoo2o9i6retcbk0kcjsn.apps.googleusercontent.com",
+          "client_id": "561801477499-lg186n0gvk0aokk1mh35jr85qovpj5ck.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCjfW9WB9qogLDjj_TNBHFLqhxYHBdw2lw"
+          "current_key": "AIzaSyCSISVRq0Tl7ZcTg6qTxB3ks8fAvZQeTxA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "717924404137-2sk0s9iv99r1eoo2o9i6retcbk0kcjsn.apps.googleusercontent.com",
+              "client_id": "561801477499-lg186n0gvk0aokk1mh35jr85qovpj5ck.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

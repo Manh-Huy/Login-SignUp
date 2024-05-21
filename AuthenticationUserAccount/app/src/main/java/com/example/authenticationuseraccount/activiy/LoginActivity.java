@@ -70,49 +70,17 @@ public class LoginActivity extends AppCompatActivity {
                 String email = inputEmail.getText().toString();
                 final String password = inputPassword.getText().toString();
 
-                if (TextUtils.isEmpty(email))
-                {
+                if (TextUtils.isEmpty(email)) {
                     Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if (TextUtils.isEmpty(password))
-                {
+                if (TextUtils.isEmpty(password)) {
                     Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                mAuth.signInWithEmailAndPassword(email,password)
-                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (!task.isSuccessful())
-                                {
-                                    Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_LONG).show();
-                                }
-                                else
-                                {
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    if (user != null && user.isEmailVerified()) {
-                                        Toast.makeText(getApplicationContext(), "Logged in successfully", Toast.LENGTH_SHORT).show();
-
-                                        if (isFirstTimeLogin())
-                                        {
-                                            String signInMethod = "Email";
-                                            User userInfo = getUserInfo(user, signInMethod);
-                                            addUser(userInfo);
-                                            Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: " + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: " + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
-                                        }
-
-                                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "Please verify your email", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            }
-                        });
+                loginUser(email, password);
             }
         });
 
@@ -125,6 +93,36 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void loginUser(String email, String password) {
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_LONG).show();
+                        } else {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            if (user != null && user.isEmailVerified()) {
+                                Toast.makeText(getApplicationContext(), "Logged in successfully", Toast.LENGTH_SHORT).show();
+
+                                if (isFirstTimeLogin()) {
+                                    String signInMethod = "Email";
+                                    User userInfo = getUserInfo(user, signInMethod);
+                                    addUser(userInfo);
+                                    Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: " + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: " + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
+                                }
+
+                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Please verify your email", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -134,14 +132,13 @@ public class LoginActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                Toast.makeText(this, "Google Sign in Succeeded",  Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Google Sign in Succeeded", Toast.LENGTH_LONG).show();
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
-                Toast.makeText(this, "Google Sign in Failed " + e,  Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Google Sign in Failed " + e, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -157,10 +154,9 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
                             Log.d(TAG, "signInWithCredential:success: currentUser: " + user.getEmail());
-                            Toast.makeText(LoginActivity.this, "Firebase Authentication Succeeded ",  Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this, "Firebase Authentication Succeeded ", Toast.LENGTH_LONG).show();
 
-                            if (isFirstTimeLogin())
-                            {
+                            if (isFirstTimeLogin()) {
                                 String signInMethod = "Google";
                                 User userInfo = getUserInfo(user, signInMethod);
                                 addUser(userInfo);
@@ -171,7 +167,7 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Firebase Authentication failed:" + task.getException(),  Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this, "Firebase Authentication failed:" + task.getException(), Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -198,8 +194,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private User getUserInfo(FirebaseUser user, String signInMethod)
-    {
+    private User getUserInfo(FirebaseUser user, String signInMethod) {
         User userInfo = new User();
 //        for (UserInfo profile : user.getProviderData()) {
 //            userInfo.setUserID(profile.getUid());
@@ -212,20 +207,16 @@ public class LoginActivity extends AppCompatActivity {
         userInfo.setUserID(user.getUid());
         userInfo.setUsername(user.getDisplayName());
         userInfo.setEmail(user.getEmail());
-        if (user.getPhotoUrl() != null)
-        {
+        if (user.getPhotoUrl() != null) {
             userInfo.setImageURL(user.getPhotoUrl().toString());
-        }
-        else
-        {
+        } else {
             userInfo.setImageURL("");
         }
         userInfo.setSignInMethod(signInMethod);
         return userInfo;
     }
 
-    private void addUser(User user)
-    {
+    private void addUser(User user) {
         ApiService.apiService.addUser(user).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {

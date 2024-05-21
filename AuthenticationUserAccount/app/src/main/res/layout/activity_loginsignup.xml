@@ -20,8 +20,8 @@
         android:padding="28dp" >
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
             android:src="@drawable/logo" />
 
         <TextView
@@ -30,7 +30,7 @@
             android:text="CHILL MUSIC CORNER"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
-            android:textSize="32sp"
+            android:textSize="30sp"
             android:textColor="@color/white" />
 
         <View

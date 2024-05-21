@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -37,6 +38,8 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword;
+
+    private CheckBox checkBoxRememberMe;
     private FirebaseAuth mAuth;
 
     private static final String TAG = "GoogleActivity";
@@ -54,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
 
         inputEmail = findViewById(R.id.editTextEmail);
         inputPassword = findViewById(R.id.editTextPassword);
+        checkBoxRememberMe = findViewById(R.id.checkbox_remember_me);
 
         Button btnLogin = findViewById(R.id.btnLogin);
         ImageView imageViewSignWithGoogle = findViewById(R.id.signWithGoogle);
@@ -84,6 +88,8 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
+                boolean isRememberMe = checkBoxRememberMe.isChecked();
+                mSharedPreferencesManager.putBoolean("remember_me", isRememberMe);
                 loginUser(email, password);
             }
         });
@@ -166,6 +172,10 @@ public class LoginActivity extends AppCompatActivity {
                                 addUser(userInfo);
                                 Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: " + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: " + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
                             }
+
+                            boolean isRememberMe = checkBoxRememberMe.isChecked();
+                            mSharedPreferencesManager.putBoolean("remember_me", isRememberMe);
+
                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                             finish();
                         } else {

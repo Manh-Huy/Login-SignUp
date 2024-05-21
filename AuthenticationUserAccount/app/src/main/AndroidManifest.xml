@@ -14,11 +14,14 @@
         android:theme="@style/Theme.AuthenticationUserAccount"
         tools:targetApi="31">
         <activity
+            android:name=".activiy.BufferActivity"
+            android:exported="false" />
+        <activity
             android:name=".activiy.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".activiy.HomeActivity"
-            android:exported="false" />[
+            android:exported="false" />
         <activity
             android:name=".activiy.MainActivity"
             android:exported="false" />

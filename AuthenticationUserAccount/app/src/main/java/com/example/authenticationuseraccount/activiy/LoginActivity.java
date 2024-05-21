@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.model.User;
+import com.example.authenticationuseraccount.utils.SharedPreferencesManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -43,10 +43,14 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
     GoogleSignInClient mGoogleSignInClient;
 
+    SharedPreferencesManager mSharedPreferencesManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        mSharedPreferencesManager = SharedPreferencesManager.getInstance(LoginActivity.this);
 
         inputEmail = findViewById(R.id.editTextEmail);
         inputPassword = findViewById(R.id.editTextPassword);
@@ -103,7 +107,6 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null && user.isEmailVerified()) {
-                                Toast.makeText(getApplicationContext(), "Logged in successfully", Toast.LENGTH_SHORT).show();
 
                                 if (isFirstTimeLogin()) {
                                     String signInMethod = "Email";
@@ -135,6 +138,7 @@ public class LoginActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Toast.makeText(this, "Google Sign in Succeeded", Toast.LENGTH_LONG).show();
                 firebaseAuthWithGoogle(account);
+
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
@@ -177,14 +181,11 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             // Kiểm tra xem người dùng đã từng đăng nhập trước đó chưa
-            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-            boolean isFirstTime = sharedPreferences.getBoolean(user.getUid(), true);
-
+            boolean isFirstTime = mSharedPreferencesManager.getBoolean(user.getUid(), true);
+            Log.e(TAG, "isFirstTimeLogin: " + isFirstTime);
             if (isFirstTime) {
                 // Nếu là lần đầu tiên, đánh dấu rằng đã đăng nhập lần đầu
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(user.getUid(), false);
-                editor.apply();
+                mSharedPreferencesManager.putBoolean(user.getUid(), false);
             }
 
             return isFirstTime;

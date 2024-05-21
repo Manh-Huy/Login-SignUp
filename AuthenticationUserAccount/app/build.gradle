@@ -3,6 +3,15 @@ plugins {
 }
 
 android {
+
+    signingConfigs {
+        release {
+            storeFile file('E:\\KNOWLEDGE\\Year04\\Sem2\\Mobile_Utils_Projects\\Capstone\\Login-SignUp\\AuthenticationUserAccount\\app\\keystore\\main_keystore.jks')
+            storePassword '123456'
+            keyPassword '123456'
+            keyAlias 'THK_Chill_Music_Corner'
+        }
+    }
     namespace 'com.example.authenticationuseraccount'
     compileSdk 34
 
@@ -20,6 +29,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {

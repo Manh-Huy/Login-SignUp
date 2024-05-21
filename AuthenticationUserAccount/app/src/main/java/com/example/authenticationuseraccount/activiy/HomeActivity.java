@@ -57,7 +57,6 @@ public class HomeActivity extends AppCompatActivity {
 
         //Quick Pick recycle view
         rcvQuickPick = findViewById(R.id.rcv_quick_pick);
-        rcvQuickPick.setHasFixedSize(true);
         rcvQuickPick.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         List<Song> listQuickPickSong = new ArrayList<>();
@@ -78,7 +77,6 @@ public class HomeActivity extends AppCompatActivity {
 
         //Recommend recycle view
         rcvRecommend = findViewById(R.id.rcv_recommend);
-        rcvRecommend.setHasFixedSize(true);
         rcvRecommend.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         ThumbnailSongAdapter recommendSongAdapter = new ThumbnailSongAdapter(getListSong());

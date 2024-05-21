@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Configure google Sign in
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(Constants.DEFAULT_WEB_CLIENT_ID)
                 .requestEmail()
                 .build();
 

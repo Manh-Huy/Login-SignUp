@@ -6,7 +6,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('E:\\KNOWLEDGE\\Year04\\Sem2\\Mobile_Utils_Projects\\Capstone\\Login-SignUp\\AuthenticationUserAccount\\app\\keystore\\main_keystore.jks')
+            storeFile file('D:\\OneDrive\\Desktop\\main_keystore.jks')
             storePassword '123456'
             keyPassword '123456'
             keyAlias 'THK_Chill_Music_Corner'
@@ -43,18 +43,30 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.firebase:firebase-core:21.1.1'
-    implementation 'com.google.firebase:firebase-auth:23.0.0'
-    implementation 'com.google.android.gms:play-services-auth:21.1.1'
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
     implementation 'me.relex:circleindicator:2.1.6'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    //Api Retrofit x Gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+
+    //Firebase
+    implementation 'com.google.firebase:firebase-core:21.1.1'
+    implementation 'com.google.firebase:firebase-auth:23.0.0'
+    implementation 'com.google.android.gms:play-services-auth:21.1.1'
+
+    //ExoPlayer Androidx.Media3
+    implementation 'androidx.media3:media3-exoplayer:1.0.0'
+    implementation 'androidx.media3:media3-ui:1.0.0'
+    implementation 'androidx.media3:media3-session:1.0.0'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.15.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.15.1'
+
 }
 apply plugin: 'com.google.gms.google-services'

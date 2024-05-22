@@ -6,7 +6,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('E:\\KNOWLEDGE\\Year04\\Sem2\\Mobile_Utils_Projects\\Capstone\\Login-SignUp\\AuthenticationUserAccount\\app\\keystore\\main_keystore.jks')
+            storeFile file('F:\\Push_In_Github\\Login-SignUp\\AuthenticationUserAccount\\app\\keystore\\main_keystore.jks')
             storePassword '123456'
             keyPassword '123456'
             keyAlias 'THK_Chill_Music_Corner'

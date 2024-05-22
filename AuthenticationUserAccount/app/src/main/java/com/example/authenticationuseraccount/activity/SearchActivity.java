@@ -1,4 +1,4 @@
-package com.example.authenticationuseraccount.activiy;
+package com.example.authenticationuseraccount.activity;
 
 import android.content.Context;
 import android.content.Intent;

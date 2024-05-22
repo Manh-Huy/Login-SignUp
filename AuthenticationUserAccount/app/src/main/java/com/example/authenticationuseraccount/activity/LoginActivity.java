@@ -1,4 +1,4 @@
-package com.example.authenticationuseraccount.activiy;
+package com.example.authenticationuseraccount.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.authenticationuseraccount.R;
@@ -40,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText inputEmail, inputPassword;
 
     private CheckBox checkBoxRememberMe;
+    private TextView textViewForgotPass;
     private FirebaseAuth mAuth;
 
     private static final String TAG = "GoogleActivity";
@@ -58,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         inputEmail = findViewById(R.id.editTextEmail);
         inputPassword = findViewById(R.id.editTextPassword);
         checkBoxRememberMe = findViewById(R.id.checkbox_remember_me);
+        textViewForgotPass = findViewById(R.id.textView_forgot_pass);
 
         Button btnLogin = findViewById(R.id.btnLogin);
         ImageView imageViewSignWithGoogle = findViewById(R.id.signWithGoogle);
@@ -99,6 +102,14 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                 startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
+
+        textViewForgotPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                startActivity(intent);
             }
         });
     }

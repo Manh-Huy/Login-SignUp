@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.model.Song;
 
@@ -17,6 +19,13 @@ import java.util.List;
 public class ThumbnailSongNewAdapter extends RecyclerView.Adapter<ThumbnailSongNewAdapter.ThumbnailSongNewViewHolder> {
 
     private List<Song> mSongs;
+
+    private Context mContext;
+
+    public ThumbnailSongNewAdapter(Context mContext,List<Song> mSongs) {
+        this.mSongs = mSongs;
+        this.mContext = mContext;
+    }
 
     public void setData(List<Song> list) {
         this.mSongs = list;
@@ -35,9 +44,12 @@ public class ThumbnailSongNewAdapter extends RecyclerView.Adapter<ThumbnailSongN
         Song song = mSongs.get(position);
         if (song == null) return;
 
-        holder.imgThumbnail.setImageResource(song.getImage());
-        holder.tvSongTitle.setText(song.getNameSong());
+        holder.tvSongTitle.setText(song.getName());
         holder.tvArtist.setText(song.getArtist());
+
+        Glide.with(mContext)
+                .load(song.getImageURL())
+                .into(holder.imgThumbnail);
     }
 
     @Override

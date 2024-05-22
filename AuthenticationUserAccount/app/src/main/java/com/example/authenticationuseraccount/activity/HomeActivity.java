@@ -21,7 +21,13 @@ import com.example.authenticationuseraccount.model.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.text.ParseException;
+
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -35,13 +41,18 @@ public class HomeActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private CircleIndicator circleIndicator;
     private BannerAdapter bannerAdapter;
-    private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend;
+    private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend, rcvNewRelease;
     private ImageView searchImageView, imgMenuIcon;
     private Disposable mDisposable;
-    private ThumbnailSongSmallAdapter mThumbnailSongSmallAdapter;
-    private ThumbnailSongAdapter mThumbnailSongAdapter;
+    private ThumbnailSongSmallAdapter mThumbnailSongSmallAdapter_QuickPick;
+    private ThumbnailSongAdapter mThumbnailSongAdapter_NewRelease;
+    private ThumbnailSongAdapter mThumbnailSongAdapter_ListenAgain;
+    private ThumbnailSongAdapter mThumbnailSongAdapter_Recommend;
     private ThumbnailSongNewAdapter mThumbnailSongNewAdapter;
     private List<Song> mListSong;
+    private List<Song> listSongQuickPick;
+    private List<Song> listNewReleaseSong;
+    private final int numberSongShowInQuickPick = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +71,16 @@ public class HomeActivity extends AppCompatActivity {
         rcvListenAgain.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rcvRecommend = findViewById(R.id.rcv_recommend);
         rcvRecommend.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rcvNewRelease = findViewById(R.id.rcv_new_release);
+        rcvNewRelease.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
 
         mListSong = new ArrayList<>();
-        mThumbnailSongSmallAdapter = new ThumbnailSongSmallAdapter(HomeActivity.this,mListSong);
-        mThumbnailSongAdapter = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
+        mThumbnailSongSmallAdapter_QuickPick = new ThumbnailSongSmallAdapter(HomeActivity.this,mListSong);
+        mThumbnailSongAdapter_NewRelease = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
+        mThumbnailSongAdapter_ListenAgain = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
+        mThumbnailSongAdapter_Recommend = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
+
         mThumbnailSongNewAdapter = new ThumbnailSongNewAdapter(HomeActivity.this, mListSong);
 
         //Banner
@@ -124,12 +141,19 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onComplete() {
                         LogUtils.d("Call api success");
-                        mThumbnailSongSmallAdapter.setData(mListSong);
+                        listSongQuickPick = takeMusicWithHighView(numberSongShowInQuickPick, mListSong);
+                        listNewReleaseSong = takeNewReLeaseMusic(mListSong);
+
+                        mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
+                        mThumbnailSongAdapter_NewRelease.setData(listNewReleaseSong);
+                        mThumbnailSongAdapter_ListenAgain.setData(mListSong);
+                        mThumbnailSongAdapter_Recommend.setData(mListSong);
                         //mThumbnailSongNewAdapter.setData(mListSong);
-                        mThumbnailSongAdapter.setData(mListSong);
-                        rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter);
-                        rcvRecommend.setAdapter(mThumbnailSongAdapter);
-                        rcvListenAgain.setAdapter(mThumbnailSongAdapter);
+
+                        rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter_QuickPick);
+                        rcvNewRelease.setAdapter(mThumbnailSongAdapter_NewRelease);
+                        rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
+                        rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
                     }
                 });
     }
@@ -141,4 +165,46 @@ public class HomeActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
+
+    private List<Song> takeMusicWithHighView(int numberSong, List<Song> listSong) {
+        Collections.sort(listSong, new Comparator<Song>() {
+            @Override
+            public int compare(Song s1, Song s2) {
+                int views1 = Integer.parseInt(s1.getViews());
+                int views2 = Integer.parseInt(s2.getViews());
+                return Integer.compare(views2, views1);
+            }
+        });
+
+        List<Song> topSongs = new ArrayList<>();
+        for (int i = 0; i < numberSong && i < listSong.size(); i++) {
+            topSongs.add(listSong.get(i));
+        }
+
+        return topSongs;
+    }
+
+    private List<Song> takeNewReLeaseMusic(List<Song> listSong) {
+        List<Song> newReleaseSongs = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date currentDate = new Date();
+
+        for (Song song : listSong) {
+            try {
+                Date createdAtDate = sdf.parse(song.getCreatedAt());
+                long diffInMillies = Math.abs(currentDate.getTime() - createdAtDate.getTime());
+                long diffInDays = diffInMillies / (1000 * 60 * 60 * 24);
+
+                // Kiểm tra nếu ngày phát hành trong vòng 7 ngày
+                if (diffInDays <= 7) {
+                    newReleaseSongs.add(song);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return newReleaseSongs;
+    }
+
 }

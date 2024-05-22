@@ -1,6 +1,8 @@
 package com.example.authenticationuseraccount.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.model.Song;
 
 import java.util.List;
@@ -51,6 +54,16 @@ public class ThumbnailSongSmallAdapter extends RecyclerView.Adapter<ThumbnailSon
                 .load(song.getImageURL())
                 .into(holder.imgThumbnail);
 
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent =new Intent(mContext, MediaPlayerActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("SongObject", song);
+                intent.putExtras(bundle);
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -60,6 +61,7 @@ public class HomeActivity extends AppCompatActivity {
         rcvListenAgain.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rcvRecommend = findViewById(R.id.rcv_recommend);
         rcvRecommend.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
 
         mListSong = new ArrayList<>();
         mThumbnailSongSmallAdapter = new ThumbnailSongSmallAdapter(HomeActivity.this,mListSong);

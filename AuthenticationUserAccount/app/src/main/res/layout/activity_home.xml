@@ -89,6 +89,24 @@
                 android:layout_marginBottom="8dp" />
 
             <TextView
+                android:id="@+id/txt_genre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="23dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="Genres"
+                android:textSize="24dp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcv_genre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
                 android:id="@+id/txt_new_release"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -138,11 +156,7 @@
                 android:id="@+id/rcv_recommend"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_marginHorizontal="8dp"
-                />
+                android:layout_marginHorizontal="8dp" />
         </LinearLayout>
-
-
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

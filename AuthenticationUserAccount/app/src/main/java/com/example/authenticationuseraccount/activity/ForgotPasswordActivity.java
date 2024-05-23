@@ -12,14 +12,27 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.Song;
+import com.example.authenticationuseraccount.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class ForgotPasswordActivity extends AppCompatActivity {
+import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
+public class ForgotPasswordActivity extends AppCompatActivity {
+    private Disposable mDisposable;
     private Button btnSendEmail;
     private EditText inputEmail;
+    private List<User> mListUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,16 +49,56 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
                 }
-                else
-                {
-                    sendEmailToResetPassword(email);
-                    Intent intent = new Intent(ForgotPasswordActivity.this, EmailConfirmActivity.class);
-                    startActivity(intent);
-                    finish();
+                else if (!isValidEmail(email)) {
+                    Toast.makeText(getApplicationContext(), "Invalid email address!", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    getListUserAndCheckEmail(email);
                 }
 
             }
         });
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email.matches(emailPattern);
+    }
+
+    private void getListUserAndCheckEmail(String email)
+    {
+        ApiService.apiService.getUsers()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<User>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<User> users) {
+                        mListUser = users;
+                        if (isEmailRegistered(mListUser, email)) {
+                            sendEmailToResetPassword(email);
+                            Intent intent = new Intent(ForgotPasswordActivity.this, EmailConfirmActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "No account associated with this email.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.e("Call api user error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.d("Call api user success");
+                    }
+                });
     }
 
     private void sendEmailToResetPassword(String email)
@@ -61,4 +114,21 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     }
                 });
     }
+    private boolean isEmailRegistered(List<User> userList, String email) {
+        for (User user : userList) {
+            if ("Email".equals(user.getSignInMethod()) && email.equals(user.getEmail())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
+        super.onDestroy();
+    }
+
 }

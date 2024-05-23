@@ -6,17 +6,20 @@ import android.view.View;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.BannerAdapter;
+import com.example.authenticationuseraccount.adapter.ThumbnailGenreAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailSongAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailSongNewAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailSongSmallAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.Genre;
 import com.example.authenticationuseraccount.model.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 
@@ -41,14 +44,16 @@ public class HomeActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private CircleIndicator circleIndicator;
     private BannerAdapter bannerAdapter;
-    private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend, rcvNewRelease;
+    private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend, rcvNewRelease, rcvGenre;
     private ImageView searchImageView, imgMenuIcon;
     private Disposable mDisposable;
     private ThumbnailSongSmallAdapter mThumbnailSongSmallAdapter_QuickPick;
     private ThumbnailSongAdapter mThumbnailSongAdapter_NewRelease;
+    private ThumbnailGenreAdapter mThumbnailGenreAdapter;
     private ThumbnailSongAdapter mThumbnailSongAdapter_ListenAgain;
     private ThumbnailSongAdapter mThumbnailSongAdapter_Recommend;
     private ThumbnailSongNewAdapter mThumbnailSongNewAdapter;
+    private List<Genre> mLisGenre;
     private List<Song> mListSong;
     private List<Song> listSongQuickPick;
     private List<Song> listNewReleaseSong;
@@ -64,6 +69,8 @@ public class HomeActivity extends AppCompatActivity {
         circleIndicator = findViewById(R.id.circleIndicator);
         searchImageView = findViewById(R.id.searchIcon);
 
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+
         //Recycle View
         rcvQuickPick = findViewById(R.id.rcv_quick_pick);
         rcvQuickPick.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -73,13 +80,15 @@ public class HomeActivity extends AppCompatActivity {
         rcvRecommend.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rcvNewRelease = findViewById(R.id.rcv_new_release);
         rcvNewRelease.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
+        rcvGenre = findViewById(R.id.rcv_genre);
+        rcvGenre.setLayoutManager(gridLayoutManager);
 
         mListSong = new ArrayList<>();
         mThumbnailSongSmallAdapter_QuickPick = new ThumbnailSongSmallAdapter(HomeActivity.this,mListSong);
         mThumbnailSongAdapter_NewRelease = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
         mThumbnailSongAdapter_ListenAgain = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
         mThumbnailSongAdapter_Recommend = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
+        mThumbnailGenreAdapter = new ThumbnailGenreAdapter(HomeActivity.this, mLisGenre);
 
         mThumbnailSongNewAdapter = new ThumbnailSongNewAdapter(HomeActivity.this, mListSong);
 
@@ -107,6 +116,21 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         getListSong();
+    }
+
+    private List<Genre> geListGenre()
+    {
+        List<Genre> list = new ArrayList<>();
+        list.add(new Genre("01", "Nhạc Trẻ"));
+        list.add(new Genre("02", "Trữ Tình"));
+        list.add(new Genre("03", "Remix Việt"));
+        list.add(new Genre("04", "Rap Việt"));
+        list.add(new Genre("05", "Tiền Chiến"));
+        list.add(new Genre("06", "Nhạc Trịnh"));
+        list.add(new Genre("07", "Rock Việt"));
+        list.add(new Genre("08", "Cách Mạng"));
+
+        return list;
     }
 
     private List<Banner> getListBanner() {
@@ -143,17 +167,21 @@ public class HomeActivity extends AppCompatActivity {
                         LogUtils.d("Call api success");
                         listSongQuickPick = takeMusicWithHighView(numberSongShowInQuickPick, mListSong);
                         listNewReleaseSong = takeNewReLeaseMusic(mListSong);
+                        mLisGenre = geListGenre();
 
                         mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
                         mThumbnailSongAdapter_NewRelease.setData(listNewReleaseSong);
+                        mThumbnailGenreAdapter.setData(mLisGenre);
                         mThumbnailSongAdapter_ListenAgain.setData(mListSong);
                         mThumbnailSongAdapter_Recommend.setData(mListSong);
                         //mThumbnailSongNewAdapter.setData(mListSong);
 
                         rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter_QuickPick);
                         rcvNewRelease.setAdapter(mThumbnailSongAdapter_NewRelease);
+                        rcvGenre.setAdapter(mThumbnailGenreAdapter);
                         rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
                         rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
+
                     }
                 });
     }

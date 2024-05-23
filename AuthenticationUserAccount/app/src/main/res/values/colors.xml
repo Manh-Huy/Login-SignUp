@@ -4,4 +4,14 @@
     <color name="white">#FFFFFFFF</color>
     <color name="navigationBarColor">#9BE6F1</color>
     <color name="statusBarColor">#9BE6F1</color>
+
+    <array name="rainbow_colors">
+        <item>#FF0000</item> <!-- Đỏ -->
+        <item>#FF7F00</item> <!-- Cam đậm -->
+        <item>#FFFF00</item> <!-- Vàng -->
+        <item>#00FF00</item> <!-- Lục -->
+        <item>#0000FF</item> <!-- Lam -->
+        <item>#4B0082</item> <!-- Chàm -->
+        <item>#9400D3</item> <!-- Tím -->
+    </array>
 </resources>

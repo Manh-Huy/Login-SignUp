@@ -65,4 +65,7 @@ public interface ApiService {
 
     @POST("users")
     Call<User> addUser(@Body User user);
+
+    @GET("users")
+    Observable<List<User>> getUsers();
 }

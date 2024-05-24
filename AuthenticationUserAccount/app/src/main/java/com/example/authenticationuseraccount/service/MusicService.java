@@ -1,23 +1,31 @@
 package com.example.authenticationuseraccount.service;
 
-import android.app.Service;
-import android.content.Context;
+import static com.example.authenticationuseraccount.MyApplication.CHANNEL_ID;
+
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
-import android.media.browse.MediaBrowser;
-import android.os.IBinder;
+import android.graphics.Bitmap;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
+import androidx.media3.session.MediaNotification;
 import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaSessionService;
+import androidx.media3.ui.PlayerNotificationManager;
 
+import com.example.authenticationuseraccount.activity.MainActivity;
+import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
+
+@UnstableApi
 public class MusicService extends MediaSessionService {
     private ExoPlayer mPlayer;
-    private MediaSession mediaSession = null;
+    private MediaSession mediaSession ;
 
     @UnstableApi
     @Override
@@ -30,8 +38,18 @@ public class MusicService extends MediaSessionService {
                 .setTrackSelector(new DefaultTrackSelector(this))
                 .build();
 
-        mediaSession = new MediaSession.Builder(this, mPlayer).build();
+        
 
+        Intent intent = new Intent(this, MediaPlayerActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        mediaSession = new MediaSession.Builder(this, mPlayer)
+                .setSessionActivity(pendingIntent)
+                .build();
+
+
+        //setMediaNotificationProvider();
     }
 
     @Override
@@ -39,9 +57,6 @@ public class MusicService extends MediaSessionService {
         super.onStartCommand(intent, flags, startId);
         if (intent != null && intent.hasExtra("mp3Url")) {
             String mp3Url = intent.getStringExtra("mp3Url");
-            // Here, you can use ExoPlayer to play the song from the provided URL
-            // Example: mPlayer.setMediaItem(MediaItem.fromUri(mp3Url));
-            // Make sure to handle buffering, playback state, etc.
             MediaItem mediaItem = MediaItem.fromUri(mp3Url);
             MediaItem mediaItem2 = MediaItem.fromUri("https://drive.google.com/uc?id=1syP2bZhjIxuUW32kxoXY_HnC1mgdgw79&export=download");
             mPlayer.addMediaItem(mediaItem);
@@ -65,4 +80,6 @@ public class MusicService extends MediaSessionService {
         mediaSession = null;
         super.onDestroy();
     }
+
+
 }

@@ -31,7 +31,7 @@
         android:id="@+id/instructionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Please click the button below to continue the registration operation account."
+        android:text="Click the button below to continue the registration"
         android:textSize="16sp"
         android:maxLines="2"
         android:gravity="center"

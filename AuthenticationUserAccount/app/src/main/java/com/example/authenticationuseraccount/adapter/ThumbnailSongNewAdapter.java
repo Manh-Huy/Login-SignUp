@@ -8,23 +8,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
 import com.example.authenticationuseraccount.model.Song;
 
 import java.util.List;
 
 public class ThumbnailSongNewAdapter extends RecyclerView.Adapter<ThumbnailSongNewAdapter.ThumbnailSongNewViewHolder> {
-
+    private IClickSongRecyclerViewListener iClickSongRecyclerViewListener;
     private List<Song> mSongs;
 
     private Context mContext;
 
-    public ThumbnailSongNewAdapter(Context mContext,List<Song> mSongs) {
+    public ThumbnailSongNewAdapter(Context mContext,List<Song> mSongs, IClickSongRecyclerViewListener listener) {
         this.mSongs = mSongs;
         this.mContext = mContext;
+        this.iClickSongRecyclerViewListener = listener;
     }
 
     public void setData(List<Song> list) {
@@ -50,6 +53,13 @@ public class ThumbnailSongNewAdapter extends RecyclerView.Adapter<ThumbnailSongN
         Glide.with(mContext)
                 .load(song.getImageURL())
                 .into(holder.imgThumbnail);
+
+        holder.layoutItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iClickSongRecyclerViewListener.onClickItemSong(song);
+            }
+        });
     }
 
     @Override
@@ -61,12 +71,13 @@ public class ThumbnailSongNewAdapter extends RecyclerView.Adapter<ThumbnailSongN
     }
 
     public static class ThumbnailSongNewViewHolder extends RecyclerView.ViewHolder {
-
+        CardView layoutItem;
         private ImageView imgThumbnail;
         private TextView tvSongTitle, tvArtist;
 
         public ThumbnailSongNewViewHolder(@NonNull View itemView) {
             super(itemView);
+            layoutItem = itemView.findViewById(R.id.layout_item);
             imgThumbnail = itemView.findViewById(R.id.img_thumbnail);
             tvSongTitle = itemView.findViewById(R.id.tv_song_title);
             tvArtist = itemView.findViewById(R.id.tv_artist);

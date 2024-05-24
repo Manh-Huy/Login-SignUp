@@ -10,11 +10,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
+import com.example.authenticationuseraccount.model.Song;
 import com.example.authenticationuseraccount.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -39,6 +41,38 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // take and show song object
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle == null)
+        {
+            return;
+        }
+        Song song = (Song) bundle.get("object_song");
+
+        TextView tvCreatedAt = findViewById(R.id.tvCreatedAt);
+        TextView tvArtist = findViewById(R.id.tvArtist);
+        TextView tvAlbum = findViewById(R.id.tvAlbum);
+        TextView tvImageURL = findViewById(R.id.tvImageURL);
+        TextView tvName = findViewById(R.id.tvName);
+        TextView tvGenre = findViewById(R.id.tvGenre);
+        TextView tvSongID = findViewById(R.id.tvSongID);
+        TextView tvViews = findViewById(R.id.tvViews);
+        TextView tvSongURL = findViewById(R.id.tvSongURL);
+
+
+        tvCreatedAt.setText("Created At: " + song.getCreatedAt());
+        tvArtist.setText("Artist: " + song.getArtist());
+        tvAlbum.setText("Album: " + song.getAlbum());
+        tvImageURL.setText("Image URL: " + song.getImageURL());
+        tvName.setText("Name: " + song.getName());
+        tvGenre.setText("Genre: " + song.getGenre());
+        tvSongID.setText("Song ID: " + song.getSongID());
+        tvViews.setText("Views: " + song.getViews());
+        tvSongURL.setText("Song URL: " + song.getSongURL());
+
+
+        // Logout function
         Button btnSignOut = findViewById(R.id.btnSignout);
         Button btnSignOutWithGoogle = findViewById(R.id.btnSignOutWithGoogle);
         Button btnDisconnect = findViewById(R.id.btnDisconnect);

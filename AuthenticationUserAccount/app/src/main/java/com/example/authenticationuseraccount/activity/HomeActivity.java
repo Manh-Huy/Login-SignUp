@@ -20,6 +20,8 @@ import com.example.authenticationuseraccount.adapter.ThumbnailSongSmallAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.Genre;
+import com.example.authenticationuseraccount.model.IClickGenreRecyclerViewListener;
+import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
 import com.example.authenticationuseraccount.model.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 
@@ -48,11 +50,10 @@ public class HomeActivity extends AppCompatActivity {
     private ImageView searchImageView, imgMenuIcon;
     private Disposable mDisposable;
     private ThumbnailSongSmallAdapter mThumbnailSongSmallAdapter_QuickPick;
-    private ThumbnailSongAdapter mThumbnailSongAdapter_NewRelease;
     private ThumbnailGenreAdapter mThumbnailGenreAdapter;
     private ThumbnailSongAdapter mThumbnailSongAdapter_ListenAgain;
     private ThumbnailSongAdapter mThumbnailSongAdapter_Recommend;
-    private ThumbnailSongNewAdapter mThumbnailSongNewAdapter;
+    private ThumbnailSongNewAdapter mThumbnailSongNewAdapter_NewRelease;
     private List<Genre> mLisGenre;
     private List<Song> mListSong;
     private List<Song> listSongQuickPick;
@@ -84,13 +85,43 @@ public class HomeActivity extends AppCompatActivity {
         rcvGenre.setLayoutManager(gridLayoutManager);
 
         mListSong = new ArrayList<>();
-        mThumbnailSongSmallAdapter_QuickPick = new ThumbnailSongSmallAdapter(HomeActivity.this,mListSong);
-        mThumbnailSongAdapter_NewRelease = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
-        mThumbnailSongAdapter_ListenAgain = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
-        mThumbnailSongAdapter_Recommend = new ThumbnailSongAdapter(HomeActivity.this, mListSong);
-        mThumbnailGenreAdapter = new ThumbnailGenreAdapter(HomeActivity.this, mLisGenre);
+        mThumbnailSongSmallAdapter_QuickPick = new ThumbnailSongSmallAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
+            @Override
+            public void onClickItemSong(Song song) {
+                onClickGoToMP3Player(song);
+            }
+        });
+        mThumbnailSongNewAdapter_NewRelease = new ThumbnailSongNewAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
+            @Override
+            public void onClickItemSong(Song song) {
+                onClickGoToMP3Player(song);
+            }
+        });
+        mThumbnailSongAdapter_ListenAgain = new ThumbnailSongAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
+            @Override
+            public void onClickItemSong(Song song) {
+                onClickGoToMP3Player(song);
+            }
+        });
+        mThumbnailSongAdapter_Recommend = new ThumbnailSongAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
+            @Override
+            public void onClickItemSong(Song song) {
+                onClickGoToMP3Player(song);
+            }
+        });
+        mThumbnailGenreAdapter = new ThumbnailGenreAdapter(HomeActivity.this, mLisGenre, new IClickGenreRecyclerViewListener() {
+            @Override
+            public void onClickItemGenre(Genre genre) {
 
-        mThumbnailSongNewAdapter = new ThumbnailSongNewAdapter(HomeActivity.this, mListSong);
+            }
+        });
+
+//        mThumbnailSongNewAdapter = new ThumbnailSongNewAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
+//            @Override
+//            public void onClickItemSong(Song song) {
+//                onClickGoToMP3Player(song);
+//            }
+//        });
 
         //Banner
         bannerAdapter = new BannerAdapter(this, getListBanner());
@@ -170,14 +201,13 @@ public class HomeActivity extends AppCompatActivity {
                         mLisGenre = geListGenre();
 
                         mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
-                        mThumbnailSongAdapter_NewRelease.setData(listNewReleaseSong);
+                        mThumbnailSongNewAdapter_NewRelease.setData(listNewReleaseSong);
                         mThumbnailGenreAdapter.setData(mLisGenre);
                         mThumbnailSongAdapter_ListenAgain.setData(mListSong);
                         mThumbnailSongAdapter_Recommend.setData(mListSong);
-                        //mThumbnailSongNewAdapter.setData(mListSong);
 
                         rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter_QuickPick);
-                        rcvNewRelease.setAdapter(mThumbnailSongAdapter_NewRelease);
+                        rcvNewRelease.setAdapter(mThumbnailSongNewAdapter_NewRelease);
                         rcvGenre.setAdapter(mThumbnailGenreAdapter);
                         rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
                         rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
@@ -233,6 +263,13 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         return newReleaseSongs;
+    }
+    private void onClickGoToMP3Player(Song song) {
+        Intent intent = new Intent(this, MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("object_song", song);
+        intent.putExtras(bundle);
+        this.startActivity(intent);
     }
 
 }

@@ -14,17 +14,16 @@ import android.widget.Toast;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
-import com.example.authenticationuseraccount.model.Song;
 import com.example.authenticationuseraccount.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -41,6 +40,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         btnSendEmail = findViewById(R.id.btnSendEmail);
         inputEmail = findViewById(R.id.editTextEmail);
+        mListUser = new ArrayList<>();
 
         btnSendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,14 +79,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     @Override
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<User> users) {
                         mListUser = users;
-                        if (isEmailRegistered(mListUser, email)) {
-                            sendEmailToResetPassword(email);
-                            Intent intent = new Intent(ForgotPasswordActivity.this, EmailConfirmActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(getApplicationContext(), "No account associated with this email.", Toast.LENGTH_LONG).show();
-                        }
                     }
 
                     @Override
@@ -97,6 +89,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     @Override
                     public void onComplete() {
                         LogUtils.d("Call api user success");
+                        if (isEmailRegistered(mListUser, email)) {
+                            sendEmailToResetPassword(email);
+                            Intent intent = new Intent(ForgotPasswordActivity.this, EmailConfirmActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "No account associated with this email.", Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
     }

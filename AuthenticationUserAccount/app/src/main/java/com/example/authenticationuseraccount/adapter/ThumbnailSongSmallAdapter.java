@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
 import com.example.authenticationuseraccount.model.Song;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class ThumbnailSongSmallAdapter extends RecyclerView.Adapter<ThumbnailSon
 
     private List<Song> mSongs;
     private Context mContext;
+    private IClickSongRecyclerViewListener iClickSongRecyclerViewListener;
 
 
     public void setData(List<Song> list) {
@@ -27,9 +30,10 @@ public class ThumbnailSongSmallAdapter extends RecyclerView.Adapter<ThumbnailSon
         notifyDataSetChanged();
     }
 
-    public ThumbnailSongSmallAdapter(Context mContext, List<Song> mListSong) {
+    public ThumbnailSongSmallAdapter(Context mContext, List<Song> mListSong, IClickSongRecyclerViewListener listener) {
         this.mSongs = mSongs;
         this.mContext = mContext;
+        this.iClickSongRecyclerViewListener =listener;
     }
 
     @NonNull
@@ -51,6 +55,13 @@ public class ThumbnailSongSmallAdapter extends RecyclerView.Adapter<ThumbnailSon
                 .load(song.getImageURL())
                 .into(holder.imgThumbnail);
 
+        holder.layoutItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iClickSongRecyclerViewListener.onClickItemSong(song);
+            }
+        });
+
     }
 
     @Override
@@ -63,11 +74,13 @@ public class ThumbnailSongSmallAdapter extends RecyclerView.Adapter<ThumbnailSon
 
     public static class ThumbnailSongSmallViewHolder extends RecyclerView.ViewHolder {
 
+        private LinearLayout layoutItem;
         private ImageView imgThumbnail;
         private TextView tvSongTitle, tvArtist;
 
         public ThumbnailSongSmallViewHolder(@NonNull View itemView) {
             super(itemView);
+            layoutItem = itemView.findViewById(R.id.layout_item);
             imgThumbnail = itemView.findViewById(R.id.img_thumbnail);
             tvSongTitle = itemView.findViewById(R.id.tv_song_title);
             tvArtist = itemView.findViewById(R.id.tv_artist);

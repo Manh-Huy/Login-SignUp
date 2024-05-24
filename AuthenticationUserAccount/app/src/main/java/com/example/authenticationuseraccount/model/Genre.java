@@ -1,6 +1,8 @@
 package com.example.authenticationuseraccount.model;
 
-public class Genre {
+import java.io.Serializable;
+
+public class Genre implements Serializable {
     private String genreID;
     private String name;
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,18 +12,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.model.Genre;
+import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
+import com.example.authenticationuseraccount.model.IClickGenreRecyclerViewListener;
+
 
 import java.util.List;
 
 public class ThumbnailGenreAdapter extends RecyclerView.Adapter<ThumbnailGenreAdapter.ThumbnailGenreViewHolder> {
-
+    private IClickGenreRecyclerViewListener iClickGenreRecyclerViewListener;
     private List<Genre> mGenres;
     private Context mContext;
 
-    public ThumbnailGenreAdapter(Context mcontext, List<Genre> mGenres)
+    public ThumbnailGenreAdapter(Context mcontext, List<Genre> mGenres, IClickGenreRecyclerViewListener listener)
     {
         this.mContext = mcontext;
         this.mGenres = mGenres;
+        this.iClickGenreRecyclerViewListener = listener;
     }
     public void setData(List<Genre> list) {
         this.mGenres = list;
@@ -43,6 +48,13 @@ public class ThumbnailGenreAdapter extends RecyclerView.Adapter<ThumbnailGenreAd
             return;
         }
         holder.tvGenreName.setText(genre.getName());
+
+        holder.layoutItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iClickGenreRecyclerViewListener.onClickItemGenre(genre);
+            }
+        });
     }
 
     @Override
@@ -55,11 +67,12 @@ public class ThumbnailGenreAdapter extends RecyclerView.Adapter<ThumbnailGenreAd
     }
 
     public static class ThumbnailGenreViewHolder extends RecyclerView.ViewHolder {
-
+        private LinearLayout layoutItem;
         private TextView tvGenreName;
 
         public ThumbnailGenreViewHolder(@NonNull View itemView) {
             super(itemView);
+            layoutItem = itemView.findViewById(R.id.layout_item);
             tvGenreName = itemView.findViewById(R.id.tv_genre_name);
 
         }

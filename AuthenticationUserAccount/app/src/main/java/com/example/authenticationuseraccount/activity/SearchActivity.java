@@ -65,6 +65,8 @@ public class SearchActivity extends AppCompatActivity {
         });
         searchRecycleView.setAdapter(searchSongAdapter);
 
+        DataLocalManager.mergeLocalWithAccountHistorySearch();
+
         showSearchHistory();
 
         getSong();

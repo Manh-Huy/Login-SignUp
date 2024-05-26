@@ -6,11 +6,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class DataLocalManager {
     private static final String PREF_REMEMBER_ME_ACCOUNT = "PREF_REMEMBER_ME_ACCOUNT";
-    private static String PREF_HISTORY_SEARCH = "PREF_HISTORY_SEARCH";
+    private static final String PREF_HISTORY_SEARCH = "PREF_HISTORY_SEARCH";
     private static DataLocalManager instance;
     private MySharedPreferences mySharedPreferences;
 
@@ -55,5 +56,26 @@ public class DataLocalManager {
         instance.updateHistorySearchKey();
 
         return instance.mySharedPreferences.getStringSetValue(instance.historySearchKey);
+    }
+    public static void mergeLocalWithAccountHistorySearch() {
+        DataLocalManager instance = DataLocalManager.getInstance();
+        instance.updateHistorySearchKey();
+
+        if (!Objects.equals(instance.historySearchKey, PREF_HISTORY_SEARCH))
+        {
+            Set<String> searchLocalItems = instance.mySharedPreferences.getStringSetValue(PREF_HISTORY_SEARCH);
+            Set<String> searchItems = instance.mySharedPreferences.getStringSetValue(instance.historySearchKey);
+
+            if (searchLocalItems != null && !searchLocalItems.isEmpty()) {
+                if (searchItems == null) {
+                    searchItems = new HashSet<>();
+                }
+                searchItems.addAll(searchLocalItems);
+                instance.mySharedPreferences.putStringSetValue(instance.historySearchKey, searchItems);
+
+                // Clear local history after merging
+                //instance.mySharedPreferences.putStringSetValue(PREF_HISTORY_SEARCH, new HashSet<>());
+            }
+        }
     }
 }

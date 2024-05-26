@@ -48,6 +48,9 @@ public class SplashScreenActivity extends AppCompatActivity {
             {
                 signOut();
             }
+            else {
+                Toast.makeText(this, "Chua dang nhap", Toast.LENGTH_SHORT).show();
+            }
         }
         continueToHomeActivity();
     }

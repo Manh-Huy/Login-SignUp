@@ -120,12 +120,12 @@ public class HomeActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        LogUtils.e("Call api error");
+                        LogUtils.ApplicationLogE("Call api error");
                     }
 
                     @Override
                     public void onComplete() {
-                        LogUtils.d("Call api success");
+                        LogUtils.ApplicationLogD("Call api success");
                         mThumbnailSongSmallAdapter.setData(mListSong);
                         //mThumbnailSongNewAdapter.setData(mListSong);
                         mThumbnailSongAdapter.setData(mListSong);

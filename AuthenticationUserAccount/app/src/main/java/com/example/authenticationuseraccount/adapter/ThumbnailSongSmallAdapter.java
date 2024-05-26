@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.util.UnstableApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -55,6 +56,7 @@ public class ThumbnailSongSmallAdapter extends RecyclerView.Adapter<ThumbnailSon
                 .into(holder.imgThumbnail);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @UnstableApi
             @Override
             public void onClick(View v) {
                 Intent intent =new Intent(mContext, MediaPlayerActivity.class);

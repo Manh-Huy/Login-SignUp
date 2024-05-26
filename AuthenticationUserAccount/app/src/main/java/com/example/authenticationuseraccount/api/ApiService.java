@@ -31,8 +31,6 @@ public interface ApiService {
         try {
             Request request = chain.request();
             Request.Builder builder = request.newBuilder();
-            //builder.addHeader("Authorization", "$2y$10$XU3bOvadsf8Ej04v15y8Zf4x6u3uoBR6ijnSnkpZ7yDYIxP9eho2pFVUK");
-            builder.addHeader("X-RapidAPI-Key", "da020d06f1msh1114f6a17c51777p1f97a0jsn5dbd05d5fc6f");
             return chain.proceed(builder.build());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -43,8 +41,8 @@ public interface ApiService {
             .setLevel(HttpLoggingInterceptor.Level.BODY);
 
     OkHttpClient.Builder okBuilder = new OkHttpClient.Builder()
-            .readTimeout(30, TimeUnit.SECONDS)
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(7, TimeUnit.SECONDS)
+            .connectTimeout(7, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
             //.addInterceptor(interceptor)
             .addInterceptor(loggingIntercepter);

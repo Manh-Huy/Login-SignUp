@@ -1,27 +1,41 @@
 package com.example.authenticationuseraccount.activity;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.Button;
+import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
-import androidx.media3.ui.PlayerControlView;
-import androidx.media3.ui.PlayerView;
+import androidx.palette.graphics.Palette;
+import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.adapter.DiscViewPagerAdapter;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.fragment.DiscFragment;
 import com.example.authenticationuseraccount.model.Song;
 import com.example.authenticationuseraccount.service.MusicService;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -34,14 +48,18 @@ import java.util.concurrent.ExecutionException;
 public class MediaPlayerActivity extends AppCompatActivity {
     Song mSong;
     private MediaController mediaController;
-    private Button playButton;
-    private Button pauseButton;
+
+    public static DiscViewPagerAdapter adapterDisc;
+
+    ViewPager viewPagerDisc;
     private SeekBar seekBar;
 
-    Boolean isSeekBarSetMax;
+    private TextView tvDurationPlayed, tvDurationTotal, tvSongName, tvArtistName;
+    private ImageView imgCoverArt, imgShuffle, imgPrev, imgPlayPause, imgNext, imgRepeat;
 
-    private TextView tvDurationPlayed, tvDurationTotal;
-    private boolean isSeeking = false;
+    private DiscFragment discFragment;
+
+    private boolean isSeekBarSetMax, isSeeking;
     private Handler handler = new Handler();
     SimpleDateFormat mFormatTime = new SimpleDateFormat("mm:ss");
 
@@ -50,21 +68,125 @@ public class MediaPlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media_player);
 
-        playButton = findViewById(R.id.play_button);
-        pauseButton = findViewById(R.id.pause_button);
-        seekBar = findViewById(R.id.seek_bar);
-        tvDurationTotal = findViewById(R.id.tv_duration_total);
-        tvDurationPlayed = findViewById(R.id.tv_duration_played);
-
-        isSeekBarSetMax = false;
+        initView();
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             mSong = (Song) bundle.getSerializable("SongObject");
             if (mSong != null) {
-                LogUtils.d(mSong.getSongURL());
+                handleSongMetaData(mSong);
             }
         }
+    }
+
+    private void handleSongMetaData(Song song) {
+        tvSongName.setText(song.getName());
+        tvArtistName.setText(song.getArtist());
+        Glide.with(this)
+                .asBitmap()
+                .load(song.getImageURL())
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
+                            @Override
+                            public void onGenerated(@Nullable Palette palette) {
+                                Palette.Swatch swatch = palette.getDominantSwatch();
+                                if (swatch != null) {
+                                    ImageView gredient = findViewById(R.id.imageViewGredient);
+                                    NestedScrollView mContainer = findViewById(R.id.mContainer);
+                                    gredient.setBackgroundResource(R.drawable.gredient_bg);
+                                    mContainer.setBackgroundResource(R.drawable.main_bg);
+                                    GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+                                            new int[]{swatch.getRgb(), 0x00000000});
+                                    gredient.setBackground(gradientDrawable);
+                                    GradientDrawable gradientDrawableBg = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+                                            new int[]{swatch.getRgb(), swatch.getRgb()});
+                                    mContainer.setBackground(gradientDrawableBg);
+                                    tvSongName.setTextColor(swatch.getTitleTextColor());
+                                    tvArtistName.setTextColor(swatch.getBodyTextColor());
+                                } else {
+                                    ImageView gredient = findViewById(R.id.imageViewGredient);
+                                    NestedScrollView mContainer = findViewById(R.id.mContainer);
+                                    gredient.setBackgroundResource(R.drawable.gredient_bg);
+                                    mContainer.setBackgroundResource(R.drawable.main_bg);
+                                    GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+                                            new int[]{0xff000000, 0x00000000});
+                                    gredient.setBackground(gradientDrawable);
+                                    GradientDrawable gradientDrawableBg = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+                                            new int[]{0xff000000, 0xff000000});
+                                    mContainer.setBackground(gradientDrawableBg);
+                                    tvSongName.setTextColor(Color.WHITE);
+                                    tvArtistName.setTextColor(Color.DKGRAY);
+                                }
+                                ImageAnimation(MediaPlayerActivity.this,resource);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                    }
+                });
+    }
+
+    public void ImageAnimation(Context context, Bitmap bitmap) {
+        Animation animOut = AnimationUtils.loadAnimation(context, android.R.anim.fade_out);
+        Animation animIn = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
+        animOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                discFragment.setAnim(context, bitmap);
+                animIn.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                    }
+                });
+                discFragment.startAnimation(animIn);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+        discFragment.startAnimation(animOut);
+    }
+    private void initView() {
+        viewPagerDisc = findViewById(R.id.viewPagerdianhac);
+        tvSongName = findViewById(R.id.tv_song_name);
+        tvArtistName = findViewById(R.id.tv_song_artist);
+        tvDurationTotal = findViewById(R.id.tv_duration_total);
+        tvDurationPlayed = findViewById(R.id.tv_duration_played);
+        seekBar = findViewById(R.id.seekBar);
+        imgNext = findViewById(R.id.img_next);
+        imgPrev = findViewById(R.id.img_prev);
+        imgRepeat = findViewById(R.id.img_repeat);
+        imgShuffle = findViewById(R.id.img_shuffle);
+        imgPlayPause = findViewById(R.id.img_play_pause);
+        imgCoverArt = findViewById(R.id.imageViewGredient);
+
+        viewPagerDisc = findViewById(R.id.viewPagerdianhac);
+        discFragment = new DiscFragment();
+        adapterDisc = new DiscViewPagerAdapter(getSupportFragmentManager());
+        adapterDisc.AddFragment(discFragment);
+        viewPagerDisc.setAdapter(adapterDisc);
+        discFragment = (DiscFragment) adapterDisc.getItem(0);
+
+        isSeekBarSetMax = false;
+        isSeeking = false;
     }
 
     @Override
@@ -74,12 +196,17 @@ public class MediaPlayerActivity extends AppCompatActivity {
         MediaController.Builder builder = new MediaController.Builder(this, sessionToken);
         ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
 
-
         controllerFuture.addListener(() -> {
             try {
                 MediaController mediaController = controllerFuture.get();
-                playButton.setOnClickListener(v -> mediaController.play());
-                pauseButton.setOnClickListener(v -> mediaController.pause());
+
+                imgPlayPause.setOnClickListener(v -> {
+                    if (mediaController.isPlaying()) {
+                        mediaController.pause();
+                    } else {
+                        mediaController.play();
+                    }
+                });
 
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override

@@ -2,7 +2,7 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/mContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorAccent"
@@ -138,8 +138,7 @@
             <RelativeLayout
                 android:id="@+id/relative_layout_for_bottom"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/gredient_bg">
+                android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/img_shuffle"

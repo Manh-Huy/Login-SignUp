@@ -21,9 +21,6 @@
             android:name=".activity.ForgotPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.BufferActivity"
-            android:exported="false" />
-        <activity
             android:name=".activity.SearchActivity"
             android:exported="false" />
         <activity

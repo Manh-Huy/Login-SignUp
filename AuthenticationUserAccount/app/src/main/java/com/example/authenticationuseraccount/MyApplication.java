@@ -5,12 +5,15 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+import com.example.authenticationuseraccount.utils.DataLocalManager;
+
 public class MyApplication extends Application {
 
     public static final String CHANNEL_ID = "CHANNEL_1";
     @Override
     public void onCreate() {
         super.onCreate();
+        DataLocalManager.init(getApplicationContext());
         createNotificationChannel();
     }
 

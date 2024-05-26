@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.model.homepagemodel.SearchSong;
+import com.example.authenticationuseraccount.model.Song;
 
 import java.util.List;
 
@@ -23,17 +23,17 @@ public class SearchSongAdapter extends RecyclerView.Adapter<SearchSongAdapter.Se
     }
 
     Context context;
-    List<SearchSong> items;
+    List<String> items;
     private OnItemClickListener listener;
 
-    public SearchSongAdapter(Context context, List<SearchSong> items, boolean isSearching,  OnItemClickListener listener) {
+    public SearchSongAdapter(Context context, List<String> items, boolean isSearching,  OnItemClickListener listener) {
         this.context = context;
         this.items = items;
         this.listener = listener;
         this.isSearching = isSearching;
     }
 
-    public void setFilteredList(List<SearchSong> filteredList, boolean isSeaching)
+    public void setFilteredList(List<String> filteredList, boolean isSeaching)
     {
         this.items = filteredList;
         this.isSearching = isSeaching;
@@ -57,13 +57,13 @@ public class SearchSongAdapter extends RecyclerView.Adapter<SearchSongAdapter.Se
             holder.btnDelete.setVisibility(View.GONE);
         }
 
-        holder.nameSong.setText(items.get(position).getSong());
+        holder.nameSong.setText(items.get(position));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int adapterPosition = holder.getAdapterPosition();
                 if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
-                    listener.onItemClick(items.get(adapterPosition).getSong());
+                    listener.onItemClick(items.get(adapterPosition));
                 }
             }
         });

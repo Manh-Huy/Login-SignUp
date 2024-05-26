@@ -21,6 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface ApiService {
     Gson gson = new GsonBuilder()
@@ -65,6 +66,9 @@ public interface ApiService {
 
     @POST("users")
     Call<User> addUser(@Body User user);
+
+    @GET("users/{id}")
+    Call<User> getUserById(@Path("id") String userID);
 
     @GET("users")
     Observable<List<User>> getUsers();

@@ -18,8 +18,9 @@ import android.widget.Toast;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.User;
-import com.example.authenticationuseraccount.utils.SharedPreferencesManager;
+import com.example.authenticationuseraccount.utils.DataLocalManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -32,6 +33,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,14 +52,10 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
     GoogleSignInClient mGoogleSignInClient;
 
-    SharedPreferencesManager mSharedPreferencesManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        mSharedPreferencesManager = SharedPreferencesManager.getInstance(LoginActivity.this);
 
         inputEmail = findViewById(R.id.editTextEmail);
         inputPassword = findViewById(R.id.editTextPassword);
@@ -93,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 boolean isRememberMe = checkBoxRememberMe.isChecked();
-                mSharedPreferencesManager.putBoolean("remember_me", isRememberMe);
+                DataLocalManager.setRememberMeAccount(isRememberMe);
                 loginUser(email, password);
             }
         });
@@ -126,12 +125,7 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null && user.isEmailVerified()) {
 
-                                if (isFirstTimeLogin()) {
-                                    String signInMethod = "Email";
-                                    User userInfo = getUserInfo(user, signInMethod);
-                                    addUser(userInfo);
-                                    Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: " + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: " + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
-                                }
+                                checkFirstTimeLogin(user, "Email");
 
                                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                                 startActivity(intent);
@@ -178,15 +172,10 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "signInWithCredential:success: currentUser: " + user.getEmail());
                             Toast.makeText(LoginActivity.this, "Firebase Authentication Succeeded ", Toast.LENGTH_LONG).show();
 
-                            if (isFirstTimeLogin()) {
-                                String signInMethod = "Google";
-                                User userInfo = getUserInfo(user, signInMethod);
-                                addUser(userInfo);
-                                Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: " + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: " + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
-                            }
+                            checkFirstTimeLogin(user, "Google");
 
                             boolean isRememberMe = checkBoxRememberMe.isChecked();
-                            mSharedPreferencesManager.putBoolean("remember_me", isRememberMe);
+                            DataLocalManager.setRememberMeAccount(isRememberMe);
 
                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                             finish();
@@ -197,24 +186,6 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    private boolean isFirstTimeLogin() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            // Kiểm tra xem người dùng đã từng đăng nhập trước đó chưa
-            boolean isFirstTime = mSharedPreferencesManager.getBoolean(user.getUid(), true);
-            Log.e(TAG, "isFirstTimeLogin: " + isFirstTime);
-            if (isFirstTime) {
-                // Nếu là lần đầu tiên, đánh dấu rằng đã đăng nhập lần đầu
-                mSharedPreferencesManager.putBoolean(user.getUid(), false);
-            }
-
-            return isFirstTime;
-        } else {
-            // Nếu không có người dùng hiện tại, không thể xác định lần đầu tiên
-            return false;
-        }
     }
 
     private User getUserInfo(FirebaseUser user, String signInMethod) {
@@ -252,5 +223,29 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void checkFirstTimeLogin(FirebaseUser user, String signInMethod) {
+        String id = user.getUid();
+        ApiService.apiService.getUserById(id).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                User mUser = response.body();
+                LogUtils.d("Call thanh cong");
+                if (mUser == null)
+                {
+                    User userInfo = getUserInfo(user, signInMethod);
+                    addUser(userInfo);
+                    Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: "
+                            + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: "
+                            + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
+                }
+
+            }
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+            }
+        });
+    }
+
 
 }

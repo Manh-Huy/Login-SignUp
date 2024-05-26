@@ -1,13 +1,12 @@
 package com.example.authenticationuseraccount.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,53 +19,45 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SearchSongAdapter;
-import com.example.authenticationuseraccount.model.homepagemodel.SearchSong;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.Song;
+import com.example.authenticationuseraccount.utils.DataLocalManager;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class SearchActivity extends AppCompatActivity {
-
-    private static final String TAG = "SearchActivity";
-
+    private Disposable mDisposable;
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     private RecyclerView searchRecycleView;
     private SearchView searchView;
     private ImageView micIcon;
     private TextView cancelTextView;
-    private List<SearchSong> fullListSearchSong = new ArrayList<>();
-    private List<SearchSong> listSearchSong = new ArrayList<>();
+    private ProgressBar progressBar;
+    private FrameLayout overlayLayout;
+    private List<Song> mListSong = new ArrayList<>();
     private SearchSongAdapter searchSongAdapter;
-    private SharedPreferences sharedPreferences;
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    String userUidHistory =  user + "History";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        sharedPreferences = getSharedPreferences("SearchHistory", Context.MODE_PRIVATE);;
+        progressBar = findViewById(R.id.progressBar);
+        overlayLayout = findViewById(R.id.overlayLayout);
 
         //searchRecycleView
         searchRecycleView = findViewById(R.id.searchRecyclerView);
         searchRecycleView.setLayoutManager(new LinearLayoutManager(this));
-
-        fullListSearchSong.add(new SearchSong("Drunk text"));
-        fullListSearchSong.add(new SearchSong("Stay"));
-        fullListSearchSong.add(new SearchSong("Anh là ngoại lệ của em"));
-        fullListSearchSong.add(new SearchSong("Buồn hay vui"));
-        fullListSearchSong.add(new SearchSong("Chúng ta của hiện tại"));
-        fullListSearchSong.add(new SearchSong("Thương Ly Biệt"));
-        fullListSearchSong.add(new SearchSong("Lệ lưu ly"));
-        fullListSearchSong.add(new SearchSong("Tường là"));
-
-        searchSongAdapter = new SearchSongAdapter(getApplicationContext(), listSearchSong,false, new SearchSongAdapter.OnItemClickListener() {
+        searchSongAdapter = new SearchSongAdapter(getApplicationContext(), new ArrayList<>(),false, new SearchSongAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(String query) {
                 searchView.setQuery(query, false);
@@ -74,10 +65,11 @@ public class SearchActivity extends AppCompatActivity {
         });
         searchRecycleView.setAdapter(searchSongAdapter);
 
-        // show search history
         showSearchHistory();
 
-        // search view
+        getSong();
+
+        // Search View
         searchView = findViewById(R.id.searchView);
         searchView.clearFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -108,7 +100,6 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-
         // back
         cancelTextView = findViewById(R.id.cancelTextView);
         cancelTextView.setOnClickListener(new View.OnClickListener() {
@@ -119,13 +110,42 @@ public class SearchActivity extends AppCompatActivity {
         });
 
     }
+    private void getSong() {
+        progressBar.setVisibility(View.VISIBLE);
+        overlayLayout.setVisibility(View.VISIBLE);
+        ApiService.apiService.getSongs()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        mDisposable = d;
+                    }
 
+                    @Override
+                    public void onNext(@NonNull List<Song> songs) {
+                        mListSong = songs;
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.e("Call api error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        progressBar.setVisibility(View.GONE);
+                        overlayLayout.setVisibility(View.GONE);
+                    }
+                });
+    }
     private void filterList(String text) {
-        List<SearchSong> filteredList = new ArrayList<>();
+        List<String> filteredList = new ArrayList<>();
         if (!text.isEmpty()) {
-            for (SearchSong item : fullListSearchSong) {
-                if (item.getSong().toLowerCase().contains(text.toLowerCase())) {
-                    filteredList.add(item);
+            for (Song song : mListSong) {
+                String songName = song.getName();
+                if (songName != null && songName.toLowerCase().contains(text.toLowerCase())) {
+                    filteredList.add(songName);
                 }
             }
         }
@@ -133,22 +153,13 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void saveSearchQuery(String query) {
-        List<String> searchHistory = new ArrayList<>(sharedPreferences.getStringSet(userUidHistory, new HashSet<>()));
-        searchHistory.add(query);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putStringSet(userUidHistory, new HashSet<>(searchHistory));
-        editor.apply();
+        DataLocalManager.setHistorySearch(query);
     }
 
     private void showSearchHistory() {
-        Set<String> searchHistorySet = sharedPreferences.getStringSet(userUidHistory, new HashSet<>());
-        List<String> searchHistoryList = new ArrayList<>(searchHistorySet);
-        Log.e(TAG, "showSearchHistory: " + searchHistoryList);
-        List<SearchSong> historyList = new ArrayList<>();
-        for (String query : searchHistoryList) {
-            historyList.add(new SearchSong(query));
-        }
-        searchSongAdapter.setFilteredList(historyList,false);
+        Set<String> searchHistoryList = DataLocalManager.getHistorySearch();
+        List<String> searchArrayList = new ArrayList<>(searchHistoryList);
+        searchSongAdapter.setFilteredList(searchArrayList,false);
     }
 
     private void speak() {
@@ -178,5 +189,12 @@ public class SearchActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+    @Override
+    protected void onDestroy() {
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
+        super.onDestroy();
     }
 }

@@ -21,6 +21,32 @@
         android:layout_height="wrap_content"
         android:text="Pause" />
 
+    <RelativeLayout
+        android:id="@+id/rltime"
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+
+        <TextView
+            android:id="@+id/tv_duration_played"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:text="@string/runtime"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/tv_duration_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:text="@string/runtime"
+            android:textColor="@color/black" />
+    </RelativeLayout>
+
     <SeekBar
         android:id="@+id/seek_bar"
         android:layout_width="match_parent"

@@ -38,18 +38,13 @@ public class MusicService extends MediaSessionService {
                 .setTrackSelector(new DefaultTrackSelector(this))
                 .build();
 
-        
-
         Intent intent = new Intent(this, MediaPlayerActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
 
         mediaSession = new MediaSession.Builder(this, mPlayer)
                 .setSessionActivity(pendingIntent)
                 .build();
 
-
-        //setMediaNotificationProvider();
     }
 
     @Override
@@ -59,8 +54,10 @@ public class MusicService extends MediaSessionService {
             String mp3Url = intent.getStringExtra("mp3Url");
             MediaItem mediaItem = MediaItem.fromUri(mp3Url);
             MediaItem mediaItem2 = MediaItem.fromUri("https://drive.google.com/uc?id=1syP2bZhjIxuUW32kxoXY_HnC1mgdgw79&export=download");
+            MediaItem mediaItem3 = MediaItem.fromUri("https://drive.google.com/uc?id=1pjTLOP4psJJCWIrqcBumadDmIl4vz5ra&export=download");
             mPlayer.addMediaItem(mediaItem);
             mPlayer.addMediaItem(mediaItem2);
+            mPlayer.addMediaItem(mediaItem3);
             mPlayer.prepare();
             mPlayer.play();
         }
@@ -80,6 +77,4 @@ public class MusicService extends MediaSessionService {
         mediaSession = null;
         super.onDestroy();
     }
-
-
 }

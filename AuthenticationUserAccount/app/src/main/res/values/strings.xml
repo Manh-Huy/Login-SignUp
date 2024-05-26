@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Authentication User Account</string>
+    <string name="app_name">ThkChillMusic</string>
+    <string name="runtime">--:--</string>
 </resources>

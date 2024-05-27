@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.api;
 
+import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.Song;
 import com.example.authenticationuseraccount.model.User;
 import com.google.gson.Gson;
@@ -72,4 +73,7 @@ public interface ApiService {
 
     @GET("users")
     Observable<List<User>> getUsers();
+
+    @GET("history/{id}")
+    Observable<List<ListenHistory>> getUserListenHistory(@Path("id") String userID);
 }

@@ -22,8 +22,11 @@ import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.Genre;
 import com.example.authenticationuseraccount.model.IClickGenreRecyclerViewListener;
 import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
+import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +45,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import me.relex.circleindicator.CircleIndicator;
 
 public class HomeActivity extends AppCompatActivity {
-
+    private FirebaseUser user;
     private ViewPager viewPager;
     private CircleIndicator circleIndicator;
     private BannerAdapter bannerAdapter;
@@ -58,12 +61,15 @@ public class HomeActivity extends AppCompatActivity {
     private List<Song> mListSong;
     private List<Song> listSongQuickPick;
     private List<Song> listNewReleaseSong;
+    private List<ListenHistory> mListUserListenHistory;
     private final int numberSongShowInQuickPick = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         imgMenuIcon = findViewById(R.id.menuIcon);
         viewPager = findViewById(R.id.viewPager);
@@ -115,13 +121,6 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
-
-//        mThumbnailSongNewAdapter = new ThumbnailSongNewAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
-//            @Override
-//            public void onClickItemSong(Song song) {
-//                onClickGoToMP3Player(song);
-//            }
-//        });
 
         //Banner
         bannerAdapter = new BannerAdapter(this, getListBanner());
@@ -196,9 +195,9 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onComplete() {
                         LogUtils.d("Call api success");
+                        mLisGenre = geListGenre();
                         listSongQuickPick = takeMusicWithHighView(numberSongShowInQuickPick, mListSong);
                         listNewReleaseSong = takeNewReLeaseMusic(mListSong);
-                        mLisGenre = geListGenre();
 
                         mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
                         mThumbnailSongNewAdapter_NewRelease.setData(listNewReleaseSong);
@@ -214,6 +213,34 @@ public class HomeActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    private void getUserListenHistory(String userID) {
+        ApiService.apiService.getUserListenHistory(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<ListenHistory>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull List<ListenHistory> listenHistories) {
+                        mListUserListenHistory = listenHistories;
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.e("Call api user history error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
     }
 
     @Override

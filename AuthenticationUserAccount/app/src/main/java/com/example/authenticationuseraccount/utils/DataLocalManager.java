@@ -2,20 +2,31 @@ package com.example.authenticationuseraccount.utils;
 
 import android.content.Context;
 
+import com.example.authenticationuseraccount.model.ListenHistory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 public class DataLocalManager {
     private static final String PREF_REMEMBER_ME_ACCOUNT = "PREF_REMEMBER_ME_ACCOUNT";
     private static final String PREF_HISTORY_SEARCH = "PREF_HISTORY_SEARCH";
+    private static final String PREF_LISTEN_HISTORY = "PREF_LISTEN_HISTORY";
     private static DataLocalManager instance;
     private MySharedPreferences mySharedPreferences;
 
     private String historySearchKey;
+    private String listenHistoryKey;
     public static void init(Context context) {
         instance = new DataLocalManager();
         instance.mySharedPreferences = new MySharedPreferences(context);
@@ -33,6 +44,14 @@ public class DataLocalManager {
             historySearchKey = PREF_HISTORY_SEARCH + user.getUid();
         } else {
             historySearchKey = PREF_HISTORY_SEARCH;
+        }
+    }
+    private void updateListenHistoryKey() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            listenHistoryKey = PREF_LISTEN_HISTORY + user.getUid();
+        } else {
+            listenHistoryKey = PREF_LISTEN_HISTORY;
         }
     }
     public static void setRememberMeAccount(boolean isRemember) {
@@ -78,4 +97,78 @@ public class DataLocalManager {
             }
         }
     }
+    public static void setListenHistory(ListenHistory listenHistory) {
+        DataLocalManager instance = DataLocalManager.getInstance();
+        instance.updateListenHistoryKey();
+
+        // Lấy list ListenHistory hiện tại và GÁN CHO NÓ MỘT BIẾN MỚI
+        List<ListenHistory> listListenHistory = DataLocalManager.getListenHistory(false);
+        List<ListenHistory> updatedListListenHistory = new ArrayList<>(listListenHistory);
+        updatedListListenHistory.add(listenHistory); // Thêm lịch sử mới vào danh sách
+
+        Gson gson = new Gson();
+        JsonArray jsonArray = gson.toJsonTree(updatedListListenHistory).getAsJsonArray();
+        String strJsonArray = jsonArray.toString();
+        DataLocalManager.getInstance().mySharedPreferences.putStringValue(instance.listenHistoryKey, strJsonArray);
+    }
+
+    public static List<ListenHistory> getListenHistory(boolean isGetLocalListenHistory) {
+        DataLocalManager instance = DataLocalManager.getInstance();
+        instance.updateListenHistoryKey();
+
+        String strJsonArray;
+        if (isGetLocalListenHistory)
+        {
+            strJsonArray = instance.mySharedPreferences.getStringValue(PREF_LISTEN_HISTORY);
+
+        }
+        else
+        {
+            strJsonArray = instance.mySharedPreferences.getStringValue(instance.listenHistoryKey);
+        }
+        List<ListenHistory> listListenHistory = new ArrayList<>();
+        try {
+            JSONArray jsonArray = new JSONArray(strJsonArray);
+            JSONObject jsonObject;
+            ListenHistory listenHistory;
+            Gson gson = new Gson();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                jsonObject = jsonArray.getJSONObject(i);
+                listenHistory = gson.fromJson(jsonObject.toString(), ListenHistory.class);
+                listListenHistory.add(listenHistory);
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        return listListenHistory;
+    }
+
+//    public static void mergeLocalWithAccountListenHistory() {
+//        DataLocalManager instance = DataLocalManager.getInstance();
+//        instance.updateListenHistoryKey();
+//
+//        if (!Objects.equals(instance.listenHistoryKey, PREF_LISTEN_HISTORY))
+//        {
+//            List<ListenHistory> localItems = DataLocalManager.getListenHistory(true);
+//            List<ListenHistory> accountItems = DataLocalManager.getListenHistory(false);
+//
+//            if (localItems != null && !localItems.isEmpty()) {
+//                if (accountItems == null) {
+//                    accountItems = new ArrayList<>();
+//                }
+//                accountItems.addAll(localItems);
+//
+//                Gson gson = new Gson();
+//                JsonArray jsonArray = gson.toJsonTree(accountItems).getAsJsonArray();
+//                String strJsonArray = jsonArray.toString();
+//                DataLocalManager.getInstance().mySharedPreferences.putStringValue(instance.listenHistoryKey, strJsonArray);
+//
+//                // Clear local history after merging
+//                jsonArray = gson.toJsonTree(new ArrayList<>()).getAsJsonArray();
+//                strJsonArray = jsonArray.toString();
+//                DataLocalManager.getInstance().mySharedPreferences.putStringValue(PREF_LISTEN_HISTORY, strJsonArray);
+//            }
+//        }
+//    }
 }

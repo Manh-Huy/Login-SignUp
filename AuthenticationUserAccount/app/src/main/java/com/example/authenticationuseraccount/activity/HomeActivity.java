@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.activity;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +8,8 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.util.UnstableApi;
+import androidx.media3.session.MediaController;
+import androidx.media3.session.SessionToken;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +29,10 @@ import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListene
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
+import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.service.MusicService;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -36,6 +43,7 @@ import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.text.ParseException;
+import java.util.concurrent.ExecutionException;
 
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -150,8 +158,7 @@ public class HomeActivity extends AppCompatActivity {
         getListSong();
     }
 
-    private List<Genre> geListGenre()
-    {
+    private List<Genre> geListGenre() {
         List<Genre> list = new ArrayList<>();
         list.add(new Genre("01", "Nhạc Trẻ"));
         list.add(new Genre("02", "Trữ Tình"));
@@ -303,4 +310,19 @@ public class HomeActivity extends AppCompatActivity {
         this.startActivity(intent);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SessionToken sessionToken = new SessionToken(this, new ComponentName(this, MusicService.class));
+        MediaController.Builder builder = new MediaController.Builder(this, sessionToken);
+        ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
+        controllerFuture.addListener(() -> {
+            try {
+                if (MediaItemHolder.getInstance().getMediaController() == null)
+                    MediaItemHolder.getInstance().setMediaController(controllerFuture.get());
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }, MoreExecutors.directExecutor());
+    }
 }

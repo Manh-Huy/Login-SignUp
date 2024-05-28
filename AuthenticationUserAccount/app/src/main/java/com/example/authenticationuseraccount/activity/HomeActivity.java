@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.media3.common.util.UnstableApi;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -292,10 +293,12 @@ public class HomeActivity extends AppCompatActivity {
 
         return newReleaseSongs;
     }
+
+    @UnstableApi
     private void onClickGoToMP3Player(Song song) {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, MediaPlayerActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("object_song", song);
+        bundle.putSerializable("SongObject", song);
         intent.putExtras(bundle);
         this.startActivity(intent);
     }

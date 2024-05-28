@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -75,4 +76,7 @@ public interface ApiService {
 
     @GET("history/{id}")
     Observable<List<ListenHistory>> getUserListenHistory(@Path("id") String userID);
+
+    @POST("history")
+    Completable addUserListenHistory(@Body ListenHistory listenHistory);
 }

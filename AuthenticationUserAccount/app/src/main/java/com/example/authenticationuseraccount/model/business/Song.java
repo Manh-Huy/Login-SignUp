@@ -1,4 +1,4 @@
-package com.example.authenticationuseraccount.model;
+package com.example.authenticationuseraccount.model.business;
 
 import java.io.Serializable;
 

@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Authentication User Account"
+rootProject.name = "The Real THK Chill Corner"
 include ':app'

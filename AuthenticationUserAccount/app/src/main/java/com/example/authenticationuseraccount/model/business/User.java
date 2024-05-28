@@ -1,6 +1,4 @@
-package com.example.authenticationuseraccount.model;
-
-import java.util.List;
+package com.example.authenticationuseraccount.model.business;
 
 public class User {
     private String userID;

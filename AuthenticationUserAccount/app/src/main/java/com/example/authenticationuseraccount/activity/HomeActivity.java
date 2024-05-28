@@ -90,6 +90,7 @@ public class HomeActivity extends AppCompatActivity {
         rcvGenre = findViewById(R.id.rcv_genre);
         rcvGenre.setLayoutManager(gridLayoutManager);
 
+
         mListSong = new ArrayList<>();
         mThumbnailSongSmallAdapter_QuickPick = new ThumbnailSongSmallAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
             @Override
@@ -189,7 +190,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        LogUtils.e("Call api error");
+                        LogUtils.ApplicationLogE("Call api error");
                     }
 
                     @Override

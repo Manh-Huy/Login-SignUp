@@ -37,9 +37,10 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.DiscViewPagerAdapter;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.DiscFragment;
-import com.example.authenticationuseraccount.model.Song;
+import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
+import com.example.authenticationuseraccount.utils.SharedPreferencesManager;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 
@@ -48,7 +49,7 @@ import java.util.concurrent.ExecutionException;
 
 @UnstableApi
 public class MediaPlayerActivity extends AppCompatActivity {
-    private static final String TAG = "MediaPlayerActivity";
+    private static final String TAG = "MediaPlayerActivity23";
     private MediaController mMediaController;
     private MediaMetadataRetriever mMediaMetadataRetriever;
     public static DiscViewPagerAdapter adapterDisc;
@@ -72,7 +73,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
             Song song = (Song) bundle.getSerializable("SongObject");
             LogUtils.i(TAG, song.getName());
             if (song != null) {
-                //MediaItemHolder.getInstance().getListMediaItem().clear();
+                MediaItemHolder.getInstance().getListMediaItem().clear();
                 MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
                 MediaItemHolder.getInstance().getListMediaItem().add(mediaItem);
             }
@@ -151,12 +152,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
                         }
                         if (playbackState == Player.STATE_READY) {
                             LogUtils.ApplicationLogD("Player is Ready");
-                            if (!isSetupMetaData) {
-                                isSetupMetaData = true;
-                                prepareSongMetaData(mMediaController.getMediaMetadata());
-                                setupSeekBar();
-                            }
-                            //mMediaController.play();
+                            mMediaController.play();
                             LogUtils.ApplicationLogD("Player is play " + mMediaController.getMediaMetadata().title + " at position: " + mMediaController.getCurrentMediaItemIndex());
                         }
                         if (playbackState == Player.STATE_ENDED) {
@@ -165,8 +161,11 @@ public class MediaPlayerActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onAudioSessionIdChanged(int audioSessionId) {
-                        Player.Listener.super.onAudioSessionIdChanged(audioSessionId);
+                    public void onMediaMetadataChanged(MediaMetadata mediaMetadata) {
+                        Player.Listener.super.onMediaMetadataChanged(mediaMetadata);
+                        LogUtils.ApplicationLogD("MetaDataChanged");
+                        prepareSongMetaData(mediaMetadata);
+                        setupSeekBar();
                     }
 
                     @Override
@@ -183,7 +182,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
                     }
                 });
 
-                mMediaController.setMediaItems(MediaItemHolder.getInstance().getListMediaItem(), true);
+                mMediaController.addMediaItem(MediaItemHolder.getInstance().getListMediaItem().get(0));
 
                 initButton();
 
@@ -191,6 +190,24 @@ public class MediaPlayerActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.e(TAG, "onSaveInstanceState: ");
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onPause() {
+        Log.e(TAG, "onPause: ");
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.e(TAG, "onResume: ");
+        super.onResume();
     }
 
     private void initButton() {
@@ -321,7 +338,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
     private void prepareSongMetaData(MediaMetadata metadata) {
         tvSongName.setText(metadata.title);
         tvArtistName.setText(metadata.artist);
-
+        Glide.get(this).clearMemory();
         Glide.with(this)
                 .asBitmap()
                 .load(metadata.artworkData)

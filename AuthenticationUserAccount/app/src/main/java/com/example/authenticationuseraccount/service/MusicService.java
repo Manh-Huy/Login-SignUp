@@ -6,6 +6,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.AudioAttributes;
@@ -25,7 +26,7 @@ import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 @UnstableApi
 public class MusicService extends MediaSessionService {
     private ExoPlayer mPlayer;
-    private MediaSession mediaSession ;
+    private MediaSession mediaSession;
 
     @UnstableApi
     @Override
@@ -50,17 +51,6 @@ public class MusicService extends MediaSessionService {
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        if (intent != null && intent.hasExtra("mp3Url")) {
-//            String mp3Url = intent.getStringExtra("mp3Url");
-//            MediaItem mediaItem = MediaItem.fromUri(mp3Url);
-//            MediaItem mediaItem2 = MediaItem.fromUri("https://drive.google.com/uc?id=1syP2bZhjIxuUW32kxoXY_HnC1mgdgw79&export=download");
-//            MediaItem mediaItem3 = MediaItem.fromUri("https://drive.google.com/uc?id=1pjTLOP4psJJCWIrqcBumadDmIl4vz5ra&export=download");
-//            mPlayer.addMediaItem(mediaItem);
-//            mPlayer.addMediaItem(mediaItem2);
-//            mPlayer.addMediaItem(mediaItem3);
-//            mPlayer.prepare();
-//            mPlayer.play();
-        }
         return START_STICKY;
     }
 

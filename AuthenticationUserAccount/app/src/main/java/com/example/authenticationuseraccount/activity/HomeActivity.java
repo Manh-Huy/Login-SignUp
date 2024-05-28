@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -18,7 +17,7 @@ import com.example.authenticationuseraccount.adapter.ThumbnailSongNewAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailSongSmallAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
-import com.example.authenticationuseraccount.model.Song;
+import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 
 import java.util.ArrayList;

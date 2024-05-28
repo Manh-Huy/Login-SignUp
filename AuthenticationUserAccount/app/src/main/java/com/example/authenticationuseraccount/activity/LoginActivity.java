@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
-import com.example.authenticationuseraccount.model.User;
+import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.utils.SharedPreferencesManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;

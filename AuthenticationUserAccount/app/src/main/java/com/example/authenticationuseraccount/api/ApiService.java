@@ -1,7 +1,7 @@
 package com.example.authenticationuseraccount.api;
 
-import com.example.authenticationuseraccount.model.Song;
-import com.example.authenticationuseraccount.model.User;
+import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.model.business.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

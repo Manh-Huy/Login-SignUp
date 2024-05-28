@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
-import com.example.authenticationuseraccount.model.Song;
+import com.example.authenticationuseraccount.model.business.Song;
 
 import java.util.List;
 

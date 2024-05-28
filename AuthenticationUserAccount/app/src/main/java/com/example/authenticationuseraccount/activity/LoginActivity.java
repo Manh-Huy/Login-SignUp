@@ -19,7 +19,7 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
-import com.example.authenticationuseraccount.model.User;
+import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -230,7 +230,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 User mUser = response.body();
-                LogUtils.d("Call thanh cong");
+                LogUtils.ApplicationLogD("Call thanh cong");
                 if (mUser == null)
                 {
                     User userInfo = getUserInfo(user, signInMethod);

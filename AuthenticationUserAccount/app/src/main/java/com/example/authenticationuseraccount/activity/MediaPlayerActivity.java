@@ -40,7 +40,6 @@ import com.example.authenticationuseraccount.fragment.DiscFragment;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
-import com.example.authenticationuseraccount.utils.SharedPreferencesManager;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 

@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
-import com.example.authenticationuseraccount.model.User;
+import com.example.authenticationuseraccount.model.business.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,6 +28,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
+    private static final String TAG = "ForgotPasswordActivity";
     private Disposable mDisposable;
     private Button btnSendEmail;
     private EditText inputEmail;
@@ -83,12 +84,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                        LogUtils.e("Call api user error");
+                        LogUtils.e(TAG,"Call api user error");
                     }
 
                     @Override
                     public void onComplete() {
-                        LogUtils.d("Call api user success");
+                        LogUtils.d(TAG,"Call api user success");
                         if (isEmailRegistered(mListUser, email)) {
                             sendEmailToResetPassword(email);
                             Intent intent = new Intent(ForgotPasswordActivity.this, EmailConfirmActivity.class);

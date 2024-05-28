@@ -23,7 +23,7 @@ import com.example.authenticationuseraccount.model.Genre;
 import com.example.authenticationuseraccount.model.IClickGenreRecyclerViewListener;
 import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
 import com.example.authenticationuseraccount.model.ListenHistory;
-import com.example.authenticationuseraccount.model.Song;
+import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -195,7 +195,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
-                        LogUtils.d("Call api success");
+                        LogUtils.ApplicationLogD("Call api success");
                         mLisGenre = geListGenre();
                         listSongQuickPick = takeMusicWithHighView(numberSongShowInQuickPick, mListSong);
                         listNewReleaseSong = takeNewReLeaseMusic(mListSong);
@@ -233,7 +233,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        LogUtils.e("Call api user history error");
+                        LogUtils.ApplicationLogE("Call api user history error");
                     }
 
                     @Override

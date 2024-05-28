@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.model.Song;
+import com.example.authenticationuseraccount.model.business.Song;
 
 import java.util.List;
 

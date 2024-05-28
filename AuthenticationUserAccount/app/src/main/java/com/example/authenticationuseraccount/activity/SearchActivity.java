@@ -21,7 +21,7 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SearchSongAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
-import com.example.authenticationuseraccount.model.Song;
+import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
 
 import java.util.ArrayList;
@@ -131,7 +131,7 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        LogUtils.e("Call api error");
+                        LogUtils.ApplicationLogE("Call api error");
                     }
 
                     @Override

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SearchSongAdapter;
+import com.example.authenticationuseraccount.adapter.SearchedItemSongAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.Song;
@@ -46,6 +47,7 @@ public class SearchActivity extends AppCompatActivity {
     private FrameLayout overlayLayout;
     private List<Song> mListSong = new ArrayList<>();
     private SearchSongAdapter searchSongAdapter;
+    private SearchedItemSongAdapter searchedItemSongAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,12 +80,27 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 saveSearchQuery(query);
-                filterList(query);
+                //filterList(query);
+                List<Song> resultSongs = new ArrayList<>();
+                for (Song song : mListSong) {
+                    if (song.getName().toLowerCase().contains(query.toLowerCase())) {
+                        resultSongs.add(song);
+                    }
+                }
+                if (resultSongs.isEmpty()) {
+                    Toast.makeText(SearchActivity.this, "No result return", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    searchedItemSongAdapter = new SearchedItemSongAdapter(getApplicationContext(), resultSongs);
+                    searchRecycleView.setAdapter(searchedItemSongAdapter);
+                }
+
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                searchRecycleView.setAdapter(searchSongAdapter);
                 if (newText.isEmpty()) {
                     showSearchHistory();
                 } else {

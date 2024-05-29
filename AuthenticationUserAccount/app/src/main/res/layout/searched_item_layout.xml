@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:background="#000000">
+
+    <ImageView
+        android:id="@+id/imageview_song"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_background" /> <!-- Placeholder image -->
+
+    <TextView
+        android:id="@+id/tv_nameSong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/imageview_song"
+        android:layout_marginStart="10dp"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="Đi Họp Lớp" />
+
+    <TextView
+        android:id="@+id/tv_name_artist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_nameSong"
+        android:layout_toEndOf="@id/imageview_song"
+        android:layout_marginStart="10dp"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:text="HIEUTHUHAI" />
+
+    <TextView
+        android:id="@+id/tv_album_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_name_artist"
+        android:layout_toEndOf="@id/imageview_song"
+        android:layout_marginStart="10dp"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:text="Ai Cũng Phải Bắt Đầu Từ Đâu Đó" />
+
+    <TextView
+        android:id="@+id/overflow_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:padding="5dp"
+        android:gravity="center"
+        android:text="⋮"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+</RelativeLayout>

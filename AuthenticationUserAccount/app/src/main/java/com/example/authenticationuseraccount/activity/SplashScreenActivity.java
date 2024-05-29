@@ -50,9 +50,10 @@ public class SplashScreenActivity extends AppCompatActivity {
             }
             else {
                 Toast.makeText(this, "Chua dang nhap", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(SplashScreenActivity.this, HomeActivity.class));
+                finish();
             }
         }
-        continueToHomeActivity();
     }
 
     private void signOut() {
@@ -65,16 +66,9 @@ public class SplashScreenActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 Log.w(TAG, "Signed out of google");
                 Toast.makeText(SplashScreenActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-    private void continueToHomeActivity() {
-        new android.os.Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
                 startActivity(new Intent(SplashScreenActivity.this, HomeActivity.class));
                 finish();
             }
-        }, 3000);
+        });
     }
 }

@@ -144,31 +144,31 @@ public class DataLocalManager {
         return listListenHistory;
     }
 
-//    public static void mergeLocalWithAccountListenHistory() {
-//        DataLocalManager instance = DataLocalManager.getInstance();
-//        instance.updateListenHistoryKey();
-//
-//        if (!Objects.equals(instance.listenHistoryKey, PREF_LISTEN_HISTORY))
-//        {
-//            List<ListenHistory> localItems = DataLocalManager.getListenHistory(true);
-//            List<ListenHistory> accountItems = DataLocalManager.getListenHistory(false);
-//
-//            if (localItems != null && !localItems.isEmpty()) {
-//                if (accountItems == null) {
-//                    accountItems = new ArrayList<>();
-//                }
-//                accountItems.addAll(localItems);
-//
-//                Gson gson = new Gson();
-//                JsonArray jsonArray = gson.toJsonTree(accountItems).getAsJsonArray();
-//                String strJsonArray = jsonArray.toString();
-//                DataLocalManager.getInstance().mySharedPreferences.putStringValue(instance.listenHistoryKey, strJsonArray);
-//
-//                // Clear local history after merging
-//                jsonArray = gson.toJsonTree(new ArrayList<>()).getAsJsonArray();
-//                strJsonArray = jsonArray.toString();
-//                DataLocalManager.getInstance().mySharedPreferences.putStringValue(PREF_LISTEN_HISTORY, strJsonArray);
-//            }
-//        }
-//    }
+    public static void mergeLocalWithAccountListenHistory() {
+        DataLocalManager instance = DataLocalManager.getInstance();
+        instance.updateListenHistoryKey();
+
+        if (!Objects.equals(instance.listenHistoryKey, PREF_LISTEN_HISTORY))
+        {
+            List<ListenHistory> localItems = DataLocalManager.getListenHistory(true);
+            List<ListenHistory> accountItems = DataLocalManager.getListenHistory(false);
+
+            if (localItems != null && !localItems.isEmpty()) {
+                if (accountItems == null) {
+                    accountItems = new ArrayList<>();
+                }
+                accountItems.addAll(localItems);
+
+                Gson gson = new Gson();
+                JsonArray jsonArray = gson.toJsonTree(accountItems).getAsJsonArray();
+                String strJsonArray = jsonArray.toString();
+                DataLocalManager.getInstance().mySharedPreferences.putStringValue(instance.listenHistoryKey, strJsonArray);
+
+                // Clear local history after merging
+                jsonArray = gson.toJsonTree(new ArrayList<>()).getAsJsonArray();
+                strJsonArray = jsonArray.toString();
+                DataLocalManager.getInstance().mySharedPreferences.putStringValue(PREF_LISTEN_HISTORY, strJsonArray);
+            }
+        }
+    }
 }

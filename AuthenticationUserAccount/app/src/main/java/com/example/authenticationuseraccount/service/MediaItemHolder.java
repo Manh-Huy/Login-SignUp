@@ -1,19 +1,35 @@
 package com.example.authenticationuseraccount.service;
 
 import androidx.media3.common.MediaItem;
+import androidx.media3.session.MediaController;
+
+import com.example.authenticationuseraccount.model.business.Song;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MediaItemHolder {
+
+    public MediaController getMediaController() {
+        return mediaController;
+    }
+
+    public void setMediaController(MediaController mediaController) {
+        MediaItemHolder.mediaController = mediaController;
+    }
+
+    private static MediaController mediaController;
     private static MediaItemHolder instance;
     private List<MediaItem> listMediaItem;
+    private List<Song> listSongs;
+
     private boolean isShuffle;
     private boolean isRepeatSingle;
     private boolean isRepeatPlaylist;
 
     private MediaItemHolder() {
         listMediaItem = new ArrayList<>();
+        listSongs = new ArrayList<>();
         isShuffle = false;
         isRepeatSingle = false;
         isRepeatPlaylist = false;
@@ -32,6 +48,13 @@ public class MediaItemHolder {
 
     public List<MediaItem> getListMediaItem() {
         return listMediaItem;
+    }
+
+    public void setListSongs(List<Song> listSongs) {
+        this.listSongs = listSongs;
+    }
+    public List<Song> getListSongs() {
+        return listSongs;
     }
 
     public void setListMediaItem(List<MediaItem> listMediaItem) {

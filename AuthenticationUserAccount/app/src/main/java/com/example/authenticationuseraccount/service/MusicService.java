@@ -1,26 +1,16 @@
 package com.example.authenticationuseraccount.service;
 
-import static com.example.authenticationuseraccount.MyApplication.CHANNEL_ID;
-
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.AudioAttributes;
-import androidx.media3.common.MediaItem;
-import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
-import androidx.media3.session.MediaNotification;
 import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaSessionService;
-import androidx.media3.ui.PlayerNotificationManager;
 
-import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 
 @UnstableApi

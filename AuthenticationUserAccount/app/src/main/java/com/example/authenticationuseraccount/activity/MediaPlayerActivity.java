@@ -1,12 +1,13 @@
 package com.example.authenticationuseraccount.activity;
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -35,48 +36,158 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.DiscViewPagerAdapter;
+import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.DiscFragment;
+import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 @UnstableApi
 public class MediaPlayerActivity extends AppCompatActivity {
     private static final String TAG = "MediaPlayerActivity23";
     private MediaController mMediaController;
-    private MediaMetadataRetriever mMediaMetadataRetriever;
+    MaterialCheckBox materialCheckBox;
     public static DiscViewPagerAdapter adapterDisc;
     ViewPager viewPagerDisc;
     private SeekBar seekBar;
     private TextView tvDurationPlayed, tvDurationTotal, tvSongName, tvArtistName;
     private ImageView imgCoverArt, imgShuffle, imgPrev, imgPlayPause, imgNext, imgRepeat;
     private DiscFragment discFragment;
-    private boolean isSeekBarSetMax, isSeeking, isSetupMetaData;
+    private boolean isSeekBarSetMax, isSeeking, isSetupMetaData, isSaveUserHistoryTriggered;
     private Handler handler = new Handler();
     SimpleDateFormat mFormatTime = new SimpleDateFormat("mm:ss");
+    Song mSong;
+    Disposable mDisposable;
+
+    Player.Listener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LogUtils.ApplicationLogI("onCreat Called!");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media_player);
         initView();
 
+        if (mMediaController == null) {
+            mMediaController = MediaItemHolder.getInstance().getMediaController();
+            initMediaController();
+            LogUtils.ApplicationLogD("Itssss Aliveeeeeeeee!!!!!!");
+        } else {
+            mMediaController.removeListener(mListener);
+            initMediaController();
+            LogUtils.ApplicationLogD("co bien roi dai vuong oi");
+        }
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            Song song = (Song) bundle.getSerializable("SongObject");
-            LogUtils.i(TAG, song.getName());
-            if (song != null) {
-                MediaItemHolder.getInstance().getListMediaItem().clear();
-                MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+            mSong = (Song) bundle.getSerializable("SongObject");
+            int number = 0;
+            if (mSong != null) {
+                MediaItem mediaItem = MediaItem.fromUri(mSong.getSongURL());
+                mMediaController.addMediaItem(mediaItem);
                 MediaItemHolder.getInstance().getListMediaItem().add(mediaItem);
+                MediaItemHolder.getInstance().getListSongs().add(mSong);
+
+                number = MediaItemHolder.getInstance().getMediaController().getMediaItemCount();
+                LogUtils.ApplicationLogD("Number of MediaItem: " + mMediaController.getMediaItemCount());
+                LogUtils.ApplicationLogD("Number of MediaItem SingleTon: " + number);
+                LogUtils.ApplicationLogD("Number of Song: " + MediaItemHolder.getInstance().getListSongs().size());
+            } else {
+                number = MediaItemHolder.getInstance().getMediaController().getMediaItemCount();
+                LogUtils.ApplicationLogD("Number of MediaItem: " + mMediaController.getMediaItemCount());
+                LogUtils.ApplicationLogD("Number of MediaItem SingleTon: " + number);
+                LogUtils.ApplicationLogD("Number of Song: " + MediaItemHolder.getInstance().getListSongs().size());
             }
         }
+
+    }
+
+    private void initMediaController() {
+        mListener = new Player.Listener() {
+            @Override
+            public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
+                Player.Listener.super.onMediaItemTransition(mediaItem, reason);
+                if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+                    LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_AUTO");
+                    isSetupMetaData = false;
+                    isSaveUserHistoryTriggered = false;
+                }
+                if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
+                    LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_REPEAT");
+                    isSetupMetaData = false;
+                    isSaveUserHistoryTriggered = false;
+                }
+                if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+                    LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED");
+                    mMediaController.prepare();
+                    isSetupMetaData = false;
+                    isSaveUserHistoryTriggered = false;
+                }
+                if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK) {
+                    LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_SEEK");
+                    isSetupMetaData = false;
+                    isSaveUserHistoryTriggered = false;
+                }
+            }
+
+            @Override
+            public void onPlaybackStateChanged(int playbackState) {
+                Player.Listener.super.onPlaybackStateChanged(playbackState);
+                if (playbackState == Player.STATE_IDLE) {
+                    LogUtils.ApplicationLogD("Player is IDLE");
+                }
+                if (playbackState == Player.STATE_BUFFERING) {
+                    LogUtils.ApplicationLogD("Player is Buffering");
+                }
+                if (playbackState == Player.STATE_READY) {
+                    LogUtils.ApplicationLogD("Player is Ready");
+                    mMediaController.play();
+                    LogUtils.ApplicationLogD("Player is play " + mMediaController.getMediaMetadata().title + " at position: " + mMediaController.getCurrentMediaItemIndex());
+                }
+                if (playbackState == Player.STATE_ENDED) {
+                    LogUtils.ApplicationLogD("Player is Ended");
+                }
+            }
+
+            @Override
+            public void onMediaMetadataChanged(MediaMetadata mediaMetadata) {
+                Player.Listener.super.onMediaMetadataChanged(mediaMetadata);
+                LogUtils.ApplicationLogD("MetaDataChanged");
+                prepareSongMetaData(mediaMetadata);
+                setupSeekBar();
+            }
+
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                Player.Listener.super.onIsPlayingChanged(isPlaying);
+                if (isPlaying) {
+                    //LogUtils.ApplicationLogD("Player is Playing");
+                    imgPlayPause.setImageResource(R.drawable.ic_pause);
+                } else {
+                    //LogUtils.ApplicationLogD("Player is Freezing");
+                    imgPlayPause.setImageResource(R.drawable.ic_pause);
+
+                }
+            }
+        };
+        mMediaController.addListener(mListener);
+        initButton();
     }
 
     private void initView() {
@@ -92,6 +203,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
         imgShuffle = findViewById(R.id.img_shuffle);
         imgPlayPause = findViewById(R.id.img_play_pause);
         imgCoverArt = findViewById(R.id.imageViewGredient);
+        materialCheckBox = findViewById(R.id.img_love);
 
         //Rotation Disc ViewPager
         viewPagerDisc = findViewById(R.id.viewPagerdianhac);
@@ -101,112 +213,52 @@ public class MediaPlayerActivity extends AppCompatActivity {
         viewPagerDisc.setAdapter(adapterDisc);
         discFragment = (DiscFragment) adapterDisc.getItem(0);
 
-
         isSetupMetaData = false;
-
-        mMediaMetadataRetriever = new MediaMetadataRetriever();
     }
 
     @Override
     protected void onStart() {
-        Log.e(TAG, "onStart: Called");
+        LogUtils.ApplicationLogI("onStart: Called");
         super.onStart();
-        SessionToken sessionToken = new SessionToken(this, new ComponentName(this, MusicService.class));
-        MediaController.Builder builder = new MediaController.Builder(this, sessionToken);
-        ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
-        controllerFuture.addListener(() -> {
-            try {
-                mMediaController = controllerFuture.get();
-                mMediaController.addListener(new Player.Listener() {
-                    @Override
-                    public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
-                        Player.Listener.super.onMediaItemTransition(mediaItem, reason);
-                        if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
-                            LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_AUTO");
-                            isSetupMetaData = false;
-                        }
-                        if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
-                            LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_REPEAT");
-                            isSetupMetaData = false;
-                        }
-                        if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
-                            LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED");
-                            mMediaController.prepare();
-                            isSetupMetaData = false;
-                        }
-                        if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK) {
-                            LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_SEEK");
-                            isSetupMetaData = false;
-                        }
-                    }
-
-                    @Override
-                    public void onPlaybackStateChanged(int playbackState) {
-                        Player.Listener.super.onPlaybackStateChanged(playbackState);
-                        if (playbackState == Player.STATE_IDLE) {
-                            LogUtils.ApplicationLogD("Player is IDLE");
-                        }
-                        if (playbackState == Player.STATE_BUFFERING) {
-                            LogUtils.ApplicationLogD("Player is Buffering");
-                        }
-                        if (playbackState == Player.STATE_READY) {
-                            LogUtils.ApplicationLogD("Player is Ready");
-                            mMediaController.play();
-                            LogUtils.ApplicationLogD("Player is play " + mMediaController.getMediaMetadata().title + " at position: " + mMediaController.getCurrentMediaItemIndex());
-                        }
-                        if (playbackState == Player.STATE_ENDED) {
-                            LogUtils.ApplicationLogD("Player is Ended");
-                        }
-                    }
-
-                    @Override
-                    public void onMediaMetadataChanged(MediaMetadata mediaMetadata) {
-                        Player.Listener.super.onMediaMetadataChanged(mediaMetadata);
-                        LogUtils.ApplicationLogD("MetaDataChanged");
-                        prepareSongMetaData(mediaMetadata);
-                        setupSeekBar();
-                    }
-
-                    @Override
-                    public void onIsPlayingChanged(boolean isPlaying) {
-                        Player.Listener.super.onIsPlayingChanged(isPlaying);
-                        if (isPlaying) {
-                            LogUtils.ApplicationLogD("Player is Playing");
-                            imgPlayPause.setImageResource(R.drawable.ic_pause);
-                        } else {
-                            LogUtils.ApplicationLogD("Player is Freezing");
-                            imgPlayPause.setImageResource(R.drawable.ic_pause);
-
-                        }
-                    }
-                });
-
-                mMediaController.addMediaItem(MediaItemHolder.getInstance().getListMediaItem().get(0));
-
-                initButton();
-
-            } catch (ExecutionException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }, MoreExecutors.directExecutor());
     }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.e(TAG, "onSaveInstanceState: ");
-        super.onSaveInstanceState(outState);
-    }
-
     @Override
     protected void onPause() {
-        Log.e(TAG, "onPause: ");
+        LogUtils.ApplicationLogI("onPause: ");
+        mMediaController = MediaItemHolder.getInstance().getMediaController();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        Log.e(TAG, "onResume: ");
         super.onResume();
+        if (MediaItemHolder.getInstance().getMediaController() != null) {
+            if (MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem().mediaMetadata != null) {
+                prepareSongMetaData(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem().mediaMetadata);
+                setupContinueSeekBar();
+            }
+
+        } else {
+            LogUtils.ApplicationLogE("Media Null");
+        }
+    }
+
+    private void setupContinueSeekBar() {
+        if (mMediaController.getDuration() != C.TIME_UNSET) {
+            int totalDuration = (int) mMediaController.getDuration();
+            seekBar.setMax(totalDuration / 1000);
+            tvDurationTotal.setText(mFormatTime.format(totalDuration));
+        }
+        MediaPlayerActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mMediaController != null) {
+                    int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                    seekBar.setProgress(currentPosition);
+                    tvDurationPlayed.setText(mFormatTime.format(mMediaController.getCurrentPosition()));
+                }
+                handler.postDelayed(this, 1000);
+            }
+        });
     }
 
     private void initButton() {
@@ -240,19 +292,25 @@ public class MediaPlayerActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                if (mMediaController != null)
+                    mMediaController.pause();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                if (mMediaController != null)
+                    mMediaController.play();
             }
         });
     }
 
     private void setupSeekBar() {
+        int totalDuration = 0;
         //Reset SeekBar
         if (mMediaController.getDuration() != C.TIME_UNSET) {
-            seekBar.setMax((int) (mMediaController.getDuration() / 1000));
-            tvDurationTotal.setText(mFormatTime.format(mMediaController.getDuration()));
+            totalDuration = (int) mMediaController.getDuration();
+            seekBar.setMax(totalDuration / 1000);
+            tvDurationTotal.setText(mFormatTime.format(totalDuration));
             tvDurationPlayed.setText("00:00");
         }
         //Update SeekBar Continuosly
@@ -261,28 +319,81 @@ public class MediaPlayerActivity extends AppCompatActivity {
             public void run() {
                 if (mMediaController != null) {
                     int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                    int totalDuration = (int) (mMediaController.getDuration() / 1000);
                     seekBar.setProgress(currentPosition);
                     tvDurationPlayed.setText(mFormatTime.format(mMediaController.getCurrentPosition()));
+
+                    // Update user History
+                    if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user != null) {
+                            ListenHistory listenHistory = getSongHistory(user.getUid());
+                            LogUtils.ApplicationLogI("Trigger Call Update History!");
+                            triggerAPICall(listenHistory);
+                            isSaveUserHistoryTriggered = true;
+                        } else {
+                            //triggerSaveLocal();
+                            isSaveUserHistoryTriggered = true;
+                        }
+
+                    }
                 }
                 handler.postDelayed(this, 1000);
             }
         });
     }
 
+    private ListenHistory getSongHistory(String uid) {
+
+        int currentIndex = mMediaController.getCurrentMediaItemIndex();
+        String songID = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getSongID();
+        String songName = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getName();
+        LogUtils.ApplicationLogD("Song about to saved: " + songName);
+        DateTimeFormatter formatter = null;
+        String formattedDate = "";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            LocalDate currentDate = LocalDate.now();
+            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            formattedDate = currentDate.format(formatter);
+        }
+
+        return new ListenHistory(uid, songID, 1, materialCheckBox.isChecked(), formattedDate);
+    }
+
+    @SuppressLint("CheckResult")
+    private void triggerAPICall(ListenHistory listenHistory) {
+
+        ApiService.apiService.addUserListenHistory(listenHistory)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Update User History! " + listenHistory.getSongID());
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Upload Failed");
+                });
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
-        if (mMediaController != null) {
+        LogUtils.ApplicationLogI("onStop");
+        /*if (mMediaController != null) {
             mMediaController.release();
             mMediaController = null;
-        }
+        }*/
     }
 
-    private String formatDuration(long milliseconds) {
-        long seconds = milliseconds / 1000;
-        long minutes = seconds / 60;
-        seconds = seconds % 60;
-        return String.format("%02d:%02d", minutes, seconds);
+    @Override
+    protected void onDestroy() {
+        LogUtils.ApplicationLogI("OnDestroy");
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
+        /*if (mMediaController != null) {
+            mMediaController.release();
+            mMediaController = null;
+        }*/
+        super.onDestroy();
     }
 
     private void populateMediaPlayerBackground(int swatch, int swatch1, int swatch2) {
@@ -337,8 +448,25 @@ public class MediaPlayerActivity extends AppCompatActivity {
     private void prepareSongMetaData(MediaMetadata metadata) {
         tvSongName.setText(metadata.title);
         tvArtistName.setText(metadata.artist);
-        Glide.get(this).clearMemory();
-        Glide.with(this)
+        byte[] art = metadata.artworkData;
+        if (art != null) {
+
+            Bitmap bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
+            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                @Override
+                public void onGenerated(@Nullable Palette palette) {
+                    Palette.Swatch swatch = palette.getDominantSwatch();
+                    if (swatch != null) {
+                        populateMediaPlayerBackground(swatch.getRgb(), swatch.getTitleTextColor(), swatch.getBodyTextColor());
+                    } else {
+                        populateMediaPlayerBackground(0xff000000, Color.WHITE, Color.DKGRAY);
+                    }
+                    ImageAnimation(MediaPlayerActivity.this, bitmap);
+                }
+            });
+        }
+/*        Glide.get(MediaPlayerActivity.this).clearMemory();
+        Glide.with(MediaPlayerActivity.this)
                 .asBitmap()
                 .load(metadata.artworkData)
                 .into(new CustomTarget<Bitmap>() {
@@ -362,6 +490,6 @@ public class MediaPlayerActivity extends AppCompatActivity {
                     public void onLoadCleared(@Nullable Drawable placeholder) {
 
                     }
-                });
+                });*/
     }
 }

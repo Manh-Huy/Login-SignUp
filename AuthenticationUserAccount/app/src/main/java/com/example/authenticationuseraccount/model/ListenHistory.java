@@ -16,6 +16,10 @@ public class ListenHistory {
         this.lastListen = lastListen;
     }
 
+    public ListenHistory() {
+
+    }
+
     public String getUserID() {
         return userID;
     }

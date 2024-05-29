@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tab_home"
+        android:icon="@drawable/ic_home"
+        android:title="Home"/>
+    <item
+        android:id="@+id/tab_forYou"
+        android:icon="@drawable/ic_personal"
+        android:title="4U"/>
+    <item
+        android:id="@+id/tab_corner"
+        android:icon="@drawable/ic_share_music"
+        android:title="Corner"/>
+    <item
+        android:id="@+id/tab_library"
+        android:icon="@drawable/ic_library"
+        android:title="Library"/>
+    <item
+        android:id="@+id/tab_Profile"
+        android:icon="@drawable/ic_me"
+        android:title="Profile"/>
+</menu>

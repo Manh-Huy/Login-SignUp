@@ -7,19 +7,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.viewpager.widget.PagerAdapter;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 
-
 import java.util.List;
 
-public class BannerAdapter extends PagerAdapter {
+public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.ViewHolder> {
+
     private Context mContext;
     private List<Banner> mListBanner;
-
     public BannerAdapter(Context mContext, List<Banner> mListBanner) {
         this.mContext = mContext;
         this.mListBanner = mListBanner;
@@ -27,36 +26,31 @@ public class BannerAdapter extends PagerAdapter {
 
     @NonNull
     @Override
-    public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        View view = LayoutInflater.from(container.getContext()).inflate(R.layout.item_banner, container, false);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_banner, parent, false);
+        return new ViewHolder(view);
+    }
 
-        ImageView imgBanner = view.findViewById(R.id.banner);
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Banner banner = mListBanner.get(position);
         if(banner != null) {
-            Glide.with(mContext).load(banner.getResourceId()).into(imgBanner);
+            Glide.with(mContext).load(banner.getResourceId()).into(holder.imgBanner);
         }
 
-        //Add view to viewgroup
-        container.addView(view);
-
-        return view;
     }
 
     @Override
-    public int getCount() {
-        if(mListBanner != null) {
-            return  mListBanner.size();
+    public int getItemCount() {
+        return !mListBanner.isEmpty() ? mListBanner.size() : 0;
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        private ImageView imgBanner;
+        ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imgBanner = itemView.findViewById(R.id.banner);
+
         }
-        return 0;
-    }
-
-    @Override
-    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return view == object;
-    }
-
-    @Override
-    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-        container.removeView((View) object);
     }
 }

@@ -34,8 +34,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.util.Objects;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -127,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 checkFirstTimeLogin(user, "Email");
 
-                                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
                             } else {
@@ -177,7 +175,7 @@ public class LoginActivity extends AppCompatActivity {
                             boolean isRememberMe = checkBoxRememberMe.isChecked();
                             DataLocalManager.setRememberMeAccount(isRememberMe);
 
-                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         } else {
                             // If sign in fails, display a message to the user.

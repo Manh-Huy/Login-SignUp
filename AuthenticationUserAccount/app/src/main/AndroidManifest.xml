@@ -22,6 +22,7 @@
         android:theme="@style/Theme.AuthenticationUserAccount"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
         <activity
             android:name=".activity.MediaPlayerActivity"
             android:exported="false" />
@@ -30,9 +31,6 @@
             android:exported="false" />
         <activity
             android:name=".activity.SearchActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.HomeActivity"
             android:exported="false" />
         <activity
             android:name=".activity.MainActivity"
@@ -67,7 +65,6 @@
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
         </service>
-
         <service
             android:name=".service.MusicBrowseService"
             android:exported="true">

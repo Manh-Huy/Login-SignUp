@@ -4,9 +4,7 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -72,9 +70,9 @@ public class SplashScreenActivity extends AppCompatActivity {
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashScreenActivity.this, HomeActivity.class));
+                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
                 finish();
             }
-        }, 3000);
+        }, 500);
     }
 }

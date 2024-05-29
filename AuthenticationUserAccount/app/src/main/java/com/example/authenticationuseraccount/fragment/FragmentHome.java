@@ -1,21 +1,28 @@
-package com.example.authenticationuseraccount.activity;
+package com.example.authenticationuseraccount.fragment;
 
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
+import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
+import com.example.authenticationuseraccount.activity.SearchActivity;
 import com.example.authenticationuseraccount.adapter.BannerAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailGenreAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailSongAdapter;
@@ -36,27 +43,27 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.text.ParseException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import me.relex.circleindicator.CircleIndicator;
+import me.relex.circleindicator.CircleIndicator3;
 
-public class HomeActivity extends AppCompatActivity {
+
+public class FragmentHome extends Fragment {
+
     private FirebaseUser user;
-    private ViewPager viewPager;
-    private CircleIndicator circleIndicator;
+    private ViewPager2 viewPager;
+    private CircleIndicator3 circleIndicator;
     private BannerAdapter bannerAdapter;
     private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend, rcvNewRelease, rcvGenre;
     private ImageView searchImageView, imgMenuIcon;
@@ -73,76 +80,78 @@ public class HomeActivity extends AppCompatActivity {
     private List<ListenHistory> mListUserListenHistory;
     private final int numberSongShowInQuickPick = 5;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-        imgMenuIcon = findViewById(R.id.menuIcon);
-        viewPager = findViewById(R.id.viewPager);
-        circleIndicator = findViewById(R.id.circleIndicator);
-        searchImageView = findViewById(R.id.searchIcon);
+        imgMenuIcon = view.findViewById(R.id.menuIcon);
+        viewPager = view.findViewById(R.id.viewPager);
+        circleIndicator = view.findViewById(R.id.circleIndicator);
+        searchImageView = view.findViewById(R.id.searchIcon);
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
 
-        //Recycle View
-        rcvQuickPick = findViewById(R.id.rcv_quick_pick);
-        rcvQuickPick.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        rcvListenAgain = findViewById(R.id.rcv_listen_again);
-        rcvListenAgain.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        rcvRecommend = findViewById(R.id.rcv_recommend);
-        rcvRecommend.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        rcvNewRelease = findViewById(R.id.rcv_new_release);
-        rcvNewRelease.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        rcvGenre = findViewById(R.id.rcv_genre);
+        // Recycle View
+        rcvQuickPick = view.findViewById(R.id.rcv_quick_pick);
+        rcvQuickPick.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        rcvListenAgain = view.findViewById(R.id.rcv_listen_again);
+        rcvListenAgain.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        rcvRecommend = view.findViewById(R.id.rcv_recommend);
+        rcvRecommend.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        rcvNewRelease = view.findViewById(R.id.rcv_new_release);
+        rcvNewRelease.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        rcvGenre = view.findViewById(R.id.rcv_genre);
         rcvGenre.setLayoutManager(gridLayoutManager);
 
-
         mListSong = new ArrayList<>();
-        mThumbnailSongSmallAdapter_QuickPick = new ThumbnailSongSmallAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
+        mThumbnailSongSmallAdapter_QuickPick = new ThumbnailSongSmallAdapter(getContext(), mListSong, new IClickSongRecyclerViewListener() {
             @Override
             public void onClickItemSong(Song song) {
                 onClickGoToMP3Player(song);
             }
         });
-        mThumbnailSongNewAdapter_NewRelease = new ThumbnailSongNewAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
+
+        mThumbnailSongNewAdapter_NewRelease = new ThumbnailSongNewAdapter(getContext(), mListSong, new IClickSongRecyclerViewListener() {
             @Override
             public void onClickItemSong(Song song) {
                 onClickGoToMP3Player(song);
             }
         });
-        mThumbnailSongAdapter_ListenAgain = new ThumbnailSongAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
+
+        mThumbnailSongAdapter_ListenAgain = new ThumbnailSongAdapter(getContext(), mListSong, new IClickSongRecyclerViewListener() {
             @Override
             public void onClickItemSong(Song song) {
                 onClickGoToMP3Player(song);
             }
         });
-        mThumbnailSongAdapter_Recommend = new ThumbnailSongAdapter(HomeActivity.this, mListSong, new IClickSongRecyclerViewListener() {
+
+        mThumbnailSongAdapter_Recommend = new ThumbnailSongAdapter(getContext(), mListSong, new IClickSongRecyclerViewListener() {
             @Override
             public void onClickItemSong(Song song) {
                 onClickGoToMP3Player(song);
             }
         });
-        mThumbnailGenreAdapter = new ThumbnailGenreAdapter(HomeActivity.this, mLisGenre, new IClickGenreRecyclerViewListener() {
+
+        mThumbnailGenreAdapter = new ThumbnailGenreAdapter(getContext(), mLisGenre, new IClickGenreRecyclerViewListener() {
             @Override
             public void onClickItemGenre(Genre genre) {
-
+                // Handle genre click
             }
         });
 
-        //Banner
-        bannerAdapter = new BannerAdapter(this, getListBanner());
+        // Banner
+        bannerAdapter = new BannerAdapter(getContext(), getListBanner());
         viewPager.setAdapter(bannerAdapter);
         circleIndicator.setViewPager(viewPager);
-        bannerAdapter.registerDataSetObserver(circleIndicator.getDataSetObserver());
-
+        bannerAdapter.registerAdapterDataObserver(circleIndicator.getAdapterDataObserver());
 
         imgMenuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, LoginSignUpActivity.class);
+                Intent intent = new Intent(getActivity(), LoginSignUpActivity.class);
                 startActivity(intent);
             }
         });
@@ -150,12 +159,14 @@ public class HomeActivity extends AppCompatActivity {
         searchImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, SearchActivity.class);
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
                 startActivity(intent);
             }
         });
 
         getListSong();
+
+        return view;
     }
 
     private List<Genre> geListGenre() {
@@ -219,7 +230,6 @@ public class HomeActivity extends AppCompatActivity {
                         rcvGenre.setAdapter(mThumbnailGenreAdapter);
                         rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
                         rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
-
                     }
                 });
     }
@@ -246,14 +256,13 @@ public class HomeActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
-
+                        // Handle completion
                     }
                 });
-
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         if (mDisposable != null) {
             mDisposable.dispose();
         }
@@ -301,20 +310,20 @@ public class HomeActivity extends AppCompatActivity {
         return newReleaseSongs;
     }
 
-    @UnstableApi
     private void onClickGoToMP3Player(Song song) {
-        Intent intent = new Intent(this, MediaPlayerActivity.class);
+        Intent intent = new Intent(getActivity(), MediaPlayerActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("SongObject", song);
         intent.putExtras(bundle);
-        this.startActivity(intent);
+        startActivity(intent);
     }
 
+    @UnstableApi
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
-        SessionToken sessionToken = new SessionToken(this, new ComponentName(this, MusicService.class));
-        MediaController.Builder builder = new MediaController.Builder(this, sessionToken);
+        SessionToken sessionToken = new SessionToken(getContext(), new ComponentName(getContext(), MusicService.class));
+        MediaController.Builder builder = new MediaController.Builder(getContext(), sessionToken);
         ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
         controllerFuture.addListener(() -> {
             try {

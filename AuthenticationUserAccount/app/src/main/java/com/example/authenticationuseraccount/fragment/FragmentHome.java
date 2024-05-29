@@ -3,6 +3,8 @@ package com.example.authenticationuseraccount.fragment;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +52,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -79,6 +83,8 @@ public class FragmentHome extends Fragment {
     private List<Song> listNewReleaseSong;
     private List<ListenHistory> mListUserListenHistory;
     private final int numberSongShowInQuickPick = 5;
+
+    Timer mTimer;
 
     @Nullable
     @Override
@@ -165,8 +171,32 @@ public class FragmentHome extends Fragment {
         });
 
         getListSong();
-
+        autoSlideImages();
         return view;
+    }
+
+    private void autoSlideImages() {
+        if (mTimer == null){
+            mTimer = new Timer();
+        }
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int currentItem = viewPager.getCurrentItem();
+                        int totalItem = getListBanner().size()-1;
+                        if(currentItem < totalItem){
+                            currentItem++;
+                            viewPager.setCurrentItem(currentItem);
+                        }else {
+                            viewPager.setCurrentItem(0);
+                        }
+                    }
+                });
+            }
+        },500,3000);
     }
 
     private List<Genre> geListGenre() {
@@ -265,6 +295,10 @@ public class FragmentHome extends Fragment {
     public void onDestroy() {
         if (mDisposable != null) {
             mDisposable.dispose();
+        }
+        if(mTimer != null){
+            mTimer.cancel();
+            mTimer = null;
         }
         super.onDestroy();
     }

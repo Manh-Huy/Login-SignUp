@@ -1,4 +1,4 @@
-package com.example.authenticationuseraccount.activity;
+package com.example.authenticationuseraccount.activity.panel;
 
 import static com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout.COLLAPSED;
 
@@ -23,12 +23,10 @@ import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 import com.realgear.readable_bottom_bar.ReadableBottomBar;
 
 public class RootNavigationBarPanel extends BasePanelView {
-    Context mContext;
     private ViewPager2 rootViewPager;
     private ReadableBottomBar rootNavigationBar;
     public RootNavigationBarPanel(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
         super(context, panelLayout);
-        mContext = context;
         getContext().setTheme(R.style.Theme_AuthenticationUserAccount);
         LayoutInflater.from(getContext()).inflate(R.layout.layout_root_navigation_bar, this, true);
     }

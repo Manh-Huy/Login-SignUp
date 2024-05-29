@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.panel.RootMediaPlayerPanel;
+import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
 import com.realgear.multislidinguppanel.Adapter;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 import com.realgear.multislidinguppanel.PanelStateListener;
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         List<Class<?>> items = new ArrayList<>();
 
+        items.add(RootMediaPlayerPanel.class);
         items.add(RootNavigationBarPanel.class);
 
         panelLayout.setPanelStateListener(new PanelStateListener(panelLayout));

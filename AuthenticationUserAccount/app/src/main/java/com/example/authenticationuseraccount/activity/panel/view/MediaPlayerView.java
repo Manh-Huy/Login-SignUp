@@ -28,7 +28,7 @@ import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 import java.util.concurrent.TimeUnit;
 
 
-public class MediaPlayerView implements MainActivity.OnMediaControllerConnect  {
+public class MediaPlayerView{
     public static final int STATE_NORMAL = 0;
     public static final int STATE_PARTIAL = 1;
     private View mRootView;
@@ -221,7 +221,6 @@ public class MediaPlayerView implements MainActivity.OnMediaControllerConnect  {
         }
     }
 
-    @Override
     public void onMediaControllerConnect(MediaController controller) {
         LogUtils.ApplicationLogD("onMediaControllerConnect MediaView Called");
         if (this.mMediaController != null) {

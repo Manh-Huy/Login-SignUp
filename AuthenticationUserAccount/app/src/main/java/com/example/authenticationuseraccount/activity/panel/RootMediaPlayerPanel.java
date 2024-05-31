@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.WindowInsets;
 
 import androidx.annotation.NonNull;
+import androidx.media3.session.MediaController;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.panel.view.MediaPlayerBarView;
@@ -115,6 +116,12 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
             this.mMediaPlayerView.onPlaybackStateChanged(isPlaying);
             this.mMediaPlayerBarView.onPlaybackStateChanged(isPlaying);
         }
+    }
+
+    public void onMediaControllerReady(MediaController mediaController){
+        LogUtils.ApplicationLogD("onMediaControllerConnect RootMedia Callx 2");
+        this.mMediaPlayerView.onMediaControllerConnect(mediaController);
+        this.mMediaPlayerBarView.onMediaControllerCreate(mediaController);
     }
 
     @Override

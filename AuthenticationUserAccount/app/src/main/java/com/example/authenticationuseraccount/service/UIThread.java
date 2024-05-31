@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
+import androidx.media3.session.MediaController;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
@@ -19,7 +20,7 @@ import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UIThread {
+public class UIThread implements MainActivity.OnMediaControllerConnect {
     private static UIThread instance;
     private final MainActivity m_vMainActivity;
     private MultiSlidingUpPanelLayout m_vMultiSlidingPanel;
@@ -93,4 +94,10 @@ public class UIThread {
 
 
     };
+
+    @Override
+    public void onMediaControllerConnect(MediaController controller) {
+        LogUtils.ApplicationLogD("onMediaControllerConnect UI Thread Call");
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onMediaControllerReady(controller);
+    }
 }

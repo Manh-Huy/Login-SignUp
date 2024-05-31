@@ -25,7 +25,7 @@ import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
-public class MediaPlayerBarView implements MainActivity.OnMediaControllerConnect {
+public class MediaPlayerBarView {
     public static final int STATE_NORMAL = 0;
     public static final int STATE_PARTIAL = 1;
 
@@ -165,8 +165,6 @@ public class MediaPlayerBarView implements MainActivity.OnMediaControllerConnect
         this.mProgressIndicator.setTrackColor(mutedDarkColor);
     }
 
-
-    @Override
     public void onMediaControllerConnect(MediaController controller) {
         LogUtils.ApplicationLogD("onMediaControllerConnect MediaViewBar Called");
         this.onMediaControllerCreate(controller);

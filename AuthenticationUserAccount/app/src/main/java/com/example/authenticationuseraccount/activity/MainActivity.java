@@ -30,10 +30,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
-
     private UIThread m_vThread;
-
-    private OnMediaControllerConnect mCallback;
 
     public static interface OnMediaControllerConnect {
         void onMediaControllerConnect(MediaController controller);
@@ -76,13 +73,10 @@ public class MainActivity extends AppCompatActivity {
         ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
         controllerFuture.addListener(() -> {
             try {
-                if (MediaItemHolder.getInstance().getMediaController() == null){
-                    MediaItemHolder.getInstance().setMediaController(controllerFuture.get());
-                    if (mCallback != null) {
-                        LogUtils.ApplicationLogD("Called");
-                        mCallback.onMediaControllerConnect(controllerFuture.get());
-                    }
-
+                if (MediaItemHolder.getInstance().getMediaController() == null) {
+                    MediaController mediaController = controllerFuture.get();
+                    MediaItemHolder.getInstance().setMediaController(mediaController);
+                    m_vThread.onMediaControllerConnect(mediaController);
                 }
             } catch (ExecutionException | InterruptedException e) {
                 throw new RuntimeException(e);

@@ -75,6 +75,8 @@ public class MediaPlayerBarView {
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap album_art) {
         this.mTextView_SongTitle.setText(mediaMetadata.title);
         this.mTextView_SongArtist.setText(mediaMetadata.artist);
+        this.mTextView_SongArtist.setSelected(true);
+        this.mTextView_SongTitle.setSelected(true);
         this.mProgressIndicator.setMax((int) mMediaController.getDuration());
         if (album_art != null) {
             this.mImageView_Art.setImageBitmap(album_art);

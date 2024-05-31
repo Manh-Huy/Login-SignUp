@@ -4,17 +4,15 @@
     android:id="@+id/media_player_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:backgroundTint="@color/bg_gray">
+    android:backgroundTint="#0AF6F6">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/media_player_controls_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg_gray"
+        android:background="#001510"
         android:clipToPadding="false"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="30dp"
-        android:paddingBottom="56dp">
+        android:paddingHorizontal="20dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_header_container"
@@ -23,7 +21,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
 
             <TextView
                 android:layout_width="wrap_content"
@@ -73,9 +70,9 @@
             <com.github.ybq.android.spinkit.SpinKitView
                 android:id="@+id/progress_bar"
                 style="@style/SpinKitView.Large.Circle"
-                android:layout_gravity="center"
                 android:layout_width="182dp"
-                android:layout_height="182dp" />
+                android:layout_height="182dp"
+                android:layout_gravity="center" />
 
 
         </androidx.cardview.widget.CardView>
@@ -99,11 +96,16 @@
 
                 <TextView
                     android:id="@+id/text_view_song_title"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:gravity="start"
                     android:marqueeRepeatLimit="marquee_forever"
                     android:maxLines="1"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
                     android:text="Hope"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
@@ -113,9 +115,14 @@
                     android:id="@+id/text_view_song_artist"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:gravity="start"
                     android:marqueeRepeatLimit="marquee_forever"
                     android:maxLines="1"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
                     android:text="NF"
                     android:textColor="#939393"
                     android:textSize="15sp" />

@@ -72,16 +72,21 @@
                     android:orientation="vertical"
                     android:padding="6dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/btn_favorite"
+                    app:layout_constraintEnd_toStartOf="@id/btn_favorite2"
                     app:layout_constraintStart_toEndOf="@id/image_view_album_art_cardview"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
                         android:id="@+id/text_view_song_title"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ellipsize="marquee"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
                         android:marqueeRepeatLimit="marquee_forever"
                         android:maxLines="1"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
                         android:text="Hope"
                         android:textColor="#FFF"
                         android:textSize="14sp"
@@ -90,10 +95,15 @@
 
                     <TextView
                         android:id="@+id/text_view_song_artist"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ellipsize="marquee"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
                         android:marqueeRepeatLimit="marquee_forever"
                         android:maxLines="1"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
                         android:text="NF"
                         android:textColor="#989898"
                         android:textSize="12sp" />
@@ -102,11 +112,26 @@
                 </LinearLayout>
 
                 <ImageButton
+                    android:id="@+id/btn_favorite2"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginVertical="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@null"
+                    android:scaleType="center"
+
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="H,1:1"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_favorite"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="#FFF" />
+
+                <ImageButton
                     android:id="@+id/btn_favorite"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginVertical="4dp"
-                    android:layout_marginEnd="12dp"
+                    android:layout_marginEnd="8dp"
                     android:background="@null"
                     android:scaleType="center"
                     android:src="@drawable/favorite_24px"

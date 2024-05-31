@@ -69,7 +69,9 @@
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/viewPager"
                     android:layout_width="match_parent"
-                    android:layout_height="126dp"/>
+                    android:layout_height="128dp"
+                    android:background="#EB00FFE2"
+                    android:padding="16dp"/>
 
                 <me.relex.circleindicator.CircleIndicator3
                     app:ci_drawable="@drawable/bg_indicator"
@@ -80,11 +82,11 @@
                     android:visibility="visible" />
 
                 <TextView
+                    android:textColor="@color/black"
                     android:id="@+id/txt_quick_pick"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="23dp"
-                    android:layout_marginTop="16dp"
                     android:layout_marginBottom="8dp"
                     android:text="Quick picks"
                     android:textSize="24dp"
@@ -98,6 +100,7 @@
                     android:layout_marginBottom="8dp" />
 
                 <TextView
+                    android:textColor="@color/black"
                     android:id="@+id/txt_genre"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -116,6 +119,7 @@
                     android:layout_marginBottom="8dp" />
 
                 <TextView
+                    android:textColor="@color/black"
                     android:id="@+id/txt_new_release"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -134,6 +138,7 @@
                     android:layout_marginBottom="8dp" />
 
                 <TextView
+                    android:textColor="@color/black"
                     android:id="@+id/tv_listen_again"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -151,6 +156,7 @@
                     android:layout_marginHorizontal="8dp" />
 
                 <TextView
+                    android:textColor="@color/black"
                     android:id="@+id/tv_recommend"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

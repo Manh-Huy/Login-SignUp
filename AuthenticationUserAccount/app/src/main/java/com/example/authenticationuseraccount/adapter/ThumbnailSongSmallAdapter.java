@@ -34,9 +34,9 @@ public class ThumbnailSongSmallAdapter extends RecyclerView.Adapter<ThumbnailSon
     }
 
     public ThumbnailSongSmallAdapter(Context mContext, List<Song> mListSong, IClickSongRecyclerViewListener listener) {
-        this.mSongs = mSongs;
+        this.mSongs = mListSong;
         this.mContext = mContext;
-        this.iClickSongRecyclerViewListener =listener;
+        this.iClickSongRecyclerViewListener = listener;
     }
 
     @NonNull
@@ -53,7 +53,8 @@ public class ThumbnailSongSmallAdapter extends RecyclerView.Adapter<ThumbnailSon
 
         holder.tvSongTitle.setText(song.getName());
         holder.tvArtist.setText(song.getArtist());
-
+        holder.tvSongTitle.setSelected(true);
+        holder.tvArtist.setSelected(true);
         Glide.with(mContext)
                 .load(song.getImageURL())
                 .into(holder.imgThumbnail);

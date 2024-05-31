@@ -67,7 +67,6 @@ public class MediaPlayerView {
     private boolean m_vCanUpdateSeekbar = true;
     private MediaController mMediaController;
 
-    private boolean isImageLoaded = false;
 
     public MediaPlayerView(View rootView) {
         this.mRootView = rootView;
@@ -177,9 +176,12 @@ public class MediaPlayerView {
     }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {
-        this.mImageViewThumbNail.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
+        mImageViewThumbNail.setVisibility(View.GONE);
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
+        m_vTextView_Artist.setSelected(true);
+        m_vTextView_Title.setSelected(true);
         ImageView imgView = (ImageView) this.m_vCardView_Art.getChildAt(0);
         Glide.get(this.getRootView().getContext()).clearMemory();
         Glide.with(this.getRootView().getContext())
@@ -188,7 +190,6 @@ public class MediaPlayerView {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         imgView.setImageResource(leveldown.kyle.icon_packs.R.drawable.ic_album_24px);
-                        isImageLoaded = true;
                         return false;
                     }
 
@@ -196,7 +197,6 @@ public class MediaPlayerView {
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                         mProgressBar.setVisibility(View.GONE);
                         mImageViewThumbNail.setVisibility(View.VISIBLE);
-                        isImageLoaded = true;
                         return false;
                     }
                 }).into(imgView);
@@ -247,11 +247,6 @@ public class MediaPlayerView {
     public void onPlaybackStateChanged(boolean isPlaying) {
         if (mMediaController == null) {
             mMediaController = MediaItemHolder.getInstance().getMediaController();
-        }
-        isImageLoaded = false;
-        if (!isImageLoaded && !isPlaying) {
-            mProgressBar.setVisibility(View.VISIBLE);
-            mImageViewThumbNail.setVisibility(View.GONE);
         }
 
         this.m_vBtn_PlayPause.setImageResource(!isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px : leveldown.kyle.icon_packs.R.drawable.ic_pause_24px);

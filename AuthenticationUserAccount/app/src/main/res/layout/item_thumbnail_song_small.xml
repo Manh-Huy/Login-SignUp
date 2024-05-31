@@ -4,7 +4,7 @@
     android:id="@+id/layout_item"
     android:layout_width="match_parent"
     android:layout_height="64dp"
-    android:background="?attr/selectableItemBackground"
+    android:background="@drawable/selector_item"
     android:orientation="horizontal"
     android:padding="8dp"
     app:cardCornerRadius="16dp">

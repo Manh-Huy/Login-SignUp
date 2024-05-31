@@ -77,6 +77,7 @@ public class MediaPlayerBarView {
         this.mTextView_SongArtist.setText(mediaMetadata.artist);
         this.mTextView_SongArtist.setSelected(true);
         this.mTextView_SongTitle.setSelected(true);
+
         this.mProgressIndicator.setMax((int) mMediaController.getDuration());
         if (album_art != null) {
             this.mImageView_Art.setImageBitmap(album_art);
@@ -106,7 +107,7 @@ public class MediaPlayerBarView {
     }
 
     public void onPlaybackStateChanged(boolean isPlaying) {
-        this.mProgressIndicator.setProgress((int) mMediaController.getCurrentPosition());
+        
         this.mImageBtn_PlayPause.setImageIcon(Icon.createWithResource(this.getContext(), isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_pause_24px : leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px));
     }
 

@@ -356,16 +356,6 @@ public class FragmentHome extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        SessionToken sessionToken = new SessionToken(getContext(), new ComponentName(getContext(), MusicService.class));
-        MediaController.Builder builder = new MediaController.Builder(getContext(), sessionToken);
-        ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
-        controllerFuture.addListener(() -> {
-            try {
-                if (MediaItemHolder.getInstance().getMediaController() == null)
-                    MediaItemHolder.getInstance().setMediaController(controllerFuture.get());
-            } catch (ExecutionException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }, MoreExecutors.directExecutor());
+
     }
 }

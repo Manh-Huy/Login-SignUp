@@ -43,6 +43,7 @@ import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
+import com.example.authenticationuseraccount.service.UIThread;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -187,6 +188,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
             }
         };
         mMediaController.addListener(mListener);
+        mMediaController.addListener(UIThread.getInstance().getListener());
         initButton();
     }
 

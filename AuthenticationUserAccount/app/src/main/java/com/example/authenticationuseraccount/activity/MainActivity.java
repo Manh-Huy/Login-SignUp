@@ -1,34 +1,92 @@
 package com.example.authenticationuseraccount.activity;
 
+import android.Manifest;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.media.browse.MediaBrowser;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.media3.common.Player;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.session.MediaController;
+import androidx.media3.session.MediaSession;
+import androidx.media3.session.SessionToken;
 
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.activity.panel.RootMediaPlayerPanel;
-import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
-import com.realgear.multislidinguppanel.Adapter;
-import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
-import com.realgear.multislidinguppanel.PanelStateListener;
+import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.common.PermissionManager;
+import com.example.authenticationuseraccount.service.BackEventHandler;
+import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.service.MusicService;
+import com.example.authenticationuseraccount.service.UIThread;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
+
+    private UIThread m_vThread;
+
+    private OnMediaControllerConnect mCallback;
+
+    public static interface OnMediaControllerConnect {
+        void onMediaControllerConnect(MediaController controller);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        MultiSlidingUpPanelLayout panelLayout = findViewById(R.id.root_sliding_up_panel);
+        BackEventHandler.getInstance();
 
-        List<Class<?>> items = new ArrayList<>();
+        PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            PermissionManager.requestPermission(this, Manifest.permission.FOREGROUND_SERVICE, 100);
+        }
 
-        items.add(RootMediaPlayerPanel.class);
-        items.add(RootNavigationBarPanel.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            PermissionManager.requestPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE, 100);
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                startActivity(intent);
+            }
+        }
 
-        panelLayout.setPanelStateListener(new PanelStateListener(panelLayout));
-        panelLayout.setAdapter(new Adapter(this, items));
+
+        this.m_vThread = new UIThread(this);
+
+    }
+
+    @UnstableApi
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        SessionToken sessionToken = new SessionToken(MainActivity.this, new ComponentName(MainActivity.this, MusicService.class));
+        MediaController.Builder builder = new MediaController.Builder(MainActivity.this, sessionToken);
+        ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
+        controllerFuture.addListener(() -> {
+            try {
+                if (MediaItemHolder.getInstance().getMediaController() == null){
+                    MediaItemHolder.getInstance().setMediaController(controllerFuture.get());
+                    if (mCallback != null) {
+                        LogUtils.ApplicationLogD("Called");
+                        mCallback.onMediaControllerConnect(controllerFuture.get());
+                    }
+
+                }
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }, MoreExecutors.directExecutor());
     }
 }

@@ -45,7 +45,7 @@
                 android:layout_weight="1">
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/image_view_album_art"
+                    android:id="@+id/image_view_album_art_cardview"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:elevation="0dp"
@@ -58,6 +58,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
+                        android:id="@+id/image_view_album_art"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/album_24px" />
@@ -66,25 +67,33 @@
 
                 <LinearLayout
                     android:id="@+id/text_view_container"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="6dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/image_view_album_art"
+                    app:layout_constraintEnd_toStartOf="@id/btn_favorite"
+                    app:layout_constraintStart_toEndOf="@id/image_view_album_art_cardview"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/text_view_song_title"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="1"
                         android:text="Hope"
-                        android:textColor="#fff"
+                        android:textColor="#FFF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
+
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/text_view_song_artist"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:maxLines="1"
                         android:text="NF"
                         android:textColor="#989898"
                         android:textSize="12sp" />
@@ -112,8 +121,9 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_margin="4dp"
-                    app:cardBackgroundColor="#037C79"
-                    app:cardCornerRadius="6dp"
+                    app:cardBackgroundColor="#03000000"
+                    app:cardCornerRadius="76dp"
+                    app:cardElevation="0dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintDimensionRatio="H,1:1"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -123,8 +133,11 @@
                         android:id="@+id/btn_play_pause"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@null"
+                        android:background="#03000000"
+                        android:elevation="0dp"
                         android:scaleType="fitCenter"
+                        android:scaleX="1.2"
+                        android:scaleY="1.2"
                         android:src="@drawable/play_arrow_24px" />
 
                 </androidx.cardview.widget.CardView>

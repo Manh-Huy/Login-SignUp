@@ -1,14 +1,27 @@
 package com.example.authenticationuseraccount.service;
 
+import androidx.annotation.IntDef;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
 import androidx.media3.session.MediaController;
+import androidx.media3.session.MediaSession;
 
 import com.example.authenticationuseraccount.model.business.Song;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MediaItemHolder {
+    public static final int REPEAT_TYPE_NONE = Player.REPEAT_MODE_OFF;
+    public static final int REPEAT_TYPE_ONE = Player.REPEAT_MODE_ONE;
+    public static final int REPEAT_TYPE_ALL = Player.REPEAT_MODE_ALL;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({REPEAT_TYPE_NONE, REPEAT_TYPE_ONE, REPEAT_TYPE_ALL})
+    public @interface RepeatType {
+    }
 
     public MediaController getMediaController() {
         return mediaController;
@@ -53,6 +66,7 @@ public class MediaItemHolder {
     public void setListSongs(List<Song> listSongs) {
         this.listSongs = listSongs;
     }
+
     public List<Song> getListSongs() {
         return listSongs;
     }
@@ -84,6 +98,5 @@ public class MediaItemHolder {
     public void setRepeatPlaylist(boolean repeatPlaylist) {
         isRepeatPlaylist = repeatPlaylist;
     }
-
 
 }

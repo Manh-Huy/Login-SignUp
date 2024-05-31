@@ -12,6 +12,7 @@ import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaSessionService;
 
 import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
+import com.example.authenticationuseraccount.common.LogUtils;
 
 @UnstableApi
 public class MusicService extends MediaSessionService {
@@ -32,8 +33,18 @@ public class MusicService extends MediaSessionService {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+
+        MediaSession.Callback callback = new MediaSession.Callback() {
+            @Override
+            public MediaSession.ConnectionResult onConnect(MediaSession session, MediaSession.ControllerInfo controller) {
+                LogUtils.ApplicationLogD("Callback controller info: " + controller.toString());
+                return MediaSession.Callback.super.onConnect(session, controller);
+            }
+        };
+
         mediaSession = new MediaSession.Builder(this, mPlayer)
                 .setSessionActivity(pendingIntent)
+                .setCallback(callback)
                 .build();
 
     }
@@ -47,6 +58,7 @@ public class MusicService extends MediaSessionService {
     @Nullable
     @Override
     public MediaSession onGetSession(MediaSession.ControllerInfo controllerInfo) {
+        LogUtils.ApplicationLogD("onGetSession Controller Info: "+ controllerInfo.toString());
         return mediaSession;
     }
 
@@ -57,4 +69,5 @@ public class MusicService extends MediaSessionService {
         mediaSession = null;
         super.onDestroy();
     }
+
 }

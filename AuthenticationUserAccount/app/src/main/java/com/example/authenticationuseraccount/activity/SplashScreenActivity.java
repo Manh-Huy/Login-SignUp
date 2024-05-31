@@ -48,7 +48,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             }
             else {
                 Toast.makeText(this, "Chua dang nhap", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(SplashScreenActivity.this, HomeActivity.class));
+                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
                 finish();
             }
         }
@@ -64,7 +64,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 Log.w(TAG, "Signed out of google");
                 Toast.makeText(SplashScreenActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(SplashScreenActivity.this, HomeActivity.class));
+                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
                 finish();
             }
         });

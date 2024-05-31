@@ -107,7 +107,7 @@ public class MediaPlayerBarView {
     }
 
     public void onPlaybackStateChanged(boolean isPlaying) {
-        
+
         this.mImageBtn_PlayPause.setImageIcon(Icon.createWithResource(this.getContext(), isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_pause_24px : leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px));
     }
 

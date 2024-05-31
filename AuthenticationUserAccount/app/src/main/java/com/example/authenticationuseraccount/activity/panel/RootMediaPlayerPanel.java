@@ -98,11 +98,11 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
         byte[] art = mediaMetadata.artworkData;
         Bitmap bitmap = null;
         if (art != null){
-             bitmap= BitmapFactory.decodeByteArray(art, 0, art.length);
+            bitmap= BitmapFactory.decodeByteArray(art, 0, art.length);
         }
 
         this.mMediaPlayerBarView.onUpdateMetadata(mediaMetadata, bitmap);
-        this.mMediaPlayerView.onUpdateMetadata(mediaMetadata, bitmap);
+        this.mMediaPlayerView.onUpdateMetadata(mediaMetadata,bitmap);
 
         this.mAsyncPaletteBuilder.onStartAnimation(bitmap);
     }

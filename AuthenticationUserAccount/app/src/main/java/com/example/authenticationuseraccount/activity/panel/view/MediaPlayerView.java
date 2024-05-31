@@ -1,15 +1,14 @@
 package com.example.authenticationuseraccount.activity.panel.view;
 
 import android.annotation.SuppressLint;
-import android.app.assist.AssistStructure;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.media.session.PlaybackState;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -20,17 +19,19 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.session.MediaController;
-import androidx.palette.graphics.Palette;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.activity.MainActivity;
-import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.github.ybq.android.spinkit.style.RotatingPlane;
+import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -51,8 +52,10 @@ public class MediaPlayerView {
     public static final int STATE_PARTIAL = 1;
     private final View mRootView;
     private int mState;
+    private ProgressBar mProgressBar;
     private Handler handler = new Handler();
     private ConstraintLayout mControlsContainer;
+    private ImageView mImageViewThumbNail;
     private CardView m_vCardView_Art;
     private SeekBar m_vSeekBar_Main;
     private TextView m_vTextView_CurrentDuration, m_vTextView_MaxDuration, m_vTextView_Artist, m_vTextView_Title;
@@ -68,6 +71,7 @@ public class MediaPlayerView {
         this.mRootView = rootView;
         this.mControlsContainer = findViewById(R.id.media_player_controls_container);
         this.mRootView.setAlpha(0.0F);
+        this.mProgressBar = findViewById(R.id.progress_bar);
         this.m_vCardView_Art = this.mControlsContainer.findViewById(R.id.card_view_artist_art_container);
         this.m_vTextView_Title = this.mControlsContainer.findViewById(R.id.text_view_song_title);
         this.m_vTextView_Artist = this.mControlsContainer.findViewById(R.id.text_view_song_artist);
@@ -80,7 +84,8 @@ public class MediaPlayerView {
         this.m_vBtn_Next = findViewById(R.id.btn_skip_next);
         this.m_vBtn_Shuffle = findViewById(R.id.btn_shuffle);
         this.materialCheckBox = findViewById(R.id.btn_favorite);
-
+        this.mImageViewThumbNail = findViewById(R.id.img_thumb_song);
+        this.mProgressBar.setIndeterminateDrawable(new Wave());
     }
 
     private void setOnListener() {
@@ -170,26 +175,28 @@ public class MediaPlayerView {
     }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {
+        this.mImageViewThumbNail.setVisibility(View.GONE);
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
         ImageView imgView = (ImageView) this.m_vCardView_Art.getChildAt(0);
-/*
-        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-            @Override
-            public void onGenerated(@Nullable Palette palette) {
-
-            }
-        });*/
-
 
         Glide.get(this.getRootView().getContext()).clearMemory();
-        if (imgView != null) {
-            Glide.with(this.getRootView().getContext())
-                    .load(bitmap)
-                    .skipMemoryCache(true)
-                    .placeholder(leveldown.kyle.icon_packs.R.drawable.ic_album_24px)
-                    .into(imgView);
-        }
+        Glide.with(this.getRootView().getContext())
+                .load(bitmap)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        imgView.setImageResource(leveldown.kyle.icon_packs.R.drawable.ic_album_24px);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        mProgressBar.setVisibility(View.GONE);
+                        mImageViewThumbNail.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+                }).into(imgView);
 
     }
 
@@ -239,9 +246,11 @@ public class MediaPlayerView {
             mMediaController = MediaItemHolder.getInstance().getMediaController();
         }
 
-        if (m_vCanUpdateSeekbar) {
-            //this.m_vSeekBar_Main.setProgress((int) mMediaController.getCurrentPosition());
+        if(!isPlaying){
+            mProgressBar.setVisibility(View.VISIBLE);
+            mImageViewThumbNail.setVisibility(View.GONE);
         }
+
         this.m_vBtn_PlayPause.setImageResource(!isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px : leveldown.kyle.icon_packs.R.drawable.ic_pause_24px);
 
     }

@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.media3.common.MediaItem;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
@@ -345,11 +346,13 @@ public class FragmentHome extends Fragment {
     }
 
     private void onClickGoToMP3Player(Song song) {
-        Intent intent = new Intent(getActivity(), MediaPlayerActivity.class);
+        /*Intent intent = new Intent(getActivity(), MediaPlayerActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("SongObject", song);
         intent.putExtras(bundle);
-        startActivity(intent);
+        startActivity(intent);*/
+        MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+        MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
     }
 
     @UnstableApi

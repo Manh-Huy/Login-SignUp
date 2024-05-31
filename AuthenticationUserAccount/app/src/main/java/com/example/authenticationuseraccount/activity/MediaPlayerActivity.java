@@ -315,8 +315,10 @@ public class MediaPlayerActivity extends AppCompatActivity {
             tvDurationTotal.setText(mFormatTime.format(totalDuration));
             tvDurationPlayed.setText("00:00");
         }
+
         //Update SeekBar Continuosly
-        MediaPlayerActivity.this.runOnUiThread(new Runnable() {
+        MediaPlayerActivity.this
+                .runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (mMediaController != null) {
@@ -401,8 +403,8 @@ public class MediaPlayerActivity extends AppCompatActivity {
     private void populateMediaPlayerBackground(int swatch, int swatch1, int swatch2) {
         ImageView gredient = findViewById(R.id.imageViewGredient);
         NestedScrollView mContainer = findViewById(R.id.mContainer);
-        gredient.setBackgroundResource(R.drawable.gredient_bg);
-        mContainer.setBackgroundResource(R.drawable.main_bg);
+//        gredient.setBackgroundResource(R.drawable.gredient_bg);
+//        mContainer.setBackgroundResource(R.drawable.main_bg);
         GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
                 new int[]{swatch, 0x00000000});
         gredient.setBackground(gradientDrawable);
@@ -458,6 +460,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
                 @Override
                 public void onGenerated(@Nullable Palette palette) {
                     Palette.Swatch swatch = palette.getDominantSwatch();
+
                     if (swatch != null) {
                         populateMediaPlayerBackground(swatch.getRgb(), swatch.getTitleTextColor(), swatch.getBodyTextColor());
                     } else {

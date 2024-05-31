@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.MediaMetadata;
 import android.media.session.PlaybackState;
 import android.os.Build;
 import android.view.LayoutInflater;
@@ -12,6 +11,7 @@ import android.view.View;
 import android.view.WindowInsets;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.MediaMetadata;
 import androidx.media3.session.MediaController;
 
 import com.example.authenticationuseraccount.R;
@@ -44,7 +44,6 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
 
     @Override
     public void onCreateView() {
-        LogUtils.ApplicationLogI("RootMediaPlayer onCreateView Called");
         this.setPanelState(MultiSlidingUpPanelLayout.HIDDEN);
         this.setSlideDirection(MultiSlidingUpPanelLayout.SLIDE_VERTICAL);
         this.setPeakHeight(getNavigationBarHeight() + 46);
@@ -52,14 +51,12 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
 
     @Override
     public void onBindView() {
-        LogUtils.ApplicationLogI("RootMediaPlayer BindView Called");
         mMediaPlayerView = new MediaPlayerView((View) findViewById(R.id.media_player_view));
         mMediaPlayerBarView = new MediaPlayerBarView(findViewById(R.id.media_player_bar_view));
     }
 
     @Override
     public void onPanelStateChanged(int panelSate) {
-        LogUtils.ApplicationLogI("RootMediaPlayer onPanelStateChanged Called");
         UIThread.getInstance().onPanelStateChanged(this.getClass(), panelSate);
 
         if (panelSate == MultiSlidingUpPanelLayout.HIDDEN) {
@@ -91,20 +88,28 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
         }
     }
 
-    public void onUpdateMetadata(androidx.media3.common.MediaMetadata mediaMetadata) {
+    public void onUpdateMetadata(MediaMetadata mediaMetadata) {
         if (mediaMetadata == null && getPanelState() == MultiSlidingUpPanelLayout.HIDDEN) {
             mParentView.setVisibility(INVISIBLE);
         } else {
             mParentView.setVisibility(VISIBLE);
         }
-
+        LogUtils.ApplicationLogI("Called BitMap");
         byte[] art = mediaMetadata.artworkData;
-        Bitmap bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
+        Bitmap bitmap = null;
+        if (art != null){
+             bitmap= BitmapFactory.decodeByteArray(art, 0, art.length);
+        }
 
         this.mMediaPlayerBarView.onUpdateMetadata(mediaMetadata, bitmap);
         this.mMediaPlayerView.onUpdateMetadata(mediaMetadata, bitmap);
 
         this.mAsyncPaletteBuilder.onStartAnimation(bitmap);
+    }
+
+    public void onSetupSeekBar() {
+        this.mMediaPlayerBarView.onSetupSeekBar();
+        this.mMediaPlayerView.onSetupSeekBar();
     }
 
     public void onPlaybackStateChanged(boolean isPlaying) {
@@ -118,8 +123,7 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
         }
     }
 
-    public void onMediaControllerReady(MediaController mediaController){
-        LogUtils.ApplicationLogD("onMediaControllerConnect RootMedia Callx 2");
+    public void onMediaControllerReady(MediaController mediaController) {
         this.mMediaPlayerView.onMediaControllerConnect(mediaController);
         this.mMediaPlayerBarView.onMediaControllerCreate(mediaController);
     }
@@ -129,7 +133,6 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
         super.onSliding(panel, top, dy, slidingOffset);
         mMediaPlayerView.onSliding(slidingOffset, MediaPlayerView.STATE_NORMAL);
         mMediaPlayerBarView.onSliding(slidingOffset, MediaPlayerBarView.STATE_NORMAL);
-        //LogUtils.ApplicationLogI("Super Sliding top: " + top + " dy: " + dy + " offset: " + slidingOffset);
     }
 
     public int getNavigationBarHeight() {

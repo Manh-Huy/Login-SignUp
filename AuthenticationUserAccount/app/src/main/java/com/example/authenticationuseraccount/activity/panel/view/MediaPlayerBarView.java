@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
 import android.media.session.PlaybackState;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -15,32 +16,33 @@ import android.widget.TextView;
 import androidx.annotation.IdRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.session.MediaController;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
+import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
 public class MediaPlayerBarView {
     public static final int STATE_NORMAL = 0;
     public static final int STATE_PARTIAL = 1;
-
     private final View mRootView;
-
+    private Handler handler = new Handler();
     private int mState;
-
     private FrameLayout mBackgroundView;
     private LinearProgressIndicator mProgressIndicator;
     private ConstraintLayout mControlsContainer;
-
     private ImageView mImageView_Art;
     private TextView mTextView_SongTitle;
     private TextView mTextView_SongArtist;
-
     MediaController mMediaController;
     private ImageButton mImageBtn_Fav;
     private ImageButton mImageBtn_PlayPause;
@@ -52,7 +54,6 @@ public class MediaPlayerBarView {
         this.mControlsContainer = findViewById(R.id.media_player_bar_controls_container);
         this.mProgressIndicator = findViewById(R.id.media_player_bar_progress_indicator);
         this.mImageView_Art = this.mControlsContainer.findViewById(R.id.image_view_album_art);
-        View textContainer = this.mControlsContainer.findViewById(R.id.text_view_container);
         this.mTextView_SongTitle = this.mControlsContainer.findViewById(R.id.text_view_song_title);
         this.mTextView_SongArtist = this.mControlsContainer.findViewById(R.id.text_view_song_artist);
         this.mImageBtn_Fav = this.mControlsContainer.findViewById(R.id.btn_favorite);
@@ -61,27 +62,13 @@ public class MediaPlayerBarView {
 
     }
 
-    public View getRootView() {
-        return this.mRootView;
-    }
-
     public void onInit() {
-        if (MediaItemHolder.getInstance().getMediaController() != null) {
-            mMediaController = MediaItemHolder.getInstance().getMediaController();
-            LogUtils.ApplicationLogD("onInit: MediaBar");
-            LogUtils.ApplicationLogD("IT'sssssssssssss Aliveeeeeeeeeeee");
-        } else {
-            LogUtils.ApplicationLogD("onInit: MediaBar");
-            LogUtils.ApplicationLogD("Co Biennnnnnnnnnnnnnnnnnnnnnnnnnnn");
-        }
-
         this.mImageBtn_PlayPause.setOnClickListener((v) -> {
             if (mMediaController.isPlaying()) {
                 mMediaController.pause();
             } else {
                 mMediaController.play();
             }
-            LogUtils.ApplicationLogI("MediaPlayerBar" + " Play Pause Btn Clicked");
         });
     }
 
@@ -89,25 +76,39 @@ public class MediaPlayerBarView {
         this.mTextView_SongTitle.setText(mediaMetadata.title);
         this.mTextView_SongArtist.setText(mediaMetadata.artist);
         this.mProgressIndicator.setMax((int) mMediaController.getDuration());
-
-        Log.i("Media Player Bar View", "Is bitmap null ? " + (album_art == null));
-
         if (album_art != null) {
             this.mImageView_Art.setImageBitmap(album_art);
         } else
             this.mImageView_Art.setImageDrawable(ResourcesCompat.getDrawable(this.mRootView.getResources(), leveldown.kyle.icon_packs.R.drawable.ic_album_24px, this.mRootView.getContext().getTheme()));
     }
 
-    public void onPlaybackStateChanged(boolean isPlaying) {
-        if (mMediaController == null) {
-            mMediaController = MediaItemHolder.getInstance().getMediaController();
+    public void onSetupSeekBar() {
+        int totalDuration = 0;
+        //Reset SeekBar
+        if (mMediaController.getDuration() != C.TIME_UNSET) {
+            totalDuration = (int) mMediaController.getDuration();
+            this.mProgressIndicator.setMax(totalDuration / 1000);
         }
+        //Update SeekBar Continuosly
+        mRootView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mMediaController != null) {
+                    int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                    mProgressIndicator.setProgress(currentPosition);
+                }
+                handler.postDelayed(this, 1000);
+            }
+        });
+
+    }
+
+    public void onPlaybackStateChanged(boolean isPlaying) {
         this.mProgressIndicator.setProgress((int) mMediaController.getCurrentPosition());
         this.mImageBtn_PlayPause.setImageIcon(Icon.createWithResource(this.getContext(), isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_pause_24px : leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px));
     }
 
     public void onMediaControllerCreate(MediaController mediaController) {
-        LogUtils.ApplicationLogI("onMediaControllerCreate: BarView create");
         if (mMediaController != null) {
             return;
         }

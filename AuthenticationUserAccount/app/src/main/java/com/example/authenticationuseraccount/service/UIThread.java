@@ -4,6 +4,7 @@ import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
+import androidx.media3.common.Metadata;
 import androidx.media3.common.Player;
 import androidx.media3.session.MediaController;
 
@@ -16,7 +17,6 @@ import com.realgear.multislidinguppanel.MultiSlidingPanelAdapter;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +27,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect {
     private boolean m_vCanUpdatePanelsUI;
     public List<OnPanelStateChanged> m_vOnPanelStateListeners;
     private Player.Listener mListener;
+    private MediaController mMediaController;
 
     public UIThread(MainActivity activity) {
         instance = this;
@@ -38,11 +39,13 @@ public class UIThread implements MainActivity.OnMediaControllerConnect {
         //LibraryManager.initLibrary(activity.getApplicationContext());
     }
 
-    public Player.Listener getListener(){
+    public Player.Listener getListener() {
         return this.mListener;
     }
 
-    public static UIThread getInstance() { return instance; }
+    public static UIThread getInstance() {
+        return instance;
+    }
 
     public void onCreate() {
         this.m_vMultiSlidingPanel = findViewById(R.id.root_sliding_up_panel);
@@ -90,14 +93,69 @@ public class UIThread implements MainActivity.OnMediaControllerConnect {
             } else {
                 UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onPlaybackStateChanged(false);
             }
-        };
+        }
+
+        @Override
+        public void onMediaItemTransition(@Nullable MediaItem mediaItem, int reason) {
+            Player.Listener.super.onMediaItemTransition(mediaItem, reason);
+            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+                LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_AUTO");
+                MediaItemHolder.getInstance().setSetupMetaData(false);
+                MediaItemHolder.getInstance().setSaveUserHistoryTriggered(false);
+            }
+            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
+                LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_REPEAT");
+                MediaItemHolder.getInstance().setSetupMetaData(false);
+                MediaItemHolder.getInstance().setSaveUserHistoryTriggered(false);
+            }
+            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+                LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED");
+                mMediaController.prepare();
+                MediaItemHolder.getInstance().setSetupMetaData(false);
+                MediaItemHolder.getInstance().setSaveUserHistoryTriggered(false);
+            }
+            if (reason == Player.MEDIA_ITEM_TRANSITION_REASON_SEEK) {
+                LogUtils.ApplicationLogD("MEDIA_ITEM_TRANSITION_REASON_SEEK");
+                MediaItemHolder.getInstance().setSetupMetaData(false);
+                MediaItemHolder.getInstance().setSaveUserHistoryTriggered(false);
+            }
+        }
+
+        @Override
+        public void onPlaybackStateChanged(int playbackState) {
+            Player.Listener.super.onPlaybackStateChanged(playbackState);
+            if (playbackState == Player.STATE_IDLE) {
+                LogUtils.ApplicationLogD("Player is IDLE");
+            }
+            if (playbackState == Player.STATE_BUFFERING) {
+                LogUtils.ApplicationLogD("Player is Buffering");
+            }
+            if (playbackState == Player.STATE_READY) {
+                LogUtils.ApplicationLogD("Player is Ready");
+                mMediaController.play();
+                LogUtils.ApplicationLogD("Player is play " + mMediaController.getMediaMetadata().title + " at position: " + mMediaController.getCurrentMediaItemIndex());
+            }
+            if (playbackState == Player.STATE_ENDED) {
+                LogUtils.ApplicationLogD("Player is Ended");
+            }
+        }
+
+        @Override
+        public void onMediaMetadataChanged(MediaMetadata mediaMetadata) {
+            Player.Listener.super.onMediaMetadataChanged(mediaMetadata);
+            LogUtils.ApplicationLogD("MetaDataChanged");
+
+            UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMetadata(mediaMetadata);
+            UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onSetupSeekBar();
 
 
+        }
     };
 
     @Override
     public void onMediaControllerConnect(MediaController controller) {
-        LogUtils.ApplicationLogD("onMediaControllerConnect UI Thread Call");
+        mMediaController = controller;
+        MediaItemHolder.getInstance().getMediaController().addListener(this.mListener);
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onMediaControllerReady(controller);
     }
 }

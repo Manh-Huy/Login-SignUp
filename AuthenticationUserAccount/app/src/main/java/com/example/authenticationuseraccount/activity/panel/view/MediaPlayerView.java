@@ -1,44 +1,63 @@
 package com.example.authenticationuseraccount.activity.panel.view;
 
 import android.annotation.SuppressLint;
+import android.app.assist.AssistStructure;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.session.PlaybackState;
+import android.os.Handler;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.IdRes;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.session.MediaController;
+import androidx.palette.graphics.Palette;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
+import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
+import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class MediaPlayerView{
+
+public class MediaPlayerView {
     public static final int STATE_NORMAL = 0;
     public static final int STATE_PARTIAL = 1;
-    private View mRootView;
+    private final View mRootView;
     private int mState;
-    private FrameLayout mBottomSheet;
+    private Handler handler = new Handler();
     private ConstraintLayout mControlsContainer;
     private CardView m_vCardView_Art;
     private SeekBar m_vSeekBar_Main;
-    private TextView m_vTextView_CurrentDuration,m_vTextView_MaxDuration, m_vTextView_Artist,m_vTextView_Title;
-    private ExtendedFloatingActionButton m_vBtn_Repeat, m_vBtn_Prev,m_vBtn_Next,m_vBtn_Shuffle;
+    private TextView m_vTextView_CurrentDuration, m_vTextView_MaxDuration, m_vTextView_Artist, m_vTextView_Title;
+    private ExtendedFloatingActionButton m_vBtn_Repeat, m_vBtn_Prev, m_vBtn_Next, m_vBtn_Shuffle;
+    private MaterialCheckBox materialCheckBox;
     private FloatingActionButton m_vBtn_PlayPause;
     @MediaItemHolder.RepeatType
     public int m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
@@ -60,18 +79,13 @@ public class MediaPlayerView{
         this.m_vBtn_PlayPause = findViewById(R.id.btn_play_pause);
         this.m_vBtn_Next = findViewById(R.id.btn_skip_next);
         this.m_vBtn_Shuffle = findViewById(R.id.btn_shuffle);
+        this.materialCheckBox = findViewById(R.id.btn_favorite);
 
     }
 
     private void setOnListener() {
-        if (MediaItemHolder.getInstance().getMediaController() != null) {
-            mMediaController = MediaItemHolder.getInstance().getMediaController();
-            LogUtils.ApplicationLogD("IT'sssssssssssss Aliveeeeeeeeeeee");
-        } else {
-            LogUtils.ApplicationLogD("Co Biennnnnnnnnnnnnnnnnnnnnnnnnnnn");
-        }
-        this.m_vSeekBar_Main.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
+        this.m_vSeekBar_Main.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int final_value;
             boolean isUser;
 
@@ -79,17 +93,25 @@ public class MediaPlayerView{
             public void onProgressChanged(SeekBar seekBar, int value, boolean fromUser) {
                 this.final_value = value;
                 this.isUser = fromUser;
+                int seekPosition = value * 1000;
+                if (fromUser) {
+                    mMediaController.seekTo(seekPosition);
+                }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                if (mMediaController != null)
+                    mMediaController.pause();
                 m_vCanUpdateSeekbar = false;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if (isUser) {
-                    mMediaController.seekTo(final_value);
+                    //mMediaController.seekTo(final_value);
+                    if (mMediaController != null)
+                        mMediaController.play();
                 }
                 m_vCanUpdateSeekbar = true;
             }
@@ -148,23 +170,68 @@ public class MediaPlayerView{
     }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {
-        int totalDuration = (int) mMediaController.getDuration();
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
-        this.m_vSeekBar_Main.setProgress(0);
-        this.m_vSeekBar_Main.setMax((int) totalDuration);
-
         ImageView imgView = (ImageView) this.m_vCardView_Art.getChildAt(0);
+/*
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(@Nullable Palette palette) {
+
+            }
+        });*/
+
+
+        Glide.get(this.getRootView().getContext()).clearMemory();
         if (imgView != null) {
             Glide.with(this.getRootView().getContext())
                     .load(bitmap)
-                    .skipMemoryCache(false)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                    .skipMemoryCache(true)
                     .placeholder(leveldown.kyle.icon_packs.R.drawable.ic_album_24px)
                     .into(imgView);
         }
 
-        this.m_vTextView_MaxDuration.setText(getTimeFormat(totalDuration));
+    }
+
+    public void onSetupSeekBar() {
+        int totalDuration = 0;
+        //Reset SeekBar
+        if (mMediaController.getDuration() != C.TIME_UNSET) {
+            totalDuration = (int) mMediaController.getDuration();
+            m_vSeekBar_Main.setMax(totalDuration / 1000);
+            m_vTextView_MaxDuration.setText(getTimeFormat(totalDuration));
+            m_vTextView_CurrentDuration.setText("00:00");
+        }
+        mRootView.post(new Runnable() {
+            @Override
+            public void run() {
+                int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                int totalDuration = (int) (mMediaController.getDuration() / 1000);
+                m_vSeekBar_Main.setProgress(currentPosition);
+                m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
+
+                // Update user History
+                boolean isSaveUserHistoryTriggered = MediaItemHolder.getInstance().isSaveUserHistoryTriggered();
+                if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
+                    updateUserHistory();
+                }
+
+                handler.postDelayed(this, 1000);
+            }
+        });
+    }
+
+    private void updateUserHistory() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            ListenHistory listenHistory = getSongHistory(user.getUid());
+            LogUtils.ApplicationLogI("Trigger Call Update History!");
+            triggerAPICall(listenHistory);
+            MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
+        } else {
+            //triggerSaveLocal();
+            MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
+        }
     }
 
     public void onPlaybackStateChanged(boolean isPlaying) {
@@ -173,10 +240,10 @@ public class MediaPlayerView{
         }
 
         if (m_vCanUpdateSeekbar) {
-            this.m_vSeekBar_Main.setProgress((int) mMediaController.getCurrentPosition());
+            //this.m_vSeekBar_Main.setProgress((int) mMediaController.getCurrentPosition());
         }
         this.m_vBtn_PlayPause.setImageResource(!isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px : leveldown.kyle.icon_packs.R.drawable.ic_pause_24px);
-        this.m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
+
     }
 
     public View getRootView() {
@@ -202,6 +269,7 @@ public class MediaPlayerView{
     }
 
     public void onPanelStateChanged(int panelSate) {
+        mState = panelSate;
         if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
             this.mRootView.setVisibility(View.INVISIBLE);
         } else
@@ -222,11 +290,40 @@ public class MediaPlayerView{
     }
 
     public void onMediaControllerConnect(MediaController controller) {
-        LogUtils.ApplicationLogD("onMediaControllerConnect MediaView Called");
         if (this.mMediaController != null) {
             return;
         }
         mMediaController = controller;
         setOnListener();
+    }
+
+    @SuppressLint("CheckResult")
+    private void triggerAPICall(ListenHistory listenHistory) {
+
+        ApiService.apiService.addUserListenHistory(listenHistory)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Update User History! " + listenHistory.getSongID());
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Upload Failed");
+                });
+    }
+
+    private ListenHistory getSongHistory(String uid) {
+
+        int currentIndex = mMediaController.getCurrentMediaItemIndex();
+        String songID = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getSongID();
+        String songName = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getName();
+        LogUtils.ApplicationLogD("Song about to saved: " + songName);
+        DateTimeFormatter formatter = null;
+        String formattedDate = "";
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            LocalDate currentDate = LocalDate.now();
+            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            formattedDate = currentDate.format(formatter);
+        }
+
+        return new ListenHistory(uid, songID, 1, materialCheckBox.isChecked(), formattedDate);
     }
 }

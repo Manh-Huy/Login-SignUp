@@ -35,8 +35,30 @@ public class MediaItemHolder {
     private static MediaItemHolder instance;
     private List<MediaItem> listMediaItem;
     private List<Song> listSongs;
-
+    private boolean isSetupMetaData;
+    private boolean isSaveUserHistoryTriggered ;
     private boolean isShuffle;
+
+    public static void setInstance(MediaItemHolder instance) {
+        MediaItemHolder.instance = instance;
+    }
+
+    public boolean isSetupMetaData() {
+        return isSetupMetaData;
+    }
+
+    public void setSetupMetaData(boolean setupMetaData) {
+        isSetupMetaData = setupMetaData;
+    }
+
+    public boolean isSaveUserHistoryTriggered() {
+        return isSaveUserHistoryTriggered;
+    }
+
+    public void setSaveUserHistoryTriggered(boolean saveUserHistoryTriggered) {
+        isSaveUserHistoryTriggered = saveUserHistoryTriggered;
+    }
+
     private boolean isRepeatSingle;
     private boolean isRepeatPlaylist;
 
@@ -46,6 +68,8 @@ public class MediaItemHolder {
         isShuffle = false;
         isRepeatSingle = false;
         isRepeatPlaylist = false;
+        isSetupMetaData = false;
+        isSaveUserHistoryTriggered = false;
     }
 
     public static MediaItemHolder getInstance() {

@@ -97,12 +97,12 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
         LogUtils.ApplicationLogI("Called BitMap");
         byte[] art = mediaMetadata.artworkData;
         Bitmap bitmap = null;
-        if (art != null){
-            bitmap= BitmapFactory.decodeByteArray(art, 0, art.length);
+        if (art != null) {
+            bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
         }
 
         this.mMediaPlayerBarView.onUpdateMetadata(mediaMetadata, bitmap);
-        this.mMediaPlayerView.onUpdateMetadata(mediaMetadata,bitmap);
+        this.mMediaPlayerView.onUpdateMetadata(mediaMetadata, bitmap);
 
         this.mAsyncPaletteBuilder.onStartAnimation(bitmap);
     }
@@ -152,26 +152,31 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
 
     @Override
     public void onUpdateVibrantColor(int vibrantColor) {
-
+        this.mMediaPlayerBarView.onUpdateVibrantColor(vibrantColor);
+        this.mMediaPlayerView.onUpdateVibrantColor(vibrantColor);
     }
 
     @Override
     public void onUpdateVibrantDarkColor(int vibrantDarkColor) {
-
+        this.mMediaPlayerBarView.onUpdateVibrantDarkColor(vibrantDarkColor);
+        this.mMediaPlayerView.onUpdateVibrantDarkColor(vibrantDarkColor);
     }
 
     @Override
     public void onUpdateVibrantLightColor(int vibrantLightColor) {
-
+        this.mMediaPlayerBarView.onUpdateVibrantLightColor(vibrantLightColor);
+        this.mMediaPlayerView.onUpdateVibrantLightColor(vibrantLightColor);
     }
 
     @Override
     public void onUpdateMutedColor(int mutedColor) {
-
+        this.mMediaPlayerBarView.onUpdateMutedColor(mutedColor);
+        this.mMediaPlayerView.onUpdateMutedColor(mutedColor);
     }
 
     @Override
     public void onUpdateMutedDarkColor(int mutedDarkColor) {
-
+        this.mMediaPlayerBarView.onUpdateMutedDarkColor(mutedDarkColor);
+        this.mMediaPlayerView.onUpdateMutedDarkColor(mutedDarkColor);
     }
 }

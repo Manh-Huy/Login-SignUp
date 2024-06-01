@@ -223,6 +223,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
         LogUtils.ApplicationLogI("onStart: Called");
         super.onStart();
     }
+
     @Override
     protected void onPause() {
         LogUtils.ApplicationLogI("onPause: ");
@@ -319,32 +320,32 @@ public class MediaPlayerActivity extends AppCompatActivity {
         //Update SeekBar Continuosly
         MediaPlayerActivity.this
                 .runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mMediaController != null) {
-                    int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
-                    int totalDuration = (int) (mMediaController.getDuration() / 1000);
-                    seekBar.setProgress(currentPosition);
-                    tvDurationPlayed.setText(mFormatTime.format(mMediaController.getCurrentPosition()));
+                    @Override
+                    public void run() {
+                        if (mMediaController != null) {
+                            int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                            int totalDuration = (int) (mMediaController.getDuration() / 1000);
+                            seekBar.setProgress(currentPosition);
+                            tvDurationPlayed.setText(mFormatTime.format(mMediaController.getCurrentPosition()));
 
-                    // Update user History
-                    if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
-                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        if (user != null) {
-                            ListenHistory listenHistory = getSongHistory(user.getUid());
-                            LogUtils.ApplicationLogI("Trigger Call Update History!");
-                            triggerAPICall(listenHistory);
-                            isSaveUserHistoryTriggered = true;
-                        } else {
-                            //triggerSaveLocal();
-                            isSaveUserHistoryTriggered = true;
+                            // Update user History
+                            if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
+                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                if (user != null) {
+                                    ListenHistory listenHistory = getSongHistory(user.getUid());
+                                    LogUtils.ApplicationLogI("Trigger Call Update History!");
+                                    triggerAPICall(listenHistory);
+                                    isSaveUserHistoryTriggered = true;
+                                } else {
+                                    //triggerSaveLocal();
+                                    isSaveUserHistoryTriggered = true;
+                                }
+
+                            }
                         }
-
+                        handler.postDelayed(this, 1000);
                     }
-                }
-                handler.postDelayed(this, 1000);
-            }
-        });
+                });
     }
 
     private ListenHistory getSongHistory(String uid) {

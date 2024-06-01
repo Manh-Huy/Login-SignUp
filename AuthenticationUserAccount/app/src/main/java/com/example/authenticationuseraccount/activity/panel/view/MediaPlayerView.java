@@ -333,4 +333,9 @@ public class MediaPlayerView {
 
         return new ListenHistory(uid, songID, 1, materialCheckBox.isChecked(), formattedDate);
     }
+
+    public void onUpdateVibrantColor(int vibrantColor) {
+        //this.mImageBtn_PlayPause.setBackgroundColor(vibrantColor);
+        this.
+    }
 }

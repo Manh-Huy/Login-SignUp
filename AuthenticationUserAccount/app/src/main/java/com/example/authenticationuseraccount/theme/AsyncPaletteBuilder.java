@@ -38,6 +38,9 @@ public class AsyncPaletteBuilder {
         this.mDefColors.put(Vibrant_Type.VIBRANT, Color.parseColor("#424242"));
         this.mPrevColors.put(Vibrant_Type.VIBRANT, this.mDefColors.get(Vibrant_Type.VIBRANT));
 
+        this.mDefColors.put(Vibrant_Type.VIBRANT_LIGHT, Color.parseColor("#424242"));
+        this.mPrevColors.put(Vibrant_Type.VIBRANT_LIGHT, this.mDefColors.get(Vibrant_Type.VIBRANT_LIGHT));
+
         this.mDefColors.put(Vibrant_Type.VIBRANT_DARK, Color.parseColor("#424242"));
         this.mPrevColors.put(Vibrant_Type.VIBRANT_DARK, this.mDefColors.get(Vibrant_Type.VIBRANT_DARK));
 
@@ -51,7 +54,7 @@ public class AsyncPaletteBuilder {
     private ValueAnimator getColorAnimator(int fromColor, int toColor) {
         ValueAnimator valueAnimator = ValueAnimator.ofObject(
                 (TypeEvaluator) new ArgbEvaluator(),
-                new Object[] {Integer.valueOf(fromColor), Integer.valueOf(toColor)});
+                new Object[]{Integer.valueOf(fromColor), Integer.valueOf(toColor)});
         valueAnimator.setDuration(ANIM_DURATION);
         return valueAnimator;
     }
@@ -70,7 +73,7 @@ public class AsyncPaletteBuilder {
         this.mAnimators.put(type, animator);
 
         animator.addUpdateListener(valueAnimator -> {
-            action.onValueAnimated((int)valueAnimator.getAnimatedValue());
+            action.onValueAnimated((int) valueAnimator.getAnimatedValue());
         });
 
         animator.start();
@@ -83,6 +86,11 @@ public class AsyncPaletteBuilder {
                     AsyncPaletteBuilder.this.mStateListener.onUpdateVibrantColor(value);
                     AsyncPaletteBuilder.this.mPrevColors.put(Vibrant_Type.VIBRANT, value);
                 }, this.mPrevColors.get(Vibrant_Type.VIBRANT), palette.getVibrantColor(mDefColors.get(Vibrant_Type.VIBRANT)));
+
+                onStartColorAnimation(Vibrant_Type.VIBRANT_LIGHT, value -> {
+                    AsyncPaletteBuilder.this.mStateListener.onUpdateVibrantLightColor(value);
+                    AsyncPaletteBuilder.this.mPrevColors.put(Vibrant_Type.VIBRANT_LIGHT, value);
+                }, this.mPrevColors.get(Vibrant_Type.VIBRANT_LIGHT), palette.getLightVibrantColor(mDefColors.get(Vibrant_Type.VIBRANT_LIGHT)));
 
                 onStartColorAnimation(Vibrant_Type.VIBRANT_DARK, value -> {
                     AsyncPaletteBuilder.this.mStateListener.onUpdateVibrantDarkColor(value);
@@ -98,13 +106,18 @@ public class AsyncPaletteBuilder {
                     AsyncPaletteBuilder.this.mStateListener.onUpdateMutedDarkColor(value);
                     AsyncPaletteBuilder.this.mPrevColors.put(Vibrant_Type.MUTED_DARK, value);
                 }, this.mPrevColors.get(Vibrant_Type.MUTED_DARK), palette.getDarkMutedColor(mDefColors.get(Vibrant_Type.MUTED_DARK)));
+
             });
-        }
-        else {
+        } else {
             onStartColorAnimation(Vibrant_Type.VIBRANT, value -> {
                 AsyncPaletteBuilder.this.mStateListener.onUpdateVibrantColor(value);
                 AsyncPaletteBuilder.this.mPrevColors.put(Vibrant_Type.VIBRANT, value);
             }, this.mPrevColors.get(Vibrant_Type.VIBRANT), this.mDefColors.get(Vibrant_Type.VIBRANT));
+
+            onStartColorAnimation(Vibrant_Type.VIBRANT_LIGHT, value -> {
+                AsyncPaletteBuilder.this.mStateListener.onUpdateVibrantLightColor(value);
+                AsyncPaletteBuilder.this.mPrevColors.put(Vibrant_Type.VIBRANT_LIGHT, value);
+            }, this.mPrevColors.get(Vibrant_Type.VIBRANT_LIGHT), this.mDefColors.get(Vibrant_Type.VIBRANT_LIGHT));
 
             onStartColorAnimation(Vibrant_Type.VIBRANT_DARK, value -> {
                 AsyncPaletteBuilder.this.mStateListener.onUpdateVibrantDarkColor(value);

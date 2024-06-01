@@ -153,8 +153,11 @@ public class MediaPlayerBarView {
     }
 
     public void onUpdateVibrantColor(int vibrantColor) {
+        this.mImageBtn_PlayPause.setBackgroundColor(vibrantColor);
+    }
 
-        //this.mImageBtn_PlayPause.setBackgroundColor(vibrantColor);
+    public void onUpdateVibrantLightColor(int vibrantLightColor) {
+        this.mProgressIndicator.setIndicatorColor(vibrantLightColor);
     }
 
     public void onUpdateVibrantDarkColor(int vibrantDarkColor) {
@@ -167,10 +170,5 @@ public class MediaPlayerBarView {
 
     public void onUpdateMutedDarkColor(int mutedDarkColor) {
         this.mProgressIndicator.setTrackColor(mutedDarkColor);
-    }
-
-    public void onMediaControllerConnect(MediaController controller) {
-        LogUtils.ApplicationLogD("onMediaControllerConnect MediaViewBar Called");
-        this.onMediaControllerCreate(controller);
     }
 }

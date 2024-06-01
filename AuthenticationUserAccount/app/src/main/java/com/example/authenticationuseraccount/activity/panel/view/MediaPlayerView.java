@@ -63,12 +63,14 @@ public class MediaPlayerView {
     public int m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
     private boolean m_vCanUpdateSeekbar = true;
     private MediaController mMediaController;
+    private ConstraintLayout mConstraintLayout;
 
 
     public MediaPlayerView(View rootView) {
         this.mRootView = rootView;
         this.mControlsContainer = findViewById(R.id.media_player_controls_container);
         this.mRootView.setAlpha(0.0F);
+        this.mConstraintLayout = findViewById(R.id.media_player_controls_container);
         this.mProgressBar = findViewById(R.id.progress_bar);
         this.m_vCardView_Art = this.mControlsContainer.findViewById(R.id.card_view_artist_art_container);
         this.m_vTextView_Title = this.mControlsContainer.findViewById(R.id.text_view_song_title);
@@ -333,5 +335,9 @@ public class MediaPlayerView {
 
     public void onUpdateVibrantColor(int vibrantColor) {
         //this.mImageBtn_PlayPause.setBackgroundColor(vibrantColor);
+    }
+
+    public void onUpdateVibrantDarkColor(int vibrantDarkColor) {
+        this.mConstraintLayout.setBackgroundColor(vibrantDarkColor);
     }
 }

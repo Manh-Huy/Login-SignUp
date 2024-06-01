@@ -2,30 +2,27 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="colorPrimary">#00FFFF</color>
-    <color name="colorPrimaryDark">#03E4CA</color>
-    <color name="colorAccent">#38D6C7</color>
+    <color name="colorPrimary">#69DFF4</color>
+    <color name="colorPrimaryDark">#EDEDED</color>
+    <color name="colorAccent">#83F6F6</color>
     <color name="navigationBarColor">#9BE6F1</color>
     <color name="statusBarColor">#9BE6F1</color>
 
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
     <color name="bg_gray">#1B1B1B</color>
 
-    <color name="bg_light_gray">#323232</color>
-    <color name="active_color">#2196F3</color>
+    <color name="mcgpalette0_50">#f2fffe</color>
+    <color name="mcgpalette0_100">#e0fefe</color>
+    <color name="mcgpalette0_200">#cbfdfd</color>
+    <color name="mcgpalette0_300">#b6fcfc</color>
+    <color name="mcgpalette0_400">#a6fcfb</color>
+    <color name="mcgpalette0_500">#96fbfa</color>
+    <color name="mcgpalette0_600">#8efaf9</color>
+    <color name="mcgpalette0_700">#83faf9</color>
+    <color name="mcgpalette0_800">#79f9f8</color>
+    <color name="mcgpalette0_900">#68f8f6</color>
+    <color name="mcgpalette0_A100">#ffffff</color>
+    <color name="mcgpalette0_A200">#ffffff</color>
+    <color name="mcgpalette0_A400">#ffffff</color>
+    <color name="mcgpalette0_A700">#eaffff</color>
 
-
-    <array name="rainbow_colors">
-        <item>#FF0000</item> <!-- Đỏ -->
-        <item>#FF7F00</item> <!-- Cam đậm -->
-        <item>#FFFF00</item> <!-- Vàng -->
-        <item>#00FF00</item> <!-- Lục -->
-        <item>#0000FF</item> <!-- Lam -->
-        <item>#4B0082</item> <!-- Chàm -->
-        <item>#9400D3</item> <!-- Tím -->
-    </array>
 </resources>

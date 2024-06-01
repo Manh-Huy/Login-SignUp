@@ -9,7 +9,7 @@
         android:id="@+id/root_navigation_bar"
         android:layout_width="match_parent"
         android:layout_height="54dp"
-        android:background="#FFF"
+        android:background="@color/mcgpalette0_200"
         android:clickable="true"
         app:rbb_selectedTabType="text"
         app:rbb_indicatorAppearance="round"

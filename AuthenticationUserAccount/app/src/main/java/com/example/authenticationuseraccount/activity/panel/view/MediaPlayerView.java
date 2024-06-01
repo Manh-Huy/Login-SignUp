@@ -336,6 +336,5 @@ public class MediaPlayerView {
 
     public void onUpdateVibrantColor(int vibrantColor) {
         //this.mImageBtn_PlayPause.setBackgroundColor(vibrantColor);
-        this.
     }
 }

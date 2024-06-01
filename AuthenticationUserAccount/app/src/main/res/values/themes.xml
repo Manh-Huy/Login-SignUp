@@ -1,18 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.AuthenticationUserAccount" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimary">@color/mcgpalette0_400</item>
+        <item name="colorPrimaryVariant">@color/mcgpalette0_300</item>
+        <item name="colorOnPrimary">@color/mcgpalette0_200</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/colorPrimaryDark</item>
+        <item name="colorSecondary">@color/mcgpalette0_900</item>
+        <item name="colorSecondaryVariant">@color/mcgpalette0_800</item>
+        <item name="colorOnSecondary">@color/mcgpalette0_700</item>
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="android:navigationBarColor">@color/navigationBarColor</item>
-        <item name="android:statusBarColor">@color/statusBarColor</item>
-
+        <item name="android:navigationBarColor">@color/mcgpalette0_400</item>
+        <item name="android:statusBarColor">@color/mcgpalette0_200</item>
 
     </style>
 

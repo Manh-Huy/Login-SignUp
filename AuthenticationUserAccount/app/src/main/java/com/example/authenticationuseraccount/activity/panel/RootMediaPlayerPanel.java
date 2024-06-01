@@ -159,24 +159,24 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
     @Override
     public void onUpdateVibrantDarkColor(int vibrantDarkColor) {
         this.mMediaPlayerBarView.onUpdateVibrantDarkColor(vibrantDarkColor);
-        this.mMediaPlayerView.onUpdateVibrantDarkColor(vibrantDarkColor);
+        //this.mMediaPlayerView.onUpdateVibrantDarkColor(vibrantDarkColor);
     }
 
     @Override
     public void onUpdateVibrantLightColor(int vibrantLightColor) {
         this.mMediaPlayerBarView.onUpdateVibrantLightColor(vibrantLightColor);
-        this.mMediaPlayerView.onUpdateVibrantLightColor(vibrantLightColor);
+        //this.mMediaPlayerView.onUpdateVibrantLightColor(vibrantLightColor);
     }
 
     @Override
     public void onUpdateMutedColor(int mutedColor) {
         this.mMediaPlayerBarView.onUpdateMutedColor(mutedColor);
-        this.mMediaPlayerView.onUpdateMutedColor(mutedColor);
+        //this.mMediaPlayerView.onUpdateMutedColor(mutedColor);
     }
 
     @Override
     public void onUpdateMutedDarkColor(int mutedDarkColor) {
         this.mMediaPlayerBarView.onUpdateMutedDarkColor(mutedDarkColor);
-        this.mMediaPlayerView.onUpdateMutedDarkColor(mutedDarkColor);
+        //this.mMediaPlayerView.onUpdateMutedDarkColor(mutedDarkColor);
     }
 }

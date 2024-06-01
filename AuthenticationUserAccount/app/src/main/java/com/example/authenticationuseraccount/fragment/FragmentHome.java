@@ -83,7 +83,7 @@ public class FragmentHome extends Fragment {
     private List<Song> listSongQuickPick;
     private List<Song> listNewReleaseSong;
     private List<ListenHistory> mListUserListenHistory;
-    private final int numberSongShowInQuickPick = 5;
+    private final int numberSongShowInQuickPick = 10;
 
     Timer mTimer;
 

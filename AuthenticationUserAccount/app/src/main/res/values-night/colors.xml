@@ -2,8 +2,27 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#F382A8</color>
+    <color name="colorPrimaryDark">#13E8A1</color>
+    <color name="colorAccent">#EAF3F2</color>
     <color name="navigationBarColor">#9BE6F1</color>
-    <color name="colorPrimary">#00FFFF</color>
-    <color name="colorPrimaryDark">#03E4CA</color>
-    <color name="colorAccent">#38D6C7</color>
+    <color name="statusBarColor">#9BE6F1</color>
+
+    <color name="bg_gray">#1B1B1B</color>
+
+    <color name="mcgpalette0_50">#f2fffe</color>
+    <color name="mcgpalette0_100">#e0fefe</color>
+    <color name="mcgpalette0_200">#cbfdfd</color>
+    <color name="mcgpalette0_300">#b6fcfc</color>
+    <color name="mcgpalette0_400">#a6fcfb</color>
+    <color name="mcgpalette0_500">#96fbfa</color>
+    <color name="mcgpalette0_600">#8efaf9</color>
+    <color name="mcgpalette0_700">#83faf9</color>
+    <color name="mcgpalette0_800">#79f9f8</color>
+    <color name="mcgpalette0_900">#68f8f6</color>
+    <color name="mcgpalette0_A100">#ffffff</color>
+    <color name="mcgpalette0_A200">#ffffff</color>
+    <color name="mcgpalette0_A400">#ffffff</color>
+    <color name="mcgpalette0_A700">#eaffff</color>
+
 </resources>

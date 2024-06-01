@@ -22,6 +22,7 @@ public class DataLocalManager {
     private static final String PREF_REMEMBER_ME_ACCOUNT = "PREF_REMEMBER_ME_ACCOUNT";
     private static final String PREF_HISTORY_SEARCH = "PREF_HISTORY_SEARCH";
     private static final String PREF_LISTEN_HISTORY = "PREF_LISTEN_HISTORY";
+    private static final String PREF_NAME_ALL_INFO_SONG = "PREF_NAME_ALL_INFO_SONG";
     private static DataLocalManager instance;
     private MySharedPreferences mySharedPreferences;
 
@@ -37,23 +38,6 @@ public class DataLocalManager {
         }
         return instance;
     }
-
-    private void updateHistorySearchKey() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            historySearchKey = PREF_HISTORY_SEARCH + user.getUid();
-        } else {
-            historySearchKey = PREF_HISTORY_SEARCH;
-        }
-    }
-    private void updateListenHistoryKey() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            listenHistoryKey = PREF_LISTEN_HISTORY + user.getUid();
-        } else {
-            listenHistoryKey = PREF_LISTEN_HISTORY;
-        }
-    }
     public static void setRememberMeAccount(boolean isRemember) {
         DataLocalManager.getInstance().mySharedPreferences.putBooleanValue(PREF_REMEMBER_ME_ACCOUNT, isRemember);
     }
@@ -61,9 +45,6 @@ public class DataLocalManager {
         return DataLocalManager.getInstance().mySharedPreferences.getBooleanValue(PREF_REMEMBER_ME_ACCOUNT);
     }
     public static void setHistorySearch(String query) {
-        DataLocalManager instance = DataLocalManager.getInstance();
-        instance.updateHistorySearchKey();
-
         // Lấy danh sách các mục tìm kiếm hiện có và GÁN CHO NÓ VÀO 1 BIẾN MỚI
         Set<String> searchItems = instance.mySharedPreferences.getStringSetValue(instance.historySearchKey);
         Set<String> updatedSearchItems = new HashSet<>(searchItems);
@@ -71,15 +52,9 @@ public class DataLocalManager {
         instance.mySharedPreferences.putStringSetValue(instance.historySearchKey, updatedSearchItems); // Lưu lại danh sách đã cập nhật
     }
     public static Set<String> getHistorySearch() {
-        DataLocalManager instance = DataLocalManager.getInstance();
-        instance.updateHistorySearchKey();
-
         return instance.mySharedPreferences.getStringSetValue(instance.historySearchKey);
     }
     public static void mergeLocalWithAccountHistorySearch() {
-        DataLocalManager instance = DataLocalManager.getInstance();
-        instance.updateHistorySearchKey();
-
         if (!Objects.equals(instance.historySearchKey, PREF_HISTORY_SEARCH))
         {
             Set<String> searchLocalItems = instance.mySharedPreferences.getStringSetValue(PREF_HISTORY_SEARCH);
@@ -98,9 +73,6 @@ public class DataLocalManager {
         }
     }
     public static void setListenHistory(ListenHistory listenHistory) {
-        DataLocalManager instance = DataLocalManager.getInstance();
-        instance.updateListenHistoryKey();
-
         // Lấy list ListenHistory hiện tại và GÁN CHO NÓ MỘT BIẾN MỚI
         List<ListenHistory> listListenHistory = DataLocalManager.getListenHistory(false);
         List<ListenHistory> updatedListListenHistory = new ArrayList<>(listListenHistory);
@@ -113,9 +85,6 @@ public class DataLocalManager {
     }
 
     public static List<ListenHistory> getListenHistory(boolean isGetLocalListenHistory) {
-        DataLocalManager instance = DataLocalManager.getInstance();
-        instance.updateListenHistoryKey();
-
         String strJsonArray;
         if (isGetLocalListenHistory)
         {
@@ -145,9 +114,6 @@ public class DataLocalManager {
     }
 
     public static void mergeLocalWithAccountListenHistory() {
-        DataLocalManager instance = DataLocalManager.getInstance();
-        instance.updateListenHistoryKey();
-
         if (!Objects.equals(instance.listenHistoryKey, PREF_LISTEN_HISTORY))
         {
             List<ListenHistory> localItems = DataLocalManager.getListenHistory(true);
@@ -170,5 +136,11 @@ public class DataLocalManager {
                 DataLocalManager.getInstance().mySharedPreferences.putStringValue(PREF_LISTEN_HISTORY, strJsonArray);
             }
         }
+    }
+    public static void setNameAllInfoSong(Set<String> songInfo) {
+        DataLocalManager.getInstance().mySharedPreferences.putStringSetValue(PREF_NAME_ALL_INFO_SONG, songInfo);
+    }
+    public static Set<String> getNameAllInfoSong() {
+        return DataLocalManager.getInstance().mySharedPreferences.getStringSetValue(PREF_NAME_ALL_INFO_SONG);
     }
 }

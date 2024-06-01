@@ -29,7 +29,7 @@
             android:layout_toEndOf="@id/btn_history"
             android:gravity="center_vertical"
             android:text="Title"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:textSize="20sp"
             tools:text="Item Title" />
 

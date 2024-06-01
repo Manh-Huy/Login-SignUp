@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -22,10 +23,15 @@ import com.example.authenticationuseraccount.adapter.SearchSongAdapter;
 import com.example.authenticationuseraccount.adapter.SearchedItemSongAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.SearchHistory;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -35,9 +41,12 @@ import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SearchActivity extends AppCompatActivity {
-    private Disposable mDisposable;
+    //private Disposable mDisposable;
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     private RecyclerView searchRecycleView;
     private SearchView searchView;
@@ -45,9 +54,10 @@ public class SearchActivity extends AppCompatActivity {
     private TextView cancelTextView;
     private ProgressBar progressBar;
     private FrameLayout overlayLayout;
-    private List<Song> mListSong = new ArrayList<>();
+    private List<String> listNameAllInfoSong;
     private SearchSongAdapter searchSongAdapter;
     private SearchedItemSongAdapter searchedItemSongAdapter;
+    SearchHistory searchHistoryByUserId = new SearchHistory();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,11 +77,20 @@ public class SearchActivity extends AppCompatActivity {
         });
         searchRecycleView.setAdapter(searchSongAdapter);
 
-        DataLocalManager.mergeLocalWithAccountHistorySearch();
+        addSearchHistoryFromLocal();
+
+        progressBar.setVisibility(View.VISIBLE);
+        overlayLayout.setVisibility(View.VISIBLE);
 
         showSearchHistory();
 
-        getSong();
+        // Lấy các thông tin của ba hát
+        Set<String> stringSet = new HashSet<>();
+        stringSet = DataLocalManager.getNameAllInfoSong();
+        listNameAllInfoSong = new ArrayList<>(stringSet);
+
+        progressBar.setVisibility(View.GONE);
+        overlayLayout.setVisibility(View.GONE);
 
         // Search View
         searchView = findViewById(R.id.searchView);
@@ -81,19 +100,19 @@ public class SearchActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 saveSearchQuery(query);
                 //filterList(query);
-                List<Song> resultSongs = new ArrayList<>();
-                for (Song song : mListSong) {
-                    if (song.getName().toLowerCase().contains(query.toLowerCase())) {
-                        resultSongs.add(song);
-                    }
-                }
-                if (resultSongs.isEmpty()) {
-                    Toast.makeText(SearchActivity.this, "No result return", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    searchedItemSongAdapter = new SearchedItemSongAdapter(getApplicationContext(), resultSongs);
-                    searchRecycleView.setAdapter(searchedItemSongAdapter);
-                }
+//                List<Song> resultSongs = new ArrayList<>();
+//                for (Song song : mListSong) {
+//                    if (song.getName().toLowerCase().contains(query.toLowerCase())) {
+//                        resultSongs.add(song);
+//                    }
+//                }
+//                if (resultSongs.isEmpty()) {
+//                    Toast.makeText(SearchActivity.this, "No result return", Toast.LENGTH_SHORT).show();
+//                }
+//                else {
+//                    searchedItemSongAdapter = new SearchedItemSongAdapter(getApplicationContext(), resultSongs);
+//                    searchRecycleView.setAdapter(searchedItemSongAdapter);
+//                }
 
                 return false;
             }
@@ -129,42 +148,41 @@ public class SearchActivity extends AppCompatActivity {
         });
 
     }
-    private void getSong() {
-        progressBar.setVisibility(View.VISIBLE);
-        overlayLayout.setVisibility(View.VISIBLE);
-        ApiService.apiService.getSongs()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Song>>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                        mDisposable = d;
-                    }
-
-                    @Override
-                    public void onNext(@NonNull List<Song> songs) {
-                        mListSong = songs;
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        LogUtils.ApplicationLogE("Call api error");
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        progressBar.setVisibility(View.GONE);
-                        overlayLayout.setVisibility(View.GONE);
-                    }
-                });
-    }
+//    private void getSong() {
+//        progressBar.setVisibility(View.VISIBLE);
+//        overlayLayout.setVisibility(View.VISIBLE);
+//        ApiService.apiService.getSongs()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Observer<List<Song>>() {
+//                    @Override
+//                    public void onSubscribe(@NonNull Disposable d) {
+//                        mDisposable = d;
+//                    }
+//
+//                    @Override
+//                    public void onNext(@NonNull List<Song> songs) {
+//                        mListSong = songs;
+//                    }
+//
+//                    @Override
+//                    public void onError(@NonNull Throwable e) {
+//                        LogUtils.ApplicationLogE("Call api error");
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        progressBar.setVisibility(View.GONE);
+//                        overlayLayout.setVisibility(View.GONE);
+//                    }
+//                });
+//    }
     private void filterList(String text) {
         List<String> filteredList = new ArrayList<>();
         if (!text.isEmpty()) {
-            for (Song song : mListSong) {
-                String songName = song.getName();
-                if (songName != null && songName.toLowerCase().contains(text.toLowerCase())) {
-                    filteredList.add(songName);
+            for (String item : listNameAllInfoSong) {
+                if (item != null && item.toLowerCase().contains(text.toLowerCase())) {
+                    filteredList.add(item);
                 }
             }
         }
@@ -172,13 +190,78 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void saveSearchQuery(String query) {
-        DataLocalManager.setHistorySearch(query);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null)
+        {
+            DataLocalManager.setHistorySearch(query);
+
+        }
+        else
+        {
+            String idUser = user.getUid();
+            addSearchHistory(idUser, query);
+        }
+    }
+
+    private void addSearchHistoryFromLocal() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null)
+        {
+           return;
+        }
+
+        Set<String> searchHistoryLocalList = DataLocalManager.getHistorySearch();
+        String idUser = user.getUid();
+        for (String query : searchHistoryLocalList) {
+            addSearchHistory(idUser, query);
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private void addSearchHistory(String userID, String query) {
+        ApiService.apiService.addSearchHistory(userID, query)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Succefully");
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Failed");
+                });
     }
 
     private void showSearchHistory() {
-        Set<String> searchHistoryList = DataLocalManager.getHistorySearch();
-        List<String> searchArrayList = new ArrayList<>(searchHistoryList);
-        searchSongAdapter.setFilteredList(searchArrayList,false);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null)
+        {
+            Set<String> searchHistoryList = DataLocalManager.getHistorySearch();
+            List<String> searchArrayList = new ArrayList<>(searchHistoryList);
+            searchSongAdapter.setFilteredList(searchArrayList,false);
+        }
+        else
+        {
+            String idUser = user.getUid();
+            getSearchHistoryById(idUser);
+        }
+    }
+
+    private void getSearchHistoryById(String idUser) {
+        ApiService.apiService.getSearchHistoryById(idUser).enqueue(new Callback<SearchHistory>() {
+            @Override
+            public void onResponse(Call<SearchHistory> call, Response<SearchHistory> response) {
+                searchHistoryByUserId = response.body();
+                if (searchHistoryByUserId != null) {
+                    searchSongAdapter.setFilteredList(searchHistoryByUserId.getHistory(), false);
+                } else {
+                    LogUtils.ApplicationLogE("Search history is null");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SearchHistory> call, Throwable t) {
+                LogUtils.ApplicationLogE("Call api getSearchHistoryById error");
+            }
+        });
     }
 
     private void speak() {
@@ -209,11 +292,11 @@ public class SearchActivity extends AppCompatActivity {
             }
         }
     }
-    @Override
-    protected void onDestroy() {
-        if (mDisposable != null) {
-            mDisposable.dispose();
-        }
-        super.onDestroy();
-    }
+//    @Override
+//    protected void onDestroy() {
+//        if (mDisposable != null) {
+//            mDisposable.dispose();
+//        }
+//        super.onDestroy();
+//    }
 }

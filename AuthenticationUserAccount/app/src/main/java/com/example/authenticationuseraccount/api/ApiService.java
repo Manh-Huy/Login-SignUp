@@ -2,6 +2,7 @@ package com.example.authenticationuseraccount.api;
 
 import com.example.authenticationuseraccount.model.ListenHistory;
 
+import com.example.authenticationuseraccount.model.SearchHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
 import com.google.gson.Gson;
@@ -22,6 +23,8 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -79,4 +82,12 @@ public interface ApiService {
 
     @POST("history")
     Completable addUserListenHistory(@Body ListenHistory listenHistory);
+
+    @GET("search/getAllName")
+    Observable<List<String>> getNameAllInfoSong();
+    @FormUrlEncoded
+    @POST("searchHistory")
+    Completable addSearchHistory(@Field("userID") String userID, @Field("content") String query);
+    @GET("searchHistory/{id}")
+    Call<SearchHistory> getSearchHistoryById(@Path("id") String userID);
 }

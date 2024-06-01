@@ -5,13 +5,16 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -20,10 +23,24 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class SplashScreenActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
+    private Disposable mDisposable;
+
+    private List<String> mListName = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,18 +57,54 @@ public class SplashScreenActivity extends AppCompatActivity {
         // Build a GoogleSignInClient with the options specified by gso
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        if (!DataLocalManager.getRememberMeAccount()) {
-            // Redirect to login screen if "Remember me" is false
-            if (mAuth.getCurrentUser() != null)
-            {
-                signOut();
-            }
-            else {
-                Toast.makeText(this, "Chua dang nhap", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
-                finish();
-            }
-        }
+        getNameAllInfoSongAndCheckUserLogin();
+    }
+
+    private void getNameAllInfoSongAndCheckUserLogin() {
+        ApiService.apiService.getNameAllInfoSong()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<String>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<String> strings) {
+                        mListName = strings;
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        // Save to shared preference
+                        Set<String> stringSet = new HashSet<>(mListName);
+                        DataLocalManager.setNameAllInfoSong(stringSet);
+
+                        if (!DataLocalManager.getRememberMeAccount()) {
+                            // Redirect to login screen if "Remember me" is false
+                            if (mAuth.getCurrentUser() != null)
+                            {
+                                signOut();
+                            }
+                            else {
+                                Toast.makeText(SplashScreenActivity.this, "Chua dang nhap", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                                finish();
+                            }
+                        }
+                        else
+                        {
+                            startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                            finish();
+                        }
+                    }
+                });
     }
 
     private void signOut() {
@@ -68,5 +121,12 @@ public class SplashScreenActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+    @Override
+    protected void onDestroy() {
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
+        super.onDestroy();
     }
 }

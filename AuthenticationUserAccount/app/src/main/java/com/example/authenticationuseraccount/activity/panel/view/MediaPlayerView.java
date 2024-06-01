@@ -28,6 +28,7 @@ import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.utils.DataLocalManager;
 import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -238,9 +239,15 @@ public class MediaPlayerView {
             triggerAPICall(listenHistory);
             MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
         } else {
-            //triggerSaveLocal();
+            triggerSaveLocal();
             MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
         }
+    }
+
+    private void triggerSaveLocal() {
+        LogUtils.ApplicationLogI("Trigger Local Call Update History!");
+        ListenHistory listenHistory = getSongHistory("Local");
+        DataLocalManager.setListenHistory(listenHistory);
     }
 
     public void onPlaybackStateChanged(boolean isPlaying) {

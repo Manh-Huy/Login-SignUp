@@ -9,6 +9,7 @@ import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowInsets;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.media3.common.MediaMetadata;
@@ -46,19 +47,18 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
     public void onCreateView() {
         this.setPanelState(MultiSlidingUpPanelLayout.HIDDEN);
         this.setSlideDirection(MultiSlidingUpPanelLayout.SLIDE_VERTICAL);
-        this.setPeakHeight(getNavigationBarHeight() + 46);
+        this.setPeakHeight(getNavigationBarHeight() + 106);
     }
 
     @Override
     public void onBindView() {
-        mMediaPlayerView = new MediaPlayerView((View) findViewById(R.id.media_player_view));
+        mMediaPlayerView = new MediaPlayerView(findViewById(R.id.media_player_view));
         mMediaPlayerBarView = new MediaPlayerBarView(findViewById(R.id.media_player_bar_view));
     }
 
     @Override
     public void onPanelStateChanged(int panelSate) {
         UIThread.getInstance().onPanelStateChanged(this.getClass(), panelSate);
-
         if (panelSate == MultiSlidingUpPanelLayout.HIDDEN) {
             mParentView.setVisibility(INVISIBLE);
         } else {

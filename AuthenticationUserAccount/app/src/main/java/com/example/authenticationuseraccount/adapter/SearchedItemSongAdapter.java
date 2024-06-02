@@ -2,38 +2,42 @@ package com.example.authenticationuseraccount.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
+import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
+import com.example.authenticationuseraccount.model.ItemSearchOption;
 import com.example.authenticationuseraccount.model.business.Song;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchedItemSongAdapter extends RecyclerView.Adapter<SearchedItemSongAdapter.SearchedItemSongViewHolder> {
 
-    Context mContext;
-    List<Song> listSong;
+    private Context mContext;
+    private FragmentActivity fragmentActivity;
+    private List<Song> listSong;
 
-    public SearchedItemSongAdapter(Context context, List<Song> song) {
+    public SearchedItemSongAdapter(Context context, FragmentActivity fragmentActivity, List<Song> song) {
         this.mContext = context;
+        this.fragmentActivity = fragmentActivity;
         this.listSong = song;
     }
 
     @NonNull
     @Override
     public SearchedItemSongViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new SearchedItemSongAdapter.SearchedItemSongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.searched_item_layout, parent, false));
+        return new SearchedItemSongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.searched_item_layout, parent, false));
     }
 
     @Override
@@ -50,35 +54,26 @@ public class SearchedItemSongAdapter extends RecyclerView.Adapter<SearchedItemSo
         holder.overflowMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    // Hiển thị menu tùy chọn
-                    PopupMenu popupMenu = new PopupMenu(mContext, holder.overflowMenu);
-                    popupMenu.inflate(R.menu.option_search_menu);
-                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            int itemId = item.getItemId();
-                            if (itemId == R.id.mnu_item_like) {
-                                Toast.makeText(mContext, "Đã thích", Toast.LENGTH_LONG).show();
-                            } else if (itemId == R.id.mnu_item_download) {
-                                Toast.makeText(mContext, "Đã tải xuống", Toast.LENGTH_LONG).show();
-                            } else if (itemId == R.id.mnu_item_add_to_playlist) {
-                                Toast.makeText(mContext, "Đã thêm vào danh sách phát", Toast.LENGTH_LONG).show();
-                            } else if (itemId == R.id.mnu_item_play_next) {
-                                Toast.makeText(mContext, "Sẽ phát tiếp theo", Toast.LENGTH_LONG).show();
-                            } else if (itemId == R.id.mnu_item_add_to_queue) {
-                                Toast.makeText(mContext, "Đã thêm vào hàng đợi", Toast.LENGTH_LONG).show();
-                            }
-                            return true;
-                        }
-                    });
-                    popupMenu.show();
-                }
+                clickOpenSearchOptionBottomSheetFragment();
             }
         });
+    }
 
+    private void clickOpenSearchOptionBottomSheetFragment() {
+        List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_heart, "Thích"));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_download, "Tải xuống"));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_playlist, "Thêm vào danh sách phát"));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_next, "Phát tiếp theo"));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_queue, "Thêm vào hàng đợi"));
 
+        FragmentSearchOptionBottomSheet fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
+            @Override
+            public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
+                Toast.makeText(mContext, itemSearchOption.getText(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        fragmentSearchOptionBottomSheet.show(fragmentActivity.getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
     }
 
     @Override

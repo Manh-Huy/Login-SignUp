@@ -5,6 +5,7 @@ import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.SearchHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
+import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -90,4 +91,7 @@ public interface ApiService {
     Completable addSearchHistory(@Field("userID") String userID, @Field("content") String query);
     @GET("searchHistory/{id}")
     Call<SearchHistory> getSearchHistoryById(@Path("id") String userID);
+
+    @GET("banners")
+    Observable<List<Banner>> getBanners();
 }

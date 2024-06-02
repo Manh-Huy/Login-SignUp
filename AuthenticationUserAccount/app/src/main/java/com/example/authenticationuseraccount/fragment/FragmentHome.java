@@ -78,6 +78,7 @@ public class FragmentHome extends Fragment {
     private ThumbnailSongAdapter mThumbnailSongAdapter_ListenAgain;
     private ThumbnailSongAdapter mThumbnailSongAdapter_Recommend;
     private ThumbnailSongNewAdapter mThumbnailSongNewAdapter_NewRelease;
+    private List<Banner> mListBanner;
     private List<Genre> mLisGenre;
     private List<Song> mListSong;
     private List<Song> listSongQuickPick;
@@ -149,12 +150,6 @@ public class FragmentHome extends Fragment {
             }
         });
 
-        // Banner
-        bannerAdapter = new BannerAdapter(getContext(), getListBanner());
-        viewPager.setAdapter(bannerAdapter);
-        circleIndicator.setViewPager(viewPager);
-        bannerAdapter.registerAdapterDataObserver(circleIndicator.getAdapterDataObserver());
-
         imgMenuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,7 +167,7 @@ public class FragmentHome extends Fragment {
         });
 
         getListSong();
-        autoSlideImages();
+        getListBanner();
         return view;
     }
 
@@ -187,7 +182,7 @@ public class FragmentHome extends Fragment {
                     @Override
                     public void run() {
                         int currentItem = viewPager.getCurrentItem();
-                        int totalItem = getListBanner().size()-1;
+                        int totalItem = mListBanner.size()-1;
                         if(currentItem < totalItem){
                             currentItem++;
                             viewPager.setCurrentItem(currentItem);
@@ -214,13 +209,38 @@ public class FragmentHome extends Fragment {
         return list;
     }
 
-    private List<Banner> getListBanner() {
-        List<Banner> list = new ArrayList<>();
-        list.add(new Banner(R.drawable.banner1));
-        list.add(new Banner(R.drawable.banner2));
-        list.add(new Banner(R.drawable.banner3));
-        list.add(new Banner(R.drawable.banner4));
-        return list;
+    private void getListBanner() {
+        ApiService.apiService.getBanners()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Banner>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull List<Banner> banners) {
+                        mListBanner = banners;
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api Banner error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        // Banner
+                        bannerAdapter = new BannerAdapter(getContext(), mListBanner);
+                        viewPager.setAdapter(bannerAdapter);
+                        circleIndicator.setViewPager(viewPager);
+                        bannerAdapter.registerAdapterDataObserver(circleIndicator.getAdapterDataObserver());
+
+                        autoSlideImages();
+                    }
+                });
+
     }
 
     private void getListSong() {

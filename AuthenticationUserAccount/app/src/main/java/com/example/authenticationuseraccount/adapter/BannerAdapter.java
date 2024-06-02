@@ -35,9 +35,10 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Banner banner = mListBanner.get(position);
         if(banner != null) {
-            Glide.with(mContext).load(banner.getResourceId()).into(holder.imgBanner);
+            Glide.with(mContext)
+                    .load(banner.getImageURL())
+                    .into(holder.imgBanner);
         }
-
     }
 
     @Override

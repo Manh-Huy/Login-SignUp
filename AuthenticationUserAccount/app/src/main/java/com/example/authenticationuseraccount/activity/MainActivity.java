@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        BackEventHandler.getInstance();
-
         PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             PermissionManager.requestPermission(this, Manifest.permission.FOREGROUND_SERVICE, 100);
@@ -60,10 +58,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
-
-
         this.m_vThread = new UIThread(this);
 
+        if(MediaItemHolder.getInstance().getMediaController() != null){
+            LogUtils.ApplicationLogD("MediaItemHolder Instance Not Null");
+            return;
+        }
+        BackEventHandler.getInstance();
     }
 
     @UnstableApi
@@ -92,11 +93,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        LogUtils.ApplicationLogI("MainAct onSaveInstance Called");
-        if (MediaItemHolder.getInstance().getMediaController() != null)
-            //outState.putParcelable("MediaPlayer",MediaItemHolder.getInstance());
-        super.onSaveInstanceState(outState);
-    }
 }

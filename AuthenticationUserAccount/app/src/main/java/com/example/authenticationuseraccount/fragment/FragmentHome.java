@@ -78,9 +78,9 @@ public class FragmentHome extends Fragment {
     private ThumbnailSongAdapter mThumbnailSongAdapter_ListenAgain;
     private ThumbnailSongAdapter mThumbnailSongAdapter_Recommend;
     private ThumbnailSongNewAdapter mThumbnailSongNewAdapter_NewRelease;
-    private List<Banner> mListBanner;
-    private List<Genre> mLisGenre;
-    private List<Song> mListSong;
+    private List<Banner> mListBanner = new ArrayList<>();
+    private List<Genre> mLisGenre = new ArrayList<>();
+    private List<Song> mListSong = new ArrayList<>();
     private List<Song> listSongQuickPick;
     private List<Song> listNewReleaseSong;
     private List<ListenHistory> mListUserListenHistory;
@@ -114,7 +114,6 @@ public class FragmentHome extends Fragment {
         rcvGenre = view.findViewById(R.id.rcv_genre);
         rcvGenre.setLayoutManager(gridLayoutManager);
 
-        mListSong = new ArrayList<>();
         mThumbnailSongSmallAdapter_QuickPick = new ThumbnailSongSmallAdapter(getContext(), mListSong, new IClickSongRecyclerViewListener() {
             @Override
             public void onClickItemSong(Song song) {
@@ -158,13 +157,20 @@ public class FragmentHome extends Fragment {
             }
         });
 
-        if ( mListSong != null && mListSong.isEmpty() ) {
+        if (mListSong.isEmpty()) {
+            LogUtils.ApplicationLogE("Keo API Song");
             getListSong();
+        } else {
+            LogUtils.ApplicationLogE("ko Keo API Song");
+            showSongInRecyclerView();
         }
-        if ( mListBanner!= null && mListBanner.isEmpty()) {
+
+        if (mListBanner.isEmpty()) {
+            LogUtils.ApplicationLogE("Keo API Banner");
             getListBanner();
         } else {
-            autoSlideImages();
+            LogUtils.ApplicationLogE("ko Keo API Banner");
+            showBannerInRecyclerView();
         }
 
         return view;
@@ -233,13 +239,7 @@ public class FragmentHome extends Fragment {
 
                     @Override
                     public void onComplete() {
-                        // Banner
-                        bannerAdapter = new BannerAdapter(getContext(), mListBanner);
-                        viewPager.setAdapter(bannerAdapter);
-                        circleIndicator.setViewPager(viewPager);
-                        bannerAdapter.registerAdapterDataObserver(circleIndicator.getAdapterDataObserver());
-
-                        autoSlideImages();
+                       showBannerInRecyclerView();
                     }
                 });
 
@@ -268,21 +268,7 @@ public class FragmentHome extends Fragment {
                     @Override
                     public void onComplete() {
                         LogUtils.ApplicationLogD("Call api success");
-                        mLisGenre = geListGenre();
-                        listSongQuickPick = takeMusicWithHighView(numberSongShowInQuickPick, mListSong);
-                        listNewReleaseSong = takeNewReLeaseMusic(mListSong);
-
-                        mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
-                        mThumbnailSongNewAdapter_NewRelease.setData(listNewReleaseSong);
-                        mThumbnailGenreAdapter.setData(mLisGenre);
-                        mThumbnailSongAdapter_ListenAgain.setData(mListSong);
-                        mThumbnailSongAdapter_Recommend.setData(mListSong);
-
-                        rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter_QuickPick);
-                        rcvNewRelease.setAdapter(mThumbnailSongNewAdapter_NewRelease);
-                        rcvGenre.setAdapter(mThumbnailGenreAdapter);
-                        rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
-                        rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
+                        showSongInRecyclerView();
                     }
                 });
     }
@@ -313,6 +299,33 @@ public class FragmentHome extends Fragment {
                     }
                 });
     }
+
+    private void showSongInRecyclerView() {
+        mLisGenre = geListGenre();
+        listSongQuickPick = takeMusicWithHighView(numberSongShowInQuickPick, mListSong);
+        listNewReleaseSong = takeNewReLeaseMusic(mListSong);
+
+        mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
+        mThumbnailSongNewAdapter_NewRelease.setData(listNewReleaseSong);
+        mThumbnailGenreAdapter.setData(mLisGenre);
+        mThumbnailSongAdapter_ListenAgain.setData(mListSong);
+        mThumbnailSongAdapter_Recommend.setData(mListSong);
+
+        rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter_QuickPick);
+        rcvNewRelease.setAdapter(mThumbnailSongNewAdapter_NewRelease);
+        rcvGenre.setAdapter(mThumbnailGenreAdapter);
+        rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
+        rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
+    }
+    private void showBannerInRecyclerView() {
+        bannerAdapter = new BannerAdapter(getContext(), mListBanner);
+        viewPager.setAdapter(bannerAdapter);
+        circleIndicator.setViewPager(viewPager);
+        bannerAdapter.registerAdapterDataObserver(circleIndicator.getAdapterDataObserver());
+
+        autoSlideImages();
+    }
+
 
     @Override
     public void onDestroy() {

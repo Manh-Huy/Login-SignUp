@@ -158,10 +158,15 @@ public class FragmentHome extends Fragment {
             }
         });
 
-        if (mListSong == null || mListSong.isEmpty()) {
+        if ( mListSong != null && mListSong.isEmpty() ) {
             getListSong();
         }
-        autoSlideImages();
+        if ( mListBanner!= null && mListBanner.isEmpty()) {
+            getListBanner();
+        } else {
+            autoSlideImages();
+        }
+
         return view;
     }
 
@@ -175,14 +180,17 @@ public class FragmentHome extends Fragment {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        int currentItem = viewPager.getCurrentItem();
-                        int totalItem = getListBanner().size() - 1;
-                        if (currentItem < totalItem) {
-                            currentItem++;
-                            viewPager.setCurrentItem(currentItem);
-                        } else {
-                            viewPager.setCurrentItem(0);
+                        if( mListBanner != null){
+                            int currentItem = viewPager.getCurrentItem();
+                            int totalItem = mListBanner.size() - 1;
+                            if (currentItem < totalItem) {
+                                currentItem++;
+                                viewPager.setCurrentItem(currentItem);
+                            } else {
+                                viewPager.setCurrentItem(0);
+                            }
                         }
+
                     }
                 });
             }

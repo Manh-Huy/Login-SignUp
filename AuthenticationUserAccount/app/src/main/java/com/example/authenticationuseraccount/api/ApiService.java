@@ -98,6 +98,9 @@ public interface ApiService {
     Observable<List<Banner>> getBanners();
 
     @GET("search")
-    Observable<List<SearchResult>> getSearchResult(@Query("query") String query, @Query("song") boolean song, @Query("artist") boolean artist, @Query("album") boolean album);
+    Observable<List<SearchResult>> getSearchAllResult(@Query("query") String query, @Query("song") boolean song, @Query("artist") boolean artist, @Query("album") boolean album);
+
+    @GET("search")
+    Observable<List<Song>> getSearchSongResult(@Query("query") String query, @Query("song") boolean song);
 }
 

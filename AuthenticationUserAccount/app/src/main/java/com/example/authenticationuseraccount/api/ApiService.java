@@ -3,6 +3,7 @@ package com.example.authenticationuseraccount.api;
 import com.example.authenticationuseraccount.model.ListenHistory;
 
 import com.example.authenticationuseraccount.model.SearchHistory;
+import com.example.authenticationuseraccount.model.SearchResult;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
@@ -29,6 +30,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
     Gson gson = new GsonBuilder()
@@ -94,4 +96,8 @@ public interface ApiService {
 
     @GET("banners")
     Observable<List<Banner>> getBanners();
+
+    @GET("search")
+    Observable<List<SearchResult>> getSearchResult(@Query("query") String query, @Query("song") boolean song, @Query("artist") boolean artist, @Query("album") boolean album);
 }
+

@@ -10,7 +10,7 @@ public class MySharedPreferences {
     private static final String MY_SHARED_PREFERENCES = "MY_SHARED_PREFERENCES";
     private Context mContext;
 
-    public MySharedPreferences(Context mContext) {
+    public  MySharedPreferences(Context mContext) {
         this.mContext = mContext;
     }
 

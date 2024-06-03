@@ -11,6 +11,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaSessionService;
 
+import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.common.LogUtils;
 
@@ -30,14 +31,14 @@ public class MusicService extends MediaSessionService {
                 .setTrackSelector(new DefaultTrackSelector(this))
                 .build();
 
-        Intent intent = new Intent(this, MediaPlayerActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         MediaSession.Callback callback = new MediaSession.Callback() {
             @Override
             public MediaSession.ConnectionResult onConnect(MediaSession session, MediaSession.ControllerInfo controller) {
-                LogUtils.ApplicationLogD("Callback controller info: " + controller.toString());
+                //LogUtils.ApplicationLogD("Callback controller info: " + controller.toString());
                 return MediaSession.Callback.super.onConnect(session, controller);
             }
         };
@@ -49,6 +50,7 @@ public class MusicService extends MediaSessionService {
 
     }
 
+
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -58,12 +60,13 @@ public class MusicService extends MediaSessionService {
     @Nullable
     @Override
     public MediaSession onGetSession(MediaSession.ControllerInfo controllerInfo) {
-        LogUtils.ApplicationLogD("onGetSession Controller Info: "+ controllerInfo.toString());
+        //LogUtils.ApplicationLogD("onGetSession Controller Info: "+ controllerInfo.toString());
         return mediaSession;
     }
 
     @Override
     public void onDestroy() {
+        LogUtils.ApplicationLogI("OnDestroy Service Killed");
         mediaSession.getPlayer().release();
         mediaSession.release();
         mediaSession = null;

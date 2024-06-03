@@ -47,7 +47,7 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
     public void onCreateView() {
         this.setPanelState(MultiSlidingUpPanelLayout.HIDDEN);
         this.setSlideDirection(MultiSlidingUpPanelLayout.SLIDE_VERTICAL);
-        this.setPeakHeight(getNavigationBarHeight() + 106);
+        this.setPeakHeight(getNavigationBarHeight() + 102);
     }
 
     @Override
@@ -116,6 +116,7 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
 
         if (this.getPanelState() == MultiSlidingUpPanelLayout.HIDDEN)
             this.collapsePanel();
+        //this.expandPanel();
 
         if (UIThread.getInstance().canUpdatePanelUI()) {
             this.mMediaPlayerView.onPlaybackStateChanged(isPlaying);

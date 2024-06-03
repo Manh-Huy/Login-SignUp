@@ -171,13 +171,15 @@ public class FragmentHome extends Fragment {
             }
         });
 
-        getListSong();
+        if (mListSong == null || mListSong.isEmpty()) {
+            getListSong();
+        }
         autoSlideImages();
         return view;
     }
 
     private void autoSlideImages() {
-        if (mTimer == null){
+        if (mTimer == null) {
             mTimer = new Timer();
         }
         mTimer.schedule(new TimerTask() {
@@ -187,17 +189,17 @@ public class FragmentHome extends Fragment {
                     @Override
                     public void run() {
                         int currentItem = viewPager.getCurrentItem();
-                        int totalItem = getListBanner().size()-1;
-                        if(currentItem < totalItem){
+                        int totalItem = getListBanner().size() - 1;
+                        if (currentItem < totalItem) {
                             currentItem++;
                             viewPager.setCurrentItem(currentItem);
-                        }else {
+                        } else {
                             viewPager.setCurrentItem(0);
                         }
                     }
                 });
             }
-        },500,3000);
+        }, 500, 3000);
     }
 
     private List<Genre> geListGenre() {
@@ -297,7 +299,7 @@ public class FragmentHome extends Fragment {
         if (mDisposable != null) {
             mDisposable.dispose();
         }
-        if(mTimer != null){
+        if (mTimer != null) {
             mTimer.cancel();
             mTimer = null;
         }

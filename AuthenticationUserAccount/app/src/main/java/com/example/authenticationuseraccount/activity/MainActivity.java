@@ -8,8 +8,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.provider.Settings;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
@@ -24,6 +26,7 @@ import com.example.authenticationuseraccount.service.BackEventHandler;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
 import com.example.authenticationuseraccount.service.UIThread;
+import com.example.authenticationuseraccount.utils.MySharedPreferences;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 
@@ -67,7 +70,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
+        //MySharedPreferences mySharedPreferences = new MySharedPreferences();
+        if(MediaItemHolder.getInstance().getMediaController() != null){
+            LogUtils.ApplicationLogD("MediaItemHolder Instance Not Null");
+            return;
+        }
         SessionToken sessionToken = new SessionToken(MainActivity.this, new ComponentName(MainActivity.this, MusicService.class));
         MediaController.Builder builder = new MediaController.Builder(MainActivity.this, sessionToken);
         ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
@@ -82,5 +89,14 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        LogUtils.ApplicationLogI("MainAct onSaveInstance Called");
+        if (MediaItemHolder.getInstance().getMediaController() != null)
+            //outState.putParcelable("MediaPlayer",MediaItemHolder.getInstance());
+        super.onSaveInstanceState(outState);
     }
 }

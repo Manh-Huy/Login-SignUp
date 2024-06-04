@@ -12,6 +12,7 @@ import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.IdRes;
@@ -28,6 +29,7 @@ import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -48,6 +50,7 @@ public class MediaPlayerBarView {
     MediaController mMediaController;
     private ImageButton mImageBtn_Fav;
     private ImageButton mImageBtn_PlayPause;
+    private ProgressBar mProgressBar;
 
     public MediaPlayerBarView(View rootView) {
         LogUtils.ApplicationLogE("MediaPlayerBarView Constructor");
@@ -61,7 +64,10 @@ public class MediaPlayerBarView {
         this.mImageBtn_Fav = this.mControlsContainer.findViewById(R.id.btn_favorite);
         this.mImageBtn_PlayPause = this.mControlsContainer.findViewById(R.id.btn_play_pause);
         this.mRootView.setAlpha(1.0F);
-
+        this.mProgressBar = findViewById(R.id.progress_bar);
+        this.mProgressBar.setIndeterminateDrawable(new Wave());
+        this.mImageView_Art.setVisibility(View.INVISIBLE);
+        this.mProgressBar.setVisibility(View.VISIBLE);
     }
 
     public void onPanelStateChanged(int panelSate) {
@@ -88,8 +94,13 @@ public class MediaPlayerBarView {
         this.mProgressIndicator.setMax((int) MediaItemHolder.getInstance().getMediaController().getDuration());
         if (album_art != null) {
             this.mImageView_Art.setImageBitmap(album_art);
-        } else
-            this.mImageView_Art.setImageDrawable(ResourcesCompat.getDrawable(this.mRootView.getResources(), leveldown.kyle.icon_packs.R.drawable.ic_album_24px, this.mRootView.getContext().getTheme()));
+            this.mImageView_Art.setVisibility(View.VISIBLE);
+            this.mProgressBar.setVisibility(View.INVISIBLE);
+        } else{
+            this.mProgressBar.setVisibility(View.VISIBLE);
+            this.mImageView_Art.setVisibility(View.INVISIBLE);
+            //this.mImageView_Art.setImageDrawable(ResourcesCompat.getDrawable(this.mRootView.getResources(), leveldown.kyle.icon_packs.R.drawable.ic_album_24px, this.mRootView.getContext().getTheme()));
+        }
     }
 
     public void onPlaybackStateChanged(boolean isPlaying) {

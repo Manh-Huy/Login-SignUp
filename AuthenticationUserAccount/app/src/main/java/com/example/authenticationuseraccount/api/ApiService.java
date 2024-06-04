@@ -4,6 +4,8 @@ import com.example.authenticationuseraccount.model.ListenHistory;
 
 import com.example.authenticationuseraccount.model.SearchHistory;
 import com.example.authenticationuseraccount.model.SearchResult;
+import com.example.authenticationuseraccount.model.business.Album;
+import com.example.authenticationuseraccount.model.business.Artist;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
@@ -98,9 +100,12 @@ public interface ApiService {
     Observable<List<Banner>> getBanners();
 
     @GET("search")
-    Observable<List<SearchResult>> getSearchAllResult(@Query("query") String query, @Query("song") boolean song, @Query("artist") boolean artist, @Query("album") boolean album);
-
+    Observable<List<SearchResult>> getSearchAllResult(@Query("query") String query);
     @GET("search")
     Observable<List<Song>> getSearchSongResult(@Query("query") String query, @Query("song") boolean song);
+    @GET("search")
+    Observable<List<Artist>> getSearchArtistResult(@Query("query") String query, @Query("artist") boolean artist);
+    @GET("search")
+    Observable<List<Album>> getSearchAlbumResult(@Query("query") String query, @Query("album") boolean album);
 }
 

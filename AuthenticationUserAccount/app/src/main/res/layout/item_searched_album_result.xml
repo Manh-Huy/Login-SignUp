@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Album"
-            android:layout_toEndOf="@id/img_artist"
+            android:layout_toEndOf="@id/img_album"
 
             android:layout_marginStart="10dp"
             android:textColor="@color/white"
@@ -34,8 +34,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="name Album"
-            android:layout_toEndOf="@id/img_artist"
-            android:layout_below="@id/tv_artist"
+            android:layout_toEndOf="@id/img_album"
+            android:layout_below="@id/tv_album"
             android:layout_marginStart="10dp"
             android:textColor="@color/white"
             android:textSize="16sp" />

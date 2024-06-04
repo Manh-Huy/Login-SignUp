@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SearchFilterAdapter;
 import com.example.authenticationuseraccount.adapter.SearchSongAdapter;
-import com.example.authenticationuseraccount.adapter.SearchedItemSongAdapter;
+import com.example.authenticationuseraccount.adapter.SearchedItemAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.SearchHistory;
@@ -52,9 +52,7 @@ import retrofit2.Response;
 
 public class SearchActivity extends AppCompatActivity {
     private Disposable mDisposable;
-    private List<Song> listSong = new ArrayList<>();
-    private List<Artist> listArtist = new ArrayList<>();
-    private List<Album> listAlbum = new ArrayList<>();
+    private List<Object> listItemsResult = new ArrayList<>();
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     private RecyclerView searchRecyclerView, filterRecyclerView;
     private SearchView searchView;
@@ -65,7 +63,7 @@ public class SearchActivity extends AppCompatActivity {
     private List<String> listNameAllInfoSong;
     private SearchSongAdapter searchSongAdapter;
     private SearchFilterAdapter searchFilterAdapter;
-    private SearchedItemSongAdapter searchedItemSongAdapter;
+    private SearchedItemAdapter searchedItemSongAdapter;
     SearchHistory searchHistoryByUserId = new SearchHistory();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +72,6 @@ public class SearchActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
         overlayLayout = findViewById(R.id.overlayLayout);
-
-        //getSong(); // để tạm test
 
         //searchRecycleView
         searchRecyclerView = findViewById(R.id.searchRecyclerView);
@@ -97,8 +93,6 @@ public class SearchActivity extends AppCompatActivity {
 
         filterRecyclerView = findViewById(R.id.filterRecyclerView);
         searchFilterAdapter = new SearchFilterAdapter(searchFilters);
-        //GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
-        //filterRecyclerView.setLayoutManager(gridLayoutManager);
         filterRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         filterRecyclerView.setAdapter(searchFilterAdapter);
 
@@ -124,42 +118,22 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 saveSearchQuery(query);
-                //filterList(query);
-//                List<Song> resultSongs = new ArrayList<>();
-//                for (Song song : listSong) {
-//                    if (song.getName().toLowerCase().contains(query.toLowerCase())) {
-//                        resultSongs.add(song);
-//                    }
-//                }
-//                if (resultSongs.isEmpty()) {
-//                    Toast.makeText(SearchActivity.this, "No result return", Toast.LENGTH_SHORT).show();
-//                }
-//                else {
-//                    FragmentActivity fragmentActivity = SearchActivity.this;
-//                    searchedItemSongAdapter = new SearchedItemSongAdapter(getApplicationContext(), fragmentActivity, resultSongs);
-//                    searchRecycleView.setAdapter(searchedItemSongAdapter);
-//                }
-                listSong.clear();
-                listArtist.clear();
-                listAlbum.clear();
+                listItemsResult.clear();
 
                 // Lấy vị trí của mục được chọn
                 String selectedFilter = searchFilterAdapter.getSelectedFilter();
                 switch(selectedFilter) {
                     case "All":
-//                        getSearchResult(query, false, false, false);
-//                        searchedItemSongAdapter = new SearchedItemSongAdapter(getApplicationContext(), fragmentActivity, listSong);
+                        getSearchAllResult(query);
                         break;
                     case "Song":
-                        LogUtils.ApplicationLogE("Click đã submit");
                         getSearchSongResult(query);
-
                         break;
                     case "Artist":
-                        // Thực hiện hành động cho mục "Artist"
+                        getSearchArtistResult(query);
                         break;
                     case "Album":
-                        // Thực hiện hành động cho mục "Album"
+                        getSearchAlbumResult(query);
                         break;
                     default:
                         break;
@@ -199,10 +173,10 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-    private void getSearchAllResult(String query, boolean isSearchSong,boolean isSearchArtist, boolean isSearchAlbum) {
+    private void getSearchAllResult(String query) {
         progressBar.setVisibility(View.VISIBLE);
         overlayLayout.setVisibility(View.VISIBLE);
-        ApiService.apiService.getSearchAllResult(query, isSearchSong, isSearchArtist, isSearchAlbum)
+        ApiService.apiService.getSearchAllResult(query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<SearchResult>>() {
@@ -217,13 +191,13 @@ public class SearchActivity extends AppCompatActivity {
                         for (SearchResult result : searchResults) {
                             if ("song".equals(result.getType())) {
                                 Song song = new Gson().fromJson(new Gson().toJson(result.getData()), Song.class);
-                                listSong.add(song);
+                                listItemsResult.add(song);
                             } else if ("artist".equals(result.getType())) {
                                 Artist artist = new Gson().fromJson(new Gson().toJson(result.getData()), Artist.class);
-                                listArtist.add(artist);
+                                listItemsResult.add(artist);
                             } else if ("album".equals(result.getType())) {
                                 Album album = new Gson().fromJson(new Gson().toJson(result.getData()), Album.class);
-                                listAlbum.add(album);
+                                listItemsResult.add(album);
                             }
                         }
                     }
@@ -235,6 +209,8 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
+                        showSearchResult(listItemsResult);
+
                         progressBar.setVisibility(View.GONE);
                         overlayLayout.setVisibility(View.GONE);
                     }
@@ -254,10 +230,7 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(@NonNull List<Song> songs) {
-                        listSong = songs;
-                        FragmentActivity fragmentActivity = SearchActivity.this;
-                        searchedItemSongAdapter = new SearchedItemSongAdapter(getApplicationContext(), fragmentActivity, listSong);
-                        searchRecyclerView.setAdapter(searchedItemSongAdapter);
+                        listItemsResult.addAll(songs);
                     }
 
                     @Override
@@ -267,11 +240,81 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
+                        showSearchResult(listItemsResult);
+
                         progressBar.setVisibility(View.GONE);
                         overlayLayout.setVisibility(View.GONE);
                     }
                 });
 
+    }
+    private void getSearchArtistResult(String query) {
+        progressBar.setVisibility(View.VISIBLE);
+        overlayLayout.setVisibility(View.VISIBLE);
+        ApiService.apiService.getSearchArtistResult(query, true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Artist>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull List<Artist> artists) {
+                        listItemsResult.addAll(artists);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api search artist result error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        showSearchResult(listItemsResult);
+
+                        progressBar.setVisibility(View.GONE);
+                        overlayLayout.setVisibility(View.GONE);
+                    }
+                });
+    }
+    private void getSearchAlbumResult(String query) {
+        progressBar.setVisibility(View.VISIBLE);
+        overlayLayout.setVisibility(View.VISIBLE);
+        ApiService.apiService.getSearchAlbumResult(query, true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Album>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull List<Album> albums) {
+                        listItemsResult.addAll(albums);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api search album result error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        showSearchResult(listItemsResult);
+
+                        progressBar.setVisibility(View.GONE);
+                        overlayLayout.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    private void showSearchResult(List<Object> list) {
+        FragmentActivity fragmentActivity = SearchActivity.this;
+        searchedItemSongAdapter = new SearchedItemAdapter(getApplicationContext(), fragmentActivity, list);
+        searchRecyclerView.setAdapter(searchedItemSongAdapter);
     }
     private void filterList(String text) {
         List<String> filteredList = new ArrayList<>();

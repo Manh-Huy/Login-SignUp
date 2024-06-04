@@ -388,6 +388,7 @@ public class FragmentHome extends Fragment {
         startActivity(intent);*/
         MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
         MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+        MediaItemHolder.getInstance().getListSongs().add(song);
     }
 
     @UnstableApi

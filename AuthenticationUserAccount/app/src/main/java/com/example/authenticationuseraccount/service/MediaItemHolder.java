@@ -83,6 +83,10 @@ public class MediaItemHolder {
         return instance;
     }
 
+    public void destroy(){
+        instance = null;
+    }
+
     public List<MediaItem> getListMediaItem() {
         return listMediaItem;
     }

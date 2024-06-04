@@ -13,6 +13,7 @@ import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     public static interface OnMediaControllerConnect {
         void onMediaControllerConnect(MediaController controller);
 
-        void onUpdateUIOnRestar(MediaItem currentMediaItem);
+        void onUpdateUIOnRestar(MediaController mediaController);
     }
 
     @Override
@@ -75,8 +76,8 @@ public class MainActivity extends AppCompatActivity {
         LogUtils.ApplicationLogE("MainActivity onStart");
         if (MediaItemHolder.getInstance().getMediaController() != null) {
             LogUtils.ApplicationLogD("MediaItemHolder Instance Not Null");
-            m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem());
-            //return;
+            m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController());
+            return;
         }
 
         SessionToken sessionToken = new SessionToken(MainActivity.this, new ComponentName(MainActivity.this, MusicService.class));

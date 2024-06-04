@@ -8,6 +8,7 @@ import android.media.session.PlaybackState;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.annotation.IdRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
@@ -67,6 +69,13 @@ public class MediaPlayerBarView {
         if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
             this.mRootView.setVisibility(View.VISIBLE);
         }
+
+        if (panelSate == MultiSlidingUpPanelLayout.EXPANDED){
+            this.mRootView.setAlpha(0F);
+            this.mBackgroundView.setAlpha(0F);
+            this.mProgressIndicator.setAlpha(0F);
+        }
+
     }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap album_art) {

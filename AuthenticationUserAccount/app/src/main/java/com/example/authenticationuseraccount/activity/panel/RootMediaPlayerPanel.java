@@ -19,6 +19,7 @@ import androidx.media3.session.MediaController;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.panel.view.MediaPlayerBarView;
 import com.example.authenticationuseraccount.activity.panel.view.MediaPlayerView;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.service.BackEventHandler;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
@@ -30,11 +31,10 @@ import com.realgear.multislidinguppanel.IPanel;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
 
-public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateListener {
+public class RootMediaPlayerPanel extends BasePanelView {
     private MediaPlayerView mMediaPlayerView;
     private MediaPlayerBarView mMediaPlayerBarView;
     private View mParentView;
-    private AsyncPaletteBuilder mAsyncPaletteBuilder;
     public final Runnable m_vOnBackPressed = this::collapsePanel;
 
     public RootMediaPlayerPanel(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
@@ -42,7 +42,6 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
         LogUtils.ApplicationLogE("RootMedia: Constructor");
         getContext().setTheme(R.style.Theme_AuthenticationUserAccount);
         mParentView = LayoutInflater.from(getContext()).inflate(R.layout.layout_root_mediaplayer, this, true);
-        this.mAsyncPaletteBuilder = new AsyncPaletteBuilder(this);
     }
 
     @Override
@@ -83,23 +82,36 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
         this.mMediaPlayerBarView.onMediaControllerCreate(mediaController);
     }
 
-    public void onUpdateUIOnRestar(MediaItem currentMediaItem){
-
-    }
-
-    public void onUpdateMetadata(MediaMetadata mediaMetadata) {
-        LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
-        mParentView.setVisibility(VISIBLE);
-        byte[] art = mediaMetadata.artworkData;
+    public void onUpdateUIOnRestar(MediaMetadata currentMetaData) {
+        this.setPanelState(MultiSlidingUpPanelLayout.EXPANDED);
+        byte[] art = currentMetaData.artworkData;
         Bitmap bitmap = null;
         if (art != null) {
             bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
         }
+        onUpdateMetadata(currentMetaData, bitmap);
+        onSetupSeekBar();
+    }
+
+    public void onUpdateUI(MediaMetadata currentMetaData) {
+        LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
+        mParentView.setVisibility(VISIBLE);
+        byte[] art = currentMetaData.artworkData;
+        Bitmap bitmap = null;
+        bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
+
+        this.mMediaPlayerBarView.onUpdateMetadata(currentMetaData, bitmap);
+        this.mMediaPlayerView.onUpdateMetadata(currentMetaData, bitmap);
+
+    }
+
+    public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {
+        LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
+        mParentView.setVisibility(VISIBLE);
 
         this.mMediaPlayerBarView.onUpdateMetadata(mediaMetadata, bitmap);
         this.mMediaPlayerView.onUpdateMetadata(mediaMetadata, bitmap);
 
-        this.mAsyncPaletteBuilder.onStartAnimation(bitmap);
     }
 
     public void onSetupSeekBar() {
@@ -141,31 +153,26 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
         return 0;
     }
 
-    @Override
     public void onUpdateVibrantColor(int vibrantColor) {
         this.mMediaPlayerBarView.onUpdateVibrantColor(vibrantColor);
         this.mMediaPlayerView.onUpdateVibrantColor(vibrantColor);
     }
 
-    @Override
     public void onUpdateVibrantDarkColor(int vibrantDarkColor) {
         this.mMediaPlayerBarView.onUpdateVibrantDarkColor(vibrantDarkColor);
         this.mMediaPlayerView.onUpdateVibrantDarkColor(vibrantDarkColor);
     }
 
-    @Override
     public void onUpdateVibrantLightColor(int vibrantLightColor) {
         this.mMediaPlayerBarView.onUpdateVibrantLightColor(vibrantLightColor);
         //this.mMediaPlayerView.onUpdateVibrantLightColor(vibrantLightColor);
     }
 
-    @Override
     public void onUpdateMutedColor(int mutedColor) {
         this.mMediaPlayerBarView.onUpdateMutedColor(mutedColor);
         //this.mMediaPlayerView.onUpdateMutedColor(mutedColor);
     }
 
-    @Override
     public void onUpdateMutedDarkColor(int mutedDarkColor) {
         this.mMediaPlayerBarView.onUpdateMutedDarkColor(mutedDarkColor);
         //this.mMediaPlayerView.onUpdateMutedDarkColor(mutedDarkColor);

@@ -1,5 +1,8 @@
 package com.example.authenticationuseraccount.service;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
 import androidx.media3.common.MediaItem;
@@ -13,6 +16,8 @@ import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.panel.RootMediaPlayerPanel;
 import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.theme.AsyncPaletteBuilder;
+import com.example.authenticationuseraccount.theme.interfaces.PaletteStateListener;
 import com.realgear.multislidinguppanel.MultiSlidingPanelAdapter;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
@@ -20,7 +25,7 @@ import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UIThread implements MainActivity.OnMediaControllerConnect {
+public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteStateListener {
     private static UIThread instance;
     private MainActivity m_vMainActivity;
     private MultiSlidingUpPanelLayout m_vMultiSlidingPanel;
@@ -28,11 +33,14 @@ public class UIThread implements MainActivity.OnMediaControllerConnect {
     public List<OnPanelStateChanged> m_vOnPanelStateListeners;
     private Player.Listener mListener;
 
+    private AsyncPaletteBuilder mAsyncPaletteBuilder;
+
     public UIThread(MainActivity activity) {
         LogUtils.ApplicationLogI("UIThread onCreate");
         instance = this;
         this.m_vOnPanelStateListeners = new ArrayList<>();
         this.m_vMainActivity = activity;
+        this.mAsyncPaletteBuilder = new AsyncPaletteBuilder(this);
         onCreate();
 
         //LibraryManager.initLibrary(activity.getApplicationContext());
@@ -144,8 +152,17 @@ public class UIThread implements MainActivity.OnMediaControllerConnect {
             public void onMediaMetadataChanged(MediaMetadata mediaMetadata) {
                 Player.Listener.super.onMediaMetadataChanged(mediaMetadata);
                 LogUtils.ApplicationLogD("MetaDataChanged");
-                UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMetadata(mediaMetadata);
+
+                byte[] art = mediaMetadata.artworkData;
+                Bitmap bitmap = null;
+                if (art != null) {
+                    bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
+                }
+
+                UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMetadata(mediaMetadata, bitmap);
                 UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onSetupSeekBar();
+
+                mAsyncPaletteBuilder.onStartAnimation(bitmap);
             }
         };
         MediaItemHolder.getInstance().getMediaController().addListener(this.mListener);
@@ -153,9 +170,18 @@ public class UIThread implements MainActivity.OnMediaControllerConnect {
     }
 
     @Override
-    public void onUpdateUIOnRestar(MediaItem currentMediaItem) {
+    public void onUpdateUIOnRestar(MediaController mediaController) {
         LogUtils.ApplicationLogI("UIThread onUpdateUIOnRestar");
-        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateUIOnRestar(currentMediaItem);
+        onMediaControllerConnect(MediaItemHolder.getInstance().getMediaController());
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController().getMediaMetadata());
+
+        byte[] art = MediaItemHolder.getInstance().getMediaController().getMediaMetadata().artworkData;
+        Bitmap bitmap = null;
+        if (art != null) {
+            bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
+        }
+
+        mAsyncPaletteBuilder.onStartAnimation(bitmap);
     }
 
     public void release() {
@@ -165,4 +191,30 @@ public class UIThread implements MainActivity.OnMediaControllerConnect {
         this.m_vOnPanelStateListeners = null;
     }
 
+    @Override
+    public void onUpdateVibrantColor(int vibrantColor) {
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateVibrantColor(vibrantColor);
+    }
+
+    @Override
+    public void onUpdateVibrantDarkColor(int vibrantDarkColor) {
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateVibrantDarkColor(vibrantDarkColor);
+        m_vMainActivity.getWindow().setStatusBarColor(vibrantDarkColor);
+        m_vMainActivity.getWindow().setNavigationBarColor(vibrantDarkColor);
+    }
+
+    @Override
+    public void onUpdateVibrantLightColor(int vibrantLightColor) {
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateVibrantLightColor(vibrantLightColor);
+    }
+
+    @Override
+    public void onUpdateMutedColor(int mutedColor) {
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMutedColor(mutedColor);
+    }
+
+    @Override
+    public void onUpdateMutedDarkColor(int mutedDarkColor) {
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMutedDarkColor(mutedDarkColor);
+    }
 }

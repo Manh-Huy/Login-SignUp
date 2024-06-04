@@ -73,6 +73,8 @@ public class MusicService extends MediaSessionService {
     @Override
     public void onDestroy() {
         LogUtils.ApplicationLogI("OnDestroy Service Killed");
+        MediaItemHolder.getInstance().getMediaController().release();
+        MediaItemHolder.getInstance().destroy();
         mediaSession.getPlayer().release();
         mediaSession.release();
         mediaSession = null;

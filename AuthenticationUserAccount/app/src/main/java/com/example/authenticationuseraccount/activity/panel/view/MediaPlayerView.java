@@ -12,9 +12,12 @@ import android.widget.TextView;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.media3.common.C;
+import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.session.MediaController;
 
@@ -26,6 +29,7 @@ import com.bumptech.glide.request.target.Target;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
@@ -39,6 +43,7 @@ import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -54,6 +59,7 @@ public class MediaPlayerView {
     private Handler handler = new Handler();
     private ConstraintLayout mControlsContainer;
     private ImageView mImageViewThumbNail;
+    private ImageView mImageViewQueue;
     private CardView m_vCardView_Art;
     private SeekBar m_vSeekBar_Main;
     private TextView m_vTextView_CurrentDuration, m_vTextView_MaxDuration, m_vTextView_Artist, m_vTextView_Title;
@@ -87,6 +93,7 @@ public class MediaPlayerView {
         this.materialCheckBox = findViewById(R.id.btn_favorite);
         this.mImageViewThumbNail = findViewById(R.id.img_thumb_song);
         this.mProgressBar.setIndeterminateDrawable(new Wave());
+        this.mImageViewQueue = findViewById(R.id.img_queue);
     }
 
     private void setOnListener() {
@@ -171,6 +178,21 @@ public class MediaPlayerView {
             } else {
                 this.m_vBtn_Shuffle.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_shuffle_on_24px);
                 mMediaController.setShuffleModeEnabled(true);
+            }
+        });
+
+        this.mImageViewQueue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<MediaItem> listMediaItem = MediaItemHolder.getInstance().getListMediaItem();
+                MediaItem currentMedia = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem();
+
+//                FragmentQueueBottomSheet fragmentQueueBottomSheet = new FragmentQueueBottomSheet(currentMedia, listMediaItem);
+//                fragmentQueueBottomSheet.show(getSupportFragmentManager(), fragmentQueueBottomSheet.getTag());
+
+                FragmentManager fragmentManager = ((AppCompatActivity) v.getContext().getApplicationContext()).getSupportFragmentManager();
+                FragmentQueueBottomSheet fragmentQueueBottomSheet = new FragmentQueueBottomSheet(currentMedia, listMediaItem);
+                fragmentQueueBottomSheet.show(fragmentManager, fragmentQueueBottomSheet.getTag());
             }
         });
     }

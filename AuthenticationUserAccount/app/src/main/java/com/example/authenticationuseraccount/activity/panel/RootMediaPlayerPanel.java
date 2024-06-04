@@ -12,6 +12,7 @@ import android.view.WindowInsets;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.session.MediaController;
 
@@ -38,6 +39,7 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
 
     public RootMediaPlayerPanel(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
         super(context, panelLayout);
+        LogUtils.ApplicationLogE("RootMedia: Constructor");
         getContext().setTheme(R.style.Theme_AuthenticationUserAccount);
         mParentView = LayoutInflater.from(getContext()).inflate(R.layout.layout_root_mediaplayer, this, true);
         this.mAsyncPaletteBuilder = new AsyncPaletteBuilder(this);
@@ -45,6 +47,7 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
 
     @Override
     public void onCreateView() {
+        LogUtils.ApplicationLogE("RootMedia: onCreateView");
         this.setPanelState(MultiSlidingUpPanelLayout.HIDDEN);
         this.setSlideDirection(MultiSlidingUpPanelLayout.SLIDE_VERTICAL);
         this.setPeakHeight(getNavigationBarHeight() + 102);
@@ -52,12 +55,14 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
 
     @Override
     public void onBindView() {
+        LogUtils.ApplicationLogE("RootMedia: OnBindView");
         mMediaPlayerView = new MediaPlayerView(findViewById(R.id.media_player_view));
         mMediaPlayerBarView = new MediaPlayerBarView(findViewById(R.id.media_player_bar_view));
     }
 
     @Override
     public void onPanelStateChanged(int panelSate) {
+        LogUtils.ApplicationLogE("RootMedia: onPanelStateChanged: " + panelSate);
         UIThread.getInstance().onPanelStateChanged(this.getClass(), panelSate);
         if (panelSate == MultiSlidingUpPanelLayout.HIDDEN) {
             mParentView.setVisibility(INVISIBLE);
@@ -70,31 +75,21 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
         if (this.mMediaPlayerBarView != null)
             this.mMediaPlayerBarView.onPanelStateChanged(panelSate);
 
-        if (panelSate == MultiSlidingUpPanelLayout.HIDDEN) {
-            if (MediaItemHolder.getInstance().getMediaController() != null)
-                MediaItemHolder.getInstance().getMediaController().stop();
-            BackEventHandler.getInstance().removeBackEvent(this.m_vOnBackPressed);
-        }
+    }
 
-        if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
-            BackEventHandler.getInstance().removeBackEvent(this.m_vOnBackPressed);
-        }
+    public void onMediaControllerReady(MediaController mediaController) {
+        LogUtils.ApplicationLogE("RootMedia: onMediaControllerReady");
+        this.mMediaPlayerView.onMediaControllerConnect(mediaController);
+        this.mMediaPlayerBarView.onMediaControllerCreate(mediaController);
+    }
 
-        if (panelSate == MultiSlidingUpPanelLayout.EXPANDED) {
-            mParentView.setBackgroundColor(Color.parseColor("#1B1B1B"));
-            BackEventHandler.getInstance().addBackEvent(this.m_vOnBackPressed);
-        } else {
-            mParentView.setBackgroundColor(Color.TRANSPARENT);
-        }
+    public void onUpdateUIOnRestar(MediaItem currentMediaItem){
+
     }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata) {
-        if (mediaMetadata == null && getPanelState() == MultiSlidingUpPanelLayout.HIDDEN) {
-            mParentView.setVisibility(INVISIBLE);
-        } else {
-            mParentView.setVisibility(VISIBLE);
-        }
-        LogUtils.ApplicationLogI("Called BitMap");
+        LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
+        mParentView.setVisibility(VISIBLE);
         byte[] art = mediaMetadata.artworkData;
         Bitmap bitmap = null;
         if (art != null) {
@@ -122,11 +117,6 @@ public class RootMediaPlayerPanel extends BasePanelView implements PaletteStateL
             this.mMediaPlayerView.onPlaybackStateChanged(isPlaying);
             this.mMediaPlayerBarView.onPlaybackStateChanged(isPlaying);
         }
-    }
-
-    public void onMediaControllerReady(MediaController mediaController) {
-        this.mMediaPlayerView.onMediaControllerConnect(mediaController);
-        this.mMediaPlayerBarView.onMediaControllerCreate(mediaController);
     }
 
     @Override

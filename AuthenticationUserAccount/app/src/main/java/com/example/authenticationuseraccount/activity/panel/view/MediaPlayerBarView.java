@@ -8,13 +8,16 @@ import android.media.session.PlaybackState;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.IdRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
@@ -26,6 +29,7 @@ import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,10 +50,11 @@ public class MediaPlayerBarView {
     MediaController mMediaController;
     private ImageButton mImageBtn_Fav;
     private ImageButton mImageBtn_PlayPause;
+    private ProgressBar mProgressBar;
 
     public MediaPlayerBarView(View rootView) {
+        LogUtils.ApplicationLogE("MediaPlayerBarView Constructor");
         this.mRootView = rootView;
-
         this.mBackgroundView = findViewById(R.id.media_player_bar_bg);
         this.mControlsContainer = findViewById(R.id.media_player_bar_controls_container);
         this.mProgressIndicator = findViewById(R.id.media_player_bar_progress_indicator);
@@ -59,7 +64,57 @@ public class MediaPlayerBarView {
         this.mImageBtn_Fav = this.mControlsContainer.findViewById(R.id.btn_favorite);
         this.mImageBtn_PlayPause = this.mControlsContainer.findViewById(R.id.btn_play_pause);
         this.mRootView.setAlpha(1.0F);
+        this.mProgressBar = findViewById(R.id.progress_bar);
+        this.mProgressBar.setIndeterminateDrawable(new Wave());
+        this.mImageView_Art.setVisibility(View.INVISIBLE);
+        this.mProgressBar.setVisibility(View.VISIBLE);
+    }
 
+    public void onPanelStateChanged(int panelSate) {
+        LogUtils.ApplicationLogE("MediaPlayerBarView onPanelStateChanged: " + panelSate);
+        if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
+            this.mRootView.setVisibility(View.VISIBLE);
+        }
+
+        if (panelSate == MultiSlidingUpPanelLayout.EXPANDED){
+            this.mRootView.setAlpha(0F);
+            this.mBackgroundView.setAlpha(0F);
+            this.mProgressIndicator.setAlpha(0F);
+        }
+
+    }
+
+    public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap album_art) {
+        LogUtils.ApplicationLogE("MediaPlayerBarView onUpdateMetadata");
+        this.mTextView_SongTitle.setText(mediaMetadata.title);
+        this.mTextView_SongArtist.setText(mediaMetadata.artist);
+        this.mTextView_SongArtist.setSelected(true);
+        this.mTextView_SongTitle.setSelected(true);
+
+        this.mProgressIndicator.setMax((int) MediaItemHolder.getInstance().getMediaController().getDuration());
+        if (album_art != null) {
+            this.mImageView_Art.setImageBitmap(album_art);
+            this.mImageView_Art.setVisibility(View.VISIBLE);
+            this.mProgressBar.setVisibility(View.INVISIBLE);
+        } else{
+            this.mProgressBar.setVisibility(View.VISIBLE);
+            this.mImageView_Art.setVisibility(View.INVISIBLE);
+            //this.mImageView_Art.setImageDrawable(ResourcesCompat.getDrawable(this.mRootView.getResources(), leveldown.kyle.icon_packs.R.drawable.ic_album_24px, this.mRootView.getContext().getTheme()));
+        }
+    }
+
+    public void onPlaybackStateChanged(boolean isPlaying) {
+
+        this.mImageBtn_PlayPause.setImageIcon(Icon.createWithResource(this.getContext(), isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_pause_24px : leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px));
+    }
+
+    public void onMediaControllerCreate(MediaController mediaController) {
+        LogUtils.ApplicationLogE("MediaPlayerBarView onMediaControllerCreate");
+        if (mMediaController != null) {
+            return;
+        }
+        mMediaController = mediaController;
+        this.onInit();
     }
 
     public void onInit() {
@@ -72,24 +127,11 @@ public class MediaPlayerBarView {
         });
     }
 
-    public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap album_art) {
-        this.mTextView_SongTitle.setText(mediaMetadata.title);
-        this.mTextView_SongArtist.setText(mediaMetadata.artist);
-        this.mTextView_SongArtist.setSelected(true);
-        this.mTextView_SongTitle.setSelected(true);
-
-        this.mProgressIndicator.setMax((int) mMediaController.getDuration());
-        if (album_art != null) {
-            this.mImageView_Art.setImageBitmap(album_art);
-        } else
-            this.mImageView_Art.setImageDrawable(ResourcesCompat.getDrawable(this.mRootView.getResources(), leveldown.kyle.icon_packs.R.drawable.ic_album_24px, this.mRootView.getContext().getTheme()));
-    }
-
     public void onSetupSeekBar() {
         int totalDuration = 0;
         //Reset SeekBar
-        if (mMediaController.getDuration() != C.TIME_UNSET) {
-            totalDuration = (int) mMediaController.getDuration();
+        if (MediaItemHolder.getInstance().getMediaController().getDuration() != C.TIME_UNSET) {
+            totalDuration = (int) MediaItemHolder.getInstance().getMediaController().getDuration();
             this.mProgressIndicator.setMax(totalDuration / 1000);
         }
         //Update SeekBar Continuosly
@@ -104,19 +146,6 @@ public class MediaPlayerBarView {
             }
         });
 
-    }
-
-    public void onPlaybackStateChanged(boolean isPlaying) {
-
-        this.mImageBtn_PlayPause.setImageIcon(Icon.createWithResource(this.getContext(), isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_pause_24px : leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px));
-    }
-
-    public void onMediaControllerCreate(MediaController mediaController) {
-        if (mMediaController != null) {
-            return;
-        }
-        mMediaController = mediaController;
-        this.onInit();
     }
 
     public void onSliding(float slideOffset, int state) {
@@ -146,12 +175,6 @@ public class MediaPlayerBarView {
         return this.mRootView.findViewById(id);
     }
 
-    public void onPanelStateChanged(int panelSate) {
-        if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
-            this.mRootView.setVisibility(View.VISIBLE);
-        }
-    }
-
     public void onUpdateVibrantColor(int vibrantColor) {
         this.mImageBtn_PlayPause.setBackgroundColor(vibrantColor);
     }
@@ -171,4 +194,5 @@ public class MediaPlayerBarView {
     public void onUpdateMutedDarkColor(int mutedDarkColor) {
         this.mProgressIndicator.setTrackColor(mutedDarkColor);
     }
+
 }

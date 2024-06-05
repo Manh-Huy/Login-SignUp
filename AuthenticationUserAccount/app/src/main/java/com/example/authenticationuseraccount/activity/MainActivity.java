@@ -13,6 +13,8 @@ import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.media3.common.MediaItem;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.session.MediaController;
@@ -37,14 +39,15 @@ public class MainActivity extends AppCompatActivity {
 
     public static interface OnMediaControllerConnect {
         void onMediaControllerConnect(MediaController controller);
+
+        void onUpdateUIOnRestar(MediaController mediaController);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LogUtils.ApplicationLogE("MainActivity onCreate");
         setContentView(R.layout.activity_main2);
-
-        BackEventHandler.getInstance();
 
         PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -60,9 +63,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
-
-
         this.m_vThread = new UIThread(this);
+        BackEventHandler.getInstance();
 
     }
 
@@ -70,17 +72,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        //MySharedPreferences mySharedPreferences = new MySharedPreferences();
-        if(MediaItemHolder.getInstance().getMediaController() != null){
+
+        LogUtils.ApplicationLogE("MainActivity onStart");
+        if (MediaItemHolder.getInstance().getMediaController() != null) {
             LogUtils.ApplicationLogD("MediaItemHolder Instance Not Null");
+            m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController());
             return;
         }
+
         SessionToken sessionToken = new SessionToken(MainActivity.this, new ComponentName(MainActivity.this, MusicService.class));
         MediaController.Builder builder = new MediaController.Builder(MainActivity.this, sessionToken);
         ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
         controllerFuture.addListener(() -> {
             try {
                 if (MediaItemHolder.getInstance().getMediaController() == null) {
+                    LogUtils.ApplicationLogE("OnStart Connect Media Controller");
                     MediaController mediaController = controllerFuture.get();
                     MediaItemHolder.getInstance().setMediaController(mediaController);
                     m_vThread.onMediaControllerConnect(mediaController);
@@ -89,14 +95,35 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }, MoreExecutors.directExecutor());
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LogUtils.ApplicationLogE("MainActivity onResume");
+    }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        LogUtils.ApplicationLogI("MainAct onSaveInstance Called");
-        if (MediaItemHolder.getInstance().getMediaController() != null)
-            //outState.putParcelable("MediaPlayer",MediaItemHolder.getInstance());
-        super.onSaveInstanceState(outState);
+    protected void onStop() {
+        super.onStop();
+        //m_vThread = null;
+        LogUtils.ApplicationLogE("MainActivity onStop");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        LogUtils.ApplicationLogE("MainActivity onRestart");
+    }
+
+    @Override
+    protected void onDestroy() {
+        LogUtils.ApplicationLogE("MainActivity onDestroy");
+        if (m_vThread.getListener() != null)
+            MediaItemHolder.getInstance().getMediaController().removeListener(m_vThread.getListener());
+        m_vThread.release();
+        m_vThread = null;
+        super.onDestroy();
     }
 }

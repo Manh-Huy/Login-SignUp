@@ -74,6 +74,7 @@ public class MediaPlayerView {
 
 
     public MediaPlayerView(View rootView) {
+        LogUtils.ApplicationLogE("MediaPlayerView Constructor");
         this.mRootView = rootView;
         this.mControlsContainer = findViewById(R.id.media_player_controls_container);
         this.mRootView.setAlpha(0.0F);
@@ -94,6 +95,31 @@ public class MediaPlayerView {
         this.mImageViewThumbNail = findViewById(R.id.img_thumb_song);
         this.mProgressBar.setIndeterminateDrawable(new Wave());
         this.mImageViewQueue = findViewById(R.id.img_queue);
+        this.mProgressBar.setVisibility(View.VISIBLE);
+        this.mImageViewThumbNail.setVisibility(View.INVISIBLE);
+    }
+
+    public void onMediaControllerConnect(MediaController controller) {
+        LogUtils.ApplicationLogE("MediaPlayerView onMediaControllerConnect");
+        if (this.mMediaController != null) {
+            return;
+        }
+        mMediaController = controller;
+        setOnListener();
+    }
+
+    public void onPanelStateChanged(int panelSate) {
+        LogUtils.ApplicationLogE("MediaPlayerView onPanelStateChanged: " + panelSate);
+        mState = panelSate;
+        if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
+            this.mRootView.setVisibility(View.INVISIBLE);
+        } else
+            this.mRootView.setVisibility(View.VISIBLE);
+
+        if(panelSate == MultiSlidingUpPanelLayout.EXPANDED){
+            this.mRootView.setAlpha(1F);
+            this.mControlsContainer.setAlpha(1F);
+        }
     }
 
     private void setOnListener() {
@@ -197,9 +223,11 @@ public class MediaPlayerView {
         });
     }
 
+    public void onUpdateUI() {
+
+    }
+
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {
-        mProgressBar.setVisibility(View.VISIBLE);
-        mImageViewThumbNail.setVisibility(View.GONE);
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
         m_vTextView_Artist.setSelected(true);
@@ -211,24 +239,25 @@ public class MediaPlayerView {
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        LogUtils.ApplicationLogE("onLoadFailed");
                         imgView.setImageResource(leveldown.kyle.icon_packs.R.drawable.ic_album_24px);
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        LogUtils.ApplicationLogE("onResourceReady");
                         mProgressBar.setVisibility(View.GONE);
                         mImageViewThumbNail.setVisibility(View.VISIBLE);
                         return false;
                     }
                 }).into(imgView);
-
     }
 
     public void onSetupSeekBar() {
         int totalDuration = 0;
         //Reset SeekBar
-        if (mMediaController.getDuration() != C.TIME_UNSET) {
+        if (MediaItemHolder.getInstance().getMediaController().getDuration() != C.TIME_UNSET) {
             totalDuration = (int) mMediaController.getDuration();
             m_vSeekBar_Main.setMax(totalDuration / 1000);
             m_vTextView_MaxDuration.setText(getTimeFormat(totalDuration));
@@ -261,7 +290,7 @@ public class MediaPlayerView {
             triggerAPICall(listenHistory);
             MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
         } else {
-            triggerSaveLocal();
+            //triggerSaveLocal();
             MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
         }
     }
@@ -276,9 +305,7 @@ public class MediaPlayerView {
         if (mMediaController == null) {
             mMediaController = MediaItemHolder.getInstance().getMediaController();
         }
-
         this.m_vBtn_PlayPause.setImageResource(!isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px : leveldown.kyle.icon_packs.R.drawable.ic_pause_24px);
-
     }
 
     public View getRootView() {
@@ -303,14 +330,6 @@ public class MediaPlayerView {
         return this.mRootView.findViewById(id);
     }
 
-    public void onPanelStateChanged(int panelSate) {
-        mState = panelSate;
-        if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
-            this.mRootView.setVisibility(View.INVISIBLE);
-        } else
-            this.mRootView.setVisibility(View.VISIBLE);
-    }
-
     @SuppressLint("DefaultLocale")
     public String getTimeFormat(long ms) {
         long hours = TimeUnit.MILLISECONDS.toHours(ms);
@@ -322,14 +341,6 @@ public class MediaPlayerView {
         } else {
             return String.format("%02d:%02d", minutes, seconds);
         }
-    }
-
-    public void onMediaControllerConnect(MediaController controller) {
-        if (this.mMediaController != null) {
-            return;
-        }
-        mMediaController = controller;
-        setOnListener();
     }
 
     @SuppressLint("CheckResult")
@@ -351,13 +362,12 @@ public class MediaPlayerView {
         String songID = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getSongID();
         String songName = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getName();
         LogUtils.ApplicationLogD("Song about to saved: " + songName);
+
         DateTimeFormatter formatter = null;
         String formattedDate = "";
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            LocalDate currentDate = LocalDate.now();
-            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            formattedDate = currentDate.format(formatter);
-        }
+        LocalDate currentDate = LocalDate.now();
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        formattedDate = currentDate.format(formatter);
 
         return new ListenHistory(uid, songID, 1, materialCheckBox.isChecked(), formattedDate);
     }

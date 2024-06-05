@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.TaskStackBuilder;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
@@ -32,7 +33,12 @@ public class MusicService extends MediaSessionService {
                 .build();
 
         Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        /*intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addNextIntentWithParentStack(intent);*/
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        //PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         MediaSession.Callback callback = new MediaSession.Callback() {
@@ -67,6 +73,8 @@ public class MusicService extends MediaSessionService {
     @Override
     public void onDestroy() {
         LogUtils.ApplicationLogI("OnDestroy Service Killed");
+        MediaItemHolder.getInstance().getMediaController().release();
+        MediaItemHolder.getInstance().destroy();
         mediaSession.getPlayer().release();
         mediaSession.release();
         mediaSession = null;

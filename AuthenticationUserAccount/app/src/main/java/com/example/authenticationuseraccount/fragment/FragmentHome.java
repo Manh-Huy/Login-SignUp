@@ -390,13 +390,9 @@ public class FragmentHome extends Fragment {
     }
 
     private void onClickGoToMP3Player(Song song) {
-        /*Intent intent = new Intent(getActivity(), MediaPlayerActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("SongObject", song);
-        intent.putExtras(bundle);
-        startActivity(intent);*/
         MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
         MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+        MediaItemHolder.getInstance().getListSongs().clear();
         MediaItemHolder.getInstance().getListSongs().add(song);
     }
 

@@ -9,6 +9,7 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Metadata;
 import androidx.media3.common.Player;
+import androidx.media3.common.Timeline;
 import androidx.media3.session.MediaController;
 
 import com.example.authenticationuseraccount.R;
@@ -149,8 +150,6 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
                 }
                 if (playbackState == Player.STATE_READY) {
                     LogUtils.ApplicationLogD("Player is Ready");
-                    mFragmentQueueBottomSheet.addMediaItem(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem());
-                    mFragmentQueueBottomSheet.setCurrentMediaItem(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem());
                     MediaItemHolder.getInstance().getMediaController().play();
                     LogUtils.ApplicationLogD("Player is play " + MediaItemHolder.getInstance().getMediaController().getMediaMetadata().title + " at position: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
                 }
@@ -168,12 +167,19 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
                 Bitmap bitmap = null;
                 if (art != null) {
                     bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
+                    UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMetadata(mediaMetadata, bitmap);
+                    UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onSetupSeekBar();
+                    mAsyncPaletteBuilder.onStartAnimation(bitmap);
                 }
+            }
 
-                UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMetadata(mediaMetadata, bitmap);
-                UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onSetupSeekBar();
-
-                mAsyncPaletteBuilder.onStartAnimation(bitmap);
+            @Override
+            public void onTimelineChanged(Timeline timeline, int reason) {
+                Player.Listener.super.onTimelineChanged(timeline, reason);
+                if(reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED){
+                    LogUtils.ApplicationLogD("TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED");
+                    LogUtils.ApplicationLogD("Song in Playlist: " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
+                }
             }
         };
         MediaItemHolder.getInstance().getMediaController().addListener(this.mListener);
@@ -231,6 +237,8 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     }
 
     public void openQueue() {
+        UIThread.this.mFragmentQueueBottomSheet.setCurrentMediaItem(MediaItemHolder.getInstance().getMediaController().getMediaMetadata());
+        UIThread.this.mFragmentQueueBottomSheet.setListItems(MediaItemHolder.getInstance().getListSongs());
         UIThread.this.mFragmentQueueBottomSheet.show(m_vMainActivity.getSupportFragmentManager(), mFragmentQueueBottomSheet.getTag());
     }
 }

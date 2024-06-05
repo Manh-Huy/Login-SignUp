@@ -102,7 +102,6 @@ public class MediaPlayerActivity extends AppCompatActivity {
             if (mSong != null) {
                 MediaItem mediaItem = MediaItem.fromUri(mSong.getSongURL());
                 mMediaController.addMediaItem(mediaItem);
-                MediaItemHolder.getInstance().getListMediaItem().add(mediaItem);
                 MediaItemHolder.getInstance().getListSongs().add(mSong);
 
                 number = MediaItemHolder.getInstance().getMediaController().getMediaItemCount();

@@ -212,12 +212,6 @@ public class MediaPlayerView {
                 List<MediaItem> listMediaItem = MediaItemHolder.getInstance().getListMediaItem();
                 MediaItem currentMedia = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem();
                 uiThread.openQueue();
-                /*FragmentQueueBottomSheet fragmentQueueBottomSheet = new FragmentQueueBottomSheet(currentMedia, listMediaItem);
-                fragmentQueueBottomSheet.show(getSupportFragmentManager(), fragmentQueueBottomSheet.getTag());*/
-
-                /*FragmentManager fragmentManager = ((AppCompatActivity) v.getContext().getApplicationContext()).getSupportFragmentManager();
-                FragmentQueueBottomSheet fragmentQueueBottomSheet = new FragmentQueueBottomSheet(currentMedia, listMediaItem);
-                fragmentQueueBottomSheet.show(fragmentManager, fragmentQueueBottomSheet.getTag());*/
             }
         });
     }

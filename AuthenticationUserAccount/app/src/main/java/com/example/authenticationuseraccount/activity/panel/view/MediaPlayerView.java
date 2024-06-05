@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
@@ -28,6 +29,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.model.ListenHistory;
@@ -220,6 +222,25 @@ public class MediaPlayerView {
                 fragmentQueueBottomSheet.show(fragmentManager, fragmentQueueBottomSheet.getTag());*/
             }
         });
+        this.materialCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user == null) {
+                    materialCheckBox.setChecked(false);
+                    ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
+                } else {
+                    if (materialCheckBox.isChecked()) {
+                        ListenHistory listenHistory = getSongHistory(user.getUid(), true);
+                        LogUtils.ApplicationLogI("Trigger Call Update History When Click Love!");
+                        triggerAPICall(listenHistory);
+                        MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
+                    } else {
+                        Toast.makeText(mRootView.getContext(), "You have unliked the song", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
     }
 
     public void onUpdateUI() {
@@ -233,6 +254,7 @@ public class MediaPlayerView {
     }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {
+        this.materialCheckBox.setChecked(false);
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
         m_vTextView_Artist.setSelected(true);
@@ -290,7 +312,7 @@ public class MediaPlayerView {
     private void updateUserHistory() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            ListenHistory listenHistory = getSongHistory(user.getUid());
+            ListenHistory listenHistory = getSongHistory(user.getUid(), false);
             LogUtils.ApplicationLogI("Trigger Call Update History!");
             triggerAPICall(listenHistory);
             MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
@@ -302,7 +324,7 @@ public class MediaPlayerView {
 
     private void triggerSaveLocal() {
         LogUtils.ApplicationLogI("Trigger Local Call Update History!");
-        ListenHistory listenHistory = getSongHistory("Local");
+        ListenHistory listenHistory = getSongHistory("Local", false);
         DataLocalManager.setListenHistory(listenHistory);
     }
 
@@ -361,7 +383,7 @@ public class MediaPlayerView {
                 });
     }
 
-    private ListenHistory getSongHistory(String uid) {
+    private ListenHistory getSongHistory(String uid, boolean isClickLove) {
 
         String currentSongName = (String) mMediaController.getMediaMetadata().title;
         String currentSongArtist = (String) mMediaController.getMediaMetadata().artist;
@@ -385,7 +407,12 @@ public class MediaPlayerView {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         formattedDate = currentDate.format(formatter);
 
-        return new ListenHistory(uid, songID, 1, materialCheckBox.isChecked(), formattedDate);
+        if (isClickLove) {
+            return new ListenHistory(uid, songID, 3, materialCheckBox.isChecked(), formattedDate);
+        }
+        else {
+            return new ListenHistory(uid, songID, 1, materialCheckBox.isChecked(), formattedDate);
+        }
     }
 
     public void onUpdateVibrantColor(int vibrantColor) {

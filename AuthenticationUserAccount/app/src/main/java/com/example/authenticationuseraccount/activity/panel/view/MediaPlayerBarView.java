@@ -85,6 +85,8 @@ public class MediaPlayerBarView {
     }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap album_art) {
+        //mImageBtn_Fav.setImageResource(R.drawable.baseline_favorite_24);
+        mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
         LogUtils.ApplicationLogE("MediaPlayerBarView onUpdateMetadata");
         this.mTextView_SongTitle.setText(mediaMetadata.title);
         this.mTextView_SongArtist.setText(mediaMetadata.artist);

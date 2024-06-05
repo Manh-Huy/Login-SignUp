@@ -6,7 +6,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('F:\\Push_In_Github\\Login-SignUp\\AuthenticationUserAccount\\app\\keystore\\main_keystore.jks')
+            storeFile file('E:\\KNOWLEDGE\\Year04\\Sem2\\Mobile_Utils_Projects\\Capstone\\Login-SignUp\\AuthenticationUserAccount\\app\\keystore\\main_keystore.jks')
             storePassword '123456'
             keyPassword '123456'
             keyAlias 'THK_Chill_Music_Corner'
@@ -84,8 +84,8 @@ dependencies {
     //Progress Bar
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
-    // Circle Image View
-    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    //Payment Stripe
+    implementation 'com.stripe:stripe-android:20.44.2'
     
 }
 apply plugin: 'com.google.gms.google-services'

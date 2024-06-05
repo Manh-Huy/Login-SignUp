@@ -231,6 +231,6 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     }
 
     public void openQueue() {
-        UIThread.this.mFragmentQueueBottomSheet.show(m_vMainActivity.getSupportFragmentManager(),mFragmentQueueBottomSheet.getTag());
+        UIThread.this.mFragmentQueueBottomSheet.show(m_vMainActivity.getSupportFragmentManager(), mFragmentQueueBottomSheet.getTag());
     }
 }

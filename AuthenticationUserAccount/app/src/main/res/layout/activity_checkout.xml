@@ -7,22 +7,16 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activity.CheckoutActivity"
     tools:showIn="@layout/activity_checkout">
+
     <Button
         android:id="@+id/pay_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Pay now"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:textColor="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/address_button"
-        app:layout_constraintEnd_toStartOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-    <Button
-        android:id="@+id/address_button"
-        android:textColor="@color/black"
-        android:text="Add shipping address"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

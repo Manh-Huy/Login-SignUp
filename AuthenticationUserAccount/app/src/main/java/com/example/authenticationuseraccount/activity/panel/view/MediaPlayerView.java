@@ -31,6 +31,7 @@ import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.model.ListenHistory;
+import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.UIThread;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
@@ -71,15 +72,12 @@ public class MediaPlayerView {
     public int m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
     private boolean m_vCanUpdateSeekbar = true;
     private MediaController mMediaController;
-    private ConstraintLayout mConstraintLayout;
-
 
     public MediaPlayerView(View rootView) {
         LogUtils.ApplicationLogE("MediaPlayerView Constructor");
         this.mRootView = rootView;
         this.mControlsContainer = findViewById(R.id.media_player_controls_container);
         this.mRootView.setAlpha(0.0F);
-        this.mConstraintLayout = findViewById(R.id.media_player_controls_container);
         this.mProgressBar = findViewById(R.id.progress_bar);
         this.m_vCardView_Art = this.mControlsContainer.findViewById(R.id.card_view_artist_art_container);
         this.m_vTextView_Title = this.mControlsContainer.findViewById(R.id.text_view_song_title);
@@ -117,7 +115,7 @@ public class MediaPlayerView {
         } else
             this.mRootView.setVisibility(View.VISIBLE);
 
-        if(panelSate == MultiSlidingUpPanelLayout.EXPANDED){
+        if (panelSate == MultiSlidingUpPanelLayout.EXPANDED) {
             this.mRootView.setAlpha(1F);
             this.mControlsContainer.setAlpha(1F);
         }
@@ -227,9 +225,10 @@ public class MediaPlayerView {
     public void onUpdateUI() {
 
     }
+
     private UIThread uiThread;
 
-    public void onReceiveUiThread(UIThread uiThread){
+    public void onReceiveUiThread(UIThread uiThread) {
         this.uiThread = uiThread;
     }
 
@@ -364,9 +363,20 @@ public class MediaPlayerView {
 
     private ListenHistory getSongHistory(String uid) {
 
-        int currentIndex = mMediaController.getCurrentMediaItemIndex();
-        String songID = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getSongID();
-        String songName = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getName();
+        String currentSongName = (String) mMediaController.getMediaMetadata().title;
+        String currentSongArtist = (String) mMediaController.getMediaMetadata().artist;
+        String songID = "-1";
+        String songName = "-1";
+
+        for (Song song : MediaItemHolder.getInstance().getListSongs()) {
+            LogUtils.ApplicationLogI("song in list: " + song.getName() + " song in media: " + currentSongName);
+            LogUtils.ApplicationLogI("artist in list: " + song.getArtist() + " artist in media: " + currentSongArtist);
+            if (song.getName().equals(currentSongName) && song.getArtist().equals(currentSongArtist)) {
+                songID = song.getSongID();
+                songName = song.getName();
+            }
+        }
+
         LogUtils.ApplicationLogD("Song about to saved: " + songName);
 
         DateTimeFormatter formatter = null;
@@ -383,6 +393,6 @@ public class MediaPlayerView {
     }
 
     public void onUpdateVibrantDarkColor(int vibrantDarkColor) {
-        this.mConstraintLayout.setBackgroundColor(vibrantDarkColor);
+        this.mControlsContainer.setBackgroundColor(vibrantDarkColor);
     }
 }

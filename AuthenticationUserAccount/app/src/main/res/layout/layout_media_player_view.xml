@@ -332,7 +332,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_alignParentEnd="true"
-                    android:src="@mipmap/ic_launcher"/>
+                    android:src="@drawable/baseline_queue_music_24"/>
             </RelativeLayout>
         </LinearLayout>
 

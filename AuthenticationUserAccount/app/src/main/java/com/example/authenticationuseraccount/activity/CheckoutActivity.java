@@ -33,12 +33,9 @@ import okhttp3.ResponseBody;
 public class CheckoutActivity extends AppCompatActivity {
     private static final String TAG = "CheckoutActivity";
     private static final String BACKEND_URL = "https://mobilebackendtestupload.onrender.com/payment";
-
     private String paymentIntentClientSecret;
     private PaymentSheet paymentSheet;
-
     private Button payButton;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -178,7 +178,7 @@ public class RootMediaPlayerPanel extends BasePanelView {
         //this.mMediaPlayerView.onUpdateMutedDarkColor(mutedDarkColor);
     }
 
-    public void giveUiThreadInstance(UIThread uiThread){
+    public void giveUiThreadInstance(UIThread uiThread) {
         this.mMediaPlayerView.onReceiveUiThread(uiThread);
     }
 }

@@ -86,9 +86,11 @@ public interface ApiService {
 
     @GET("search/getAllName")
     Observable<List<String>> getNameAllInfoSong();
+
     @FormUrlEncoded
     @POST("searchHistory")
     Completable addSearchHistory(@Field("userID") String userID, @Field("content") String query);
+
     @GET("searchHistory/{id}")
     Call<SearchHistory> getSearchHistoryById(@Path("id") String userID);
 

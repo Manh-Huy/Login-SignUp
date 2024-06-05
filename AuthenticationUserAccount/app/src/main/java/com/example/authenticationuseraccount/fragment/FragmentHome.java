@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.CheckoutActivity;
 import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
 import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.activity.SearchActivity;
@@ -172,6 +173,14 @@ public class FragmentHome extends Fragment {
             LogUtils.ApplicationLogE("ko Keo API Banner");
             showBannerInRecyclerView();
         }
+
+        imgMenuIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), CheckoutActivity.class);
+                getContext().startActivity(intent);
+            }
+        });
 
         return view;
     }

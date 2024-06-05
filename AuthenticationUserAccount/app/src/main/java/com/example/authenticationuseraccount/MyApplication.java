@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.os.Build;
 
 import com.example.authenticationuseraccount.utils.DataLocalManager;
+import com.stripe.android.PaymentConfiguration;
 
 public class MyApplication extends Application {
 
@@ -15,6 +16,11 @@ public class MyApplication extends Application {
         super.onCreate();
         DataLocalManager.init(getApplicationContext());
         createNotificationChannel();
+
+        PaymentConfiguration.init(
+                getApplicationContext(),
+                "pk_test_51POBbu1FjeTWqyK8DTko7WHq8pIlvPMVbvF7Aa43CUEMrNmaHWHQYGBCiLd3gIVQB4DdF6gv0SIom4mCFDkr8oiT00NAbc4OAd"
+        );
     }
 
     private void createNotificationChannel() {

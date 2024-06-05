@@ -19,9 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.ItemQueueAdapter;
+import com.example.authenticationuseraccount.common.ErrorUtils;
+import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FragmentQueueBottomSheet extends BottomSheetDialogFragment {
@@ -32,6 +35,23 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment {
         this.currentMedia = currentMedia;
         this.mListItems = mListItems;
     }
+
+    public FragmentQueueBottomSheet() {
+        this.mListItems = new ArrayList<>();
+    }
+
+    public void setListItems(List<MediaItem> mediaItems) {
+        this.mListItems = mediaItems;
+    }
+
+    public void addMediaItem(MediaItem mediaItem) {
+        this.mListItems.add(mediaItem);
+    }
+
+    public void setCurrentMediaItem(MediaItem mediaItem) {
+        this.currentMedia = currentMedia;
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -40,7 +60,8 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment {
         bottomSheetDialog.setContentView(view);
 
         ImageView imgCurrentSong = view.findViewById(R.id.currently_playing_image);
-        byte[] art = currentMedia.mediaMetadata.artworkData;
+        //byte[] art = currentMedia.mediaMetadata.artworkData;
+        byte[] art = MediaItemHolder.getInstance().getMediaController().getMediaMetadata().artworkData;
         Bitmap bitmap = null;
         if (art != null) {
             bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
@@ -48,10 +69,10 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment {
         imgCurrentSong.setImageBitmap(bitmap);
 
         TextView tvCurrentSongName = view.findViewById(R.id.currently_playing_text);
-        tvCurrentSongName.setText(currentMedia.mediaMetadata.title);
+        tvCurrentSongName.setText(MediaItemHolder.getInstance().getMediaController().getMediaMetadata().title);
 
         TextView tvCurrentSongArtist = view.findViewById(R.id.currently_playing_artist);
-        tvCurrentSongArtist.setText(currentMedia.mediaMetadata.artist);
+        tvCurrentSongArtist.setText(MediaItemHolder.getInstance().getMediaController().getMediaMetadata().artist);
 
         RecyclerView rcvData = view.findViewById(R.id.recycler_view_queue);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());

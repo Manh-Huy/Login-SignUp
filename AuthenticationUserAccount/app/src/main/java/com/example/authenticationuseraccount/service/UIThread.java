@@ -15,7 +15,9 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.panel.RootMediaPlayerPanel;
 import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
+import com.example.authenticationuseraccount.activity.panel.view.MediaPlayerView;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.theme.AsyncPaletteBuilder;
 import com.example.authenticationuseraccount.theme.interfaces.PaletteStateListener;
 import com.realgear.multislidinguppanel.MultiSlidingPanelAdapter;
@@ -32,7 +34,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     private boolean m_vCanUpdatePanelsUI;
     public List<OnPanelStateChanged> m_vOnPanelStateListeners;
     private Player.Listener mListener;
-
+    private FragmentQueueBottomSheet mFragmentQueueBottomSheet;
     private AsyncPaletteBuilder mAsyncPaletteBuilder;
 
     public UIThread(MainActivity activity) {
@@ -41,6 +43,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         this.m_vOnPanelStateListeners = new ArrayList<>();
         this.m_vMainActivity = activity;
         this.mAsyncPaletteBuilder = new AsyncPaletteBuilder(this);
+        this.mFragmentQueueBottomSheet = new FragmentQueueBottomSheet();
         onCreate();
 
         //LibraryManager.initLibrary(activity.getApplicationContext());
@@ -93,6 +96,12 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     @Override
     public void onMediaControllerConnect(MediaController controller) {
         this.mListener = new Player.Listener() {
+
+            @Override
+            public void onPlaylistMetadataChanged(MediaMetadata mediaMetadata) {
+                Player.Listener.super.onPlaylistMetadataChanged(mediaMetadata);
+            }
+
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
                 Player.Listener.super.onIsPlayingChanged(isPlaying);
@@ -140,6 +149,8 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
                 }
                 if (playbackState == Player.STATE_READY) {
                     LogUtils.ApplicationLogD("Player is Ready");
+                    mFragmentQueueBottomSheet.addMediaItem(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem());
+                    mFragmentQueueBottomSheet.setCurrentMediaItem(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem());
                     MediaItemHolder.getInstance().getMediaController().play();
                     LogUtils.ApplicationLogD("Player is play " + MediaItemHolder.getInstance().getMediaController().getMediaMetadata().title + " at position: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
                 }
@@ -167,6 +178,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         };
         MediaItemHolder.getInstance().getMediaController().addListener(this.mListener);
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onMediaControllerReady(controller);
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).giveUiThreadInstance(this);
     }
 
     @Override
@@ -216,5 +228,9 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     @Override
     public void onUpdateMutedDarkColor(int mutedDarkColor) {
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMutedDarkColor(mutedDarkColor);
+    }
+
+    public void openQueue() {
+        UIThread.this.mFragmentQueueBottomSheet.show(m_vMainActivity.getSupportFragmentManager(),mFragmentQueueBottomSheet.getTag());
     }
 }

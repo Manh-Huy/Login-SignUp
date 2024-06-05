@@ -32,6 +32,7 @@ import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.service.UIThread;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
 import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.material.checkbox.MaterialCheckBox;
@@ -212,19 +213,24 @@ public class MediaPlayerView {
             public void onClick(View v) {
                 List<MediaItem> listMediaItem = MediaItemHolder.getInstance().getListMediaItem();
                 MediaItem currentMedia = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem();
+                uiThread.openQueue();
+                /*FragmentQueueBottomSheet fragmentQueueBottomSheet = new FragmentQueueBottomSheet(currentMedia, listMediaItem);
+                fragmentQueueBottomSheet.show(getSupportFragmentManager(), fragmentQueueBottomSheet.getTag());*/
 
-//                FragmentQueueBottomSheet fragmentQueueBottomSheet = new FragmentQueueBottomSheet(currentMedia, listMediaItem);
-//                fragmentQueueBottomSheet.show(getSupportFragmentManager(), fragmentQueueBottomSheet.getTag());
-
-                FragmentManager fragmentManager = ((AppCompatActivity) v.getContext().getApplicationContext()).getSupportFragmentManager();
+                /*FragmentManager fragmentManager = ((AppCompatActivity) v.getContext().getApplicationContext()).getSupportFragmentManager();
                 FragmentQueueBottomSheet fragmentQueueBottomSheet = new FragmentQueueBottomSheet(currentMedia, listMediaItem);
-                fragmentQueueBottomSheet.show(fragmentManager, fragmentQueueBottomSheet.getTag());
+                fragmentQueueBottomSheet.show(fragmentManager, fragmentQueueBottomSheet.getTag());*/
             }
         });
     }
 
     public void onUpdateUI() {
 
+    }
+    private UIThread uiThread;
+
+    public void onReceiveUiThread(UIThread uiThread){
+        this.uiThread = uiThread;
     }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {

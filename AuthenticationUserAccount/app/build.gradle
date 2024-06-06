@@ -86,6 +86,9 @@ dependencies {
 
     //Payment Stripe
     implementation 'com.stripe:stripe-android:20.44.2'
+
+    // Image picker
+    implementation 'com.github.dhaval2404:imagepicker:2.1'
     
 }
 apply plugin: 'com.google.gms.google-services'

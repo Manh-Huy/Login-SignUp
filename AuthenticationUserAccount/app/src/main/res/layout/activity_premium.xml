@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.PremiumActivity">
+
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background_premium" />
+
+    <!-- Content Overlay -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:gravity="center"
+        android:background="@android:color/transparent">
+
+        <!-- App Logo -->
+        <ImageView
+            android:id="@+id/appLogo"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/logo"
+            android:layout_gravity="center" />
+
+        <!-- Try Free for 7 Days Text -->
+        <TextView
+            android:id="@+id/tryFreeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Try free for 7 days"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:layout_marginTop="16dp"
+            android:gravity="center" />
+
+        <!-- Access all tunings, tools & more, plus no ads Text -->
+        <TextView
+            android:id="@+id/accessText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Access all tunings, tools and more, plus no ads."
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:gravity="center" />
+
+        <!-- Cancel anytime Text -->
+        <TextView
+            android:id="@+id/cancelAnytimeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel anytime"
+            android:textColor="@android:color/holo_orange_light"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:gravity="center" />
+
+        <!-- Pricing Options -->
+        <RadioGroup
+            android:id="@+id/pricingOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp">
+
+            <!-- Yearly Option -->
+            <RadioButton
+                android:id="@+id/yearlyOption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₫409,000 Yearly (₫34,083 / month)"
+                android:textColor="@android:color/white"
+                android:background="@drawable/radio_button_selector"
+                android:buttonTint="@android:color/holo_orange_light"
+                android:padding="18dp"
+                android:layout_marginBottom="10dp"/>
+
+            <!-- Monthly Option -->
+            <RadioButton
+                android:id="@+id/monthlyOption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₫57,000 Monthly"
+                android:checked="true"
+                android:textColor="@android:color/white"
+                android:background="@drawable/radio_button_selector"
+                android:buttonTint="@android:color/holo_orange_light"
+                android:padding="18dp"/>
+
+        </RadioGroup>
+
+        <!-- Terms of Service and Privacy Notice -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:id="@+id/termsOfService"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Terms of service"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:id="@+id/privacyNotice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Privacy notice"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/buyVipButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Buy VIP"
+                android:backgroundTint="@android:color/holo_purple"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/tryForFreeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Try for free"
+                android:backgroundTint="@android:color/holo_purple"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -22,6 +22,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.EditProfileActivity;
+import com.example.authenticationuseraccount.activity.LoginActivity;
 import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
 import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.SplashScreenActivity;
@@ -36,7 +38,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class FragmentProfile extends Fragment {
     private RelativeLayout layoutLogout, layoutLogin;
-    private Button loginButton, logoutButton;
+    private Button loginButton, logoutButton, editProfileButton;
     private ImageView profileImage;
     private TextView profileName;
     @Nullable
@@ -49,6 +51,7 @@ public class FragmentProfile extends Fragment {
 
         loginButton = view.findViewById(R.id.loginButton);
         logoutButton = view.findViewById(R.id.logoutButton);
+        editProfileButton = view.findViewById(R.id.editProfileButton);
         profileImage = view.findViewById(R.id.profileImage);
         profileName = view.findViewById(R.id.profileName);
 
@@ -65,6 +68,14 @@ public class FragmentProfile extends Fragment {
             @Override
             public void onClick(View v) {
                 Logout();
+            }
+        });
+
+        editProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), EditProfileActivity.class);
+                startActivity(intent);
             }
         });
         return view;

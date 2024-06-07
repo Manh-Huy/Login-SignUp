@@ -209,8 +209,6 @@ public class MediaPlayerView {
         this.mImageViewQueue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<MediaItem> listMediaItem = MediaItemHolder.getInstance().getListMediaItem();
-                MediaItem currentMedia = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem();
                 uiThread.openQueue();
             }
         });

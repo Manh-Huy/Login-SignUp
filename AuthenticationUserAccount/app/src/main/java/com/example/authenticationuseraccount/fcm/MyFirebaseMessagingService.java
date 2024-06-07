@@ -30,18 +30,23 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
         //Get Notification
+        String strTitle;
+        String strMessage;
         RemoteMessage.Notification notification = message.getNotification();
-        if (notification == null) {
+        if (notification != null) {
+            strTitle = notification.getTitle();
+            strMessage = notification.getBody();
             return;
         }
-        String strTitle = notification.getTitle();
-        String strMessage = notification.getBody();
+
 
         //Get Data messages
         Map<String, String> stringMap = message.getData();
         String songURl = stringMap.get("songURL");
+        String title = stringMap.get("title");
+        String body = stringMap.get("body");
         Log.e(TAG, "onMessageReceived: " + songURl);
-        sendNotification(strTitle, strMessage, songURl);
+        sendNotification(title, body, songURl);
     }
 
     private void sendNotification(String strTitle, String strMessage, String songURL) {
@@ -57,8 +62,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, MyApplication.CHANNEL_ID_2)
                 .setContentTitle(strTitle)
-                .setContentText(strMessage)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(strMessage))
+                .setContentText(songURL)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(songURL))
                 .setSmallIcon(R.drawable.logo)
                 .setContentIntent(pendingIntent)
                 .setSound(uri2)

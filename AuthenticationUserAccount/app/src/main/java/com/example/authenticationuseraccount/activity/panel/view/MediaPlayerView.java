@@ -211,15 +211,7 @@ public class MediaPlayerView {
         this.mImageViewQueue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<MediaItem> listMediaItem = MediaItemHolder.getInstance().getListMediaItem();
-                MediaItem currentMedia = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItem();
                 uiThread.openQueue();
-                /*FragmentQueueBottomSheet fragmentQueueBottomSheet = new FragmentQueueBottomSheet(currentMedia, listMediaItem);
-                fragmentQueueBottomSheet.show(getSupportFragmentManager(), fragmentQueueBottomSheet.getTag());*/
-
-                /*FragmentManager fragmentManager = ((AppCompatActivity) v.getContext().getApplicationContext()).getSupportFragmentManager();
-                FragmentQueueBottomSheet fragmentQueueBottomSheet = new FragmentQueueBottomSheet(currentMedia, listMediaItem);
-                fragmentQueueBottomSheet.show(fragmentManager, fragmentQueueBottomSheet.getTag());*/
             }
         });
         this.materialCheckBox.setOnClickListener(new View.OnClickListener() {
@@ -257,6 +249,7 @@ public class MediaPlayerView {
         this.materialCheckBox.setChecked(false);
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
+        this.mProgressBar.setVisibility(View.VISIBLE);
         m_vTextView_Artist.setSelected(true);
         m_vTextView_Title.setSelected(true);
         ImageView imgView = (ImageView) this.m_vCardView_Art.getChildAt(0);

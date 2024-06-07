@@ -28,18 +28,15 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
 
     private List<Song> mSongs;
     private Context mContext;
-    private IClickSongRecyclerViewListener iClickSongRecyclerViewListener;
-
 
     public void setData(List<Song> list) {
         this.mSongs = list;
         notifyDataSetChanged();
     }
 
-    public QueueSongAdapter(Context mContext, List<Song> mListSong, IClickSongRecyclerViewListener listener) {
+    public QueueSongAdapter(Context mContext, List<Song> mListSong) {
         this.mSongs = mListSong;
         this.mContext = mContext;
-        this.iClickSongRecyclerViewListener = listener;
     }
 
     @NonNull
@@ -58,25 +55,29 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
 
         LogUtils.ApplicationLogE("Holder Index: " + position);
         LogUtils.ApplicationLogE("Media Index: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
-        if (position == MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex()) {
-            LogUtils.ApplicationLogE("Same Index => Start Animation");
-            holder.progressBar.setVisibility(View.VISIBLE);
-            holder.imgThumbnail.setVisibility(View.INVISIBLE);
-        } else {
-            holder.progressBar.setVisibility(View.GONE);
-            Glide.with(mContext)
-                    .load(song.getImageURL())
-                    .into(holder.imgThumbnail);
-        }
+
+        Glide.with(mContext)
+                .load(song.getImageURL())
+                .into(holder.imgThumbnail);
         holder.tvSongTitle.setText(song.getName());
         holder.tvArtist.setText(song.getArtist());
         holder.tvSongTitle.setSelected(true);
         holder.tvArtist.setSelected(true);
 
+        if (position == MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex()) {
+            LogUtils.ApplicationLogE("Same Index => Start Animation");
+            holder.progressBar.setVisibility(View.VISIBLE);
+            holder.imgThumbnail.setVisibility(View.INVISIBLE);
+        } else {
+            holder.progressBar.setVisibility(View.INVISIBLE);
+            holder.imgThumbnail.setVisibility(View.VISIBLE);
+        }
+
         holder.layoutItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iClickSongRecyclerViewListener.onClickItemSong(song);
+                MediaItemHolder.getInstance().getMediaController().seekToDefaultPosition(position);
+                notifyDataSetChanged();
             }
         });
 

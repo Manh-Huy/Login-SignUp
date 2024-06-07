@@ -78,12 +78,7 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rcvData.setLayoutManager(linearLayoutManager);
 
-        QueueSongAdapter songSmallAdapter = new QueueSongAdapter(getContext(), mListItems, new IClickSongRecyclerViewListener() {
-            @Override
-            public void onClickItemSong(Song song) {
-                 ErrorUtils.showError(getContext(),"Click!!!");
-            }
-        });
+        QueueSongAdapter songSmallAdapter = new QueueSongAdapter(getContext(), mListItems);
         rcvData.setAdapter(songSmallAdapter);
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);

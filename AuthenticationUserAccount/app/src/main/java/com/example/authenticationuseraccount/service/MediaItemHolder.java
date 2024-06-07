@@ -18,6 +18,16 @@ public class MediaItemHolder {
     public static final int REPEAT_TYPE_ONE = Player.REPEAT_MODE_ONE;
     public static final int REPEAT_TYPE_ALL = Player.REPEAT_MODE_ALL;
 
+    private List<Song> listLoveSong;
+
+    public List<Song> getListLoveSong() {
+        return listLoveSong;
+    }
+
+    public void setListLoveSong(List<Song> listLoveSong) {
+        this.listLoveSong = listLoveSong;
+    }
+
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({REPEAT_TYPE_NONE, REPEAT_TYPE_ONE, REPEAT_TYPE_ALL})
     public @interface RepeatType {

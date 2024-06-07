@@ -81,22 +81,27 @@ public class MainActivity extends AppCompatActivity {
             LogUtils.ApplicationLogI("Receive Action From Notfication");
             String songURl = intentFromFCM.getStringExtra(Constants.NOTIFICATION_SONG_URL);
             if (MediaItemHolder.getInstance().getMediaController() != null) {
+                LogUtils.ApplicationLogI("Receive Action From Notfication And App Already Open");
+
                 //MediaItemHolder.getInstance().getListSongs().clear();
                 //MediaItemHolder.getInstance().getListSongs().add();
                 MediaItem mediaItem = MediaItem.fromUri(songURl);
                 MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
-                LogUtils.ApplicationLogI("Receive Action From Notfication And App Already Open");
+                m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController());
+                isReceiveNotification = false;
+                mSongUrl = null;
+
             } else {
                 isReceiveNotification = true;
                 mSongUrl = songURl;
-                //MediaItem mediaItem = MediaItem.fromUri(songURl);
-                //MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
-                LogUtils.ApplicationLogI("Receive Action From Notfication App Not Open: " + songURl);
+                LogUtils.ApplicationLogI("Receive Action From Notfication mediaController null: " + songURl);
             }
         } else {
             LogUtils.ApplicationLogI("No Action From Any Notfication");
         }
     }
+
+
 
     @UnstableApi
     @Override
@@ -108,10 +113,11 @@ public class MainActivity extends AppCompatActivity {
             LogUtils.ApplicationLogD("MediaItemHolder Instance Not Null");
             if (isReceiveNotification && mSongUrl != null) {
                 LogUtils.ApplicationLogI("Receive noti and start playing");
-                MediaItem mediaItem = MediaItem.fromUri(mSongUrl);
-                MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+
                 //MediaItemHolder.getInstance().getListSongs().clear();
                 //MediaItemHolder.getInstance().getListSongs().add();
+                MediaItem mediaItem = MediaItem.fromUri(mSongUrl);
+                MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
 
                 isReceiveNotification = false;
                 mSongUrl = null;
@@ -132,9 +138,11 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (MediaItemHolder.getInstance().getMediaController() == null) {
                     LogUtils.ApplicationLogE("OnStart Connect Media Controller");
+
                     MediaController mediaController = controllerFuture.get();
                     MediaItemHolder.getInstance().setMediaController(mediaController);
                     m_vThread.onMediaControllerConnect(mediaController);
+
                     if (isReceiveNotification && mSongUrl != null) {
                         LogUtils.ApplicationLogI("Receive noti and start playing");
                         MediaItem mediaItem = MediaItem.fromUri(mSongUrl);
@@ -153,7 +161,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LogUtils.ApplicationLogE("MainActivity onPause");
+    }
 
     @Override
     protected void onResume() {
@@ -164,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        //m_vThread = null;
         LogUtils.ApplicationLogE("MainActivity onStop");
     }
 

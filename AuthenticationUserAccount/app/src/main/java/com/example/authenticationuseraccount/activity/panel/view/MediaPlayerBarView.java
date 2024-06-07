@@ -53,7 +53,7 @@ public class MediaPlayerBarView {
     private ProgressBar mProgressBar;
 
     public MediaPlayerBarView(View rootView) {
-        LogUtils.ApplicationLogE("MediaPlayerBarView Constructor");
+        //LogUtils.ApplicationLogE("MediaPlayerBarView Constructor");
         this.mRootView = rootView;
         this.mBackgroundView = findViewById(R.id.media_player_bar_bg);
         this.mControlsContainer = findViewById(R.id.media_player_bar_controls_container);
@@ -111,7 +111,7 @@ public class MediaPlayerBarView {
     }
 
     public void onMediaControllerCreate(MediaController mediaController) {
-        LogUtils.ApplicationLogE("MediaPlayerBarView onMediaControllerCreate");
+        //LogUtils.ApplicationLogE("MediaPlayerBarView onMediaControllerCreate");
         if (mMediaController != null) {
             return;
         }

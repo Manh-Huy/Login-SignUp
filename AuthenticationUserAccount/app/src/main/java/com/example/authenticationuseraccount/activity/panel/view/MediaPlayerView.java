@@ -76,7 +76,7 @@ public class MediaPlayerView {
     private MediaController mMediaController;
 
     public MediaPlayerView(View rootView) {
-        LogUtils.ApplicationLogE("MediaPlayerView Constructor");
+        //LogUtils.ApplicationLogE("MediaPlayerView Constructor");
         this.mRootView = rootView;
         this.mControlsContainer = findViewById(R.id.media_player_controls_container);
         this.mRootView.setAlpha(0.0F);

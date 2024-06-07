@@ -78,7 +78,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     }
 
     public void onPanelStateChanged(Class<?> panel, int state) {
-        LogUtils.ApplicationLogI("UIThread onPanelStateChanged");
+        //LogUtils.ApplicationLogI("UIThread onPanelStateChanged");
         this.m_vCanUpdatePanelsUI = state != MultiSlidingUpPanelLayout.DRAGGING;
 
         for (OnPanelStateChanged listener : this.m_vOnPanelStateListeners) {

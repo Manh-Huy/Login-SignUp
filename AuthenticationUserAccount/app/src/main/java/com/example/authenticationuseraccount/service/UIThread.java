@@ -167,16 +167,16 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
                 Bitmap bitmap = null;
                 if (art != null) {
                     bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
-                    UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMetadata(mediaMetadata, bitmap);
-                    UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onSetupSeekBar();
-                    mAsyncPaletteBuilder.onStartAnimation(bitmap);
                 }
+                UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateMetadata(mediaMetadata, bitmap);
+                UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onSetupSeekBar();
+                mAsyncPaletteBuilder.onStartAnimation(bitmap);
             }
 
             @Override
             public void onTimelineChanged(Timeline timeline, int reason) {
                 Player.Listener.super.onTimelineChanged(timeline, reason);
-                if(reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED){
+                if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
                     LogUtils.ApplicationLogD("TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED");
                     LogUtils.ApplicationLogD("Song in Playlist: " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
                 }

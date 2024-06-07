@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.adapter.QueueSongAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailSongSmallAdapter;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
@@ -57,7 +58,6 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
         View view = LayoutInflater.from(getContext()).inflate(R.layout.layout_queue_bottom_sheet, null);
-        bottomSheetDialog.setContentView(view);
 
         ImageView imgCurrentSong = view.findViewById(R.id.currently_playing_image);
         byte[] art = currentMedia.artworkData;
@@ -67,15 +67,18 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment {
 
         TextView tvCurrentSongName = view.findViewById(R.id.currently_playing_text);
         tvCurrentSongName.setText(currentMedia.title);
-
+        tvCurrentSongName.setSelected(true);
         TextView tvCurrentSongArtist = view.findViewById(R.id.currently_playing_artist);
         tvCurrentSongArtist.setText(currentMedia.artist);
+        tvCurrentSongArtist.setSelected(true);
+
+        bottomSheetDialog.setContentView(view);
 
         RecyclerView rcvData = view.findViewById(R.id.recycler_view_queue);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rcvData.setLayoutManager(linearLayoutManager);
 
-        ThumbnailSongSmallAdapter songSmallAdapter = new ThumbnailSongSmallAdapter(getContext(), mListItems, new IClickSongRecyclerViewListener() {
+        QueueSongAdapter songSmallAdapter = new QueueSongAdapter(getContext(), mListItems, new IClickSongRecyclerViewListener() {
             @Override
             public void onClickItemSong(Song song) {
                  ErrorUtils.showError(getContext(),"Click!!!");

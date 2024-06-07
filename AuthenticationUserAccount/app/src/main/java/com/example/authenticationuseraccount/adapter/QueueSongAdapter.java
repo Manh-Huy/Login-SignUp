@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,8 @@ import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.github.ybq.android.spinkit.style.ChasingDots;
+import com.github.ybq.android.spinkit.style.Wave;
 
 import java.util.List;
 
@@ -53,27 +56,29 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
         Song song = mSongs.get(position);
         if (song == null) return;
 
-        ErrorUtils.showError(mContext, "Holder Index: " + position);
+        LogUtils.ApplicationLogE("Holder Index: " + position);
         LogUtils.ApplicationLogE("Media Index: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
-        if(position == MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex()){
+        if (position == MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex()) {
             LogUtils.ApplicationLogE("Same Index => Start Animation");
-        }else{
-            holder.tvSongTitle.setText(song.getName());
-            holder.tvArtist.setText(song.getArtist());
-            holder.tvSongTitle.setSelected(true);
-            holder.tvArtist.setSelected(true);
+            holder.progressBar.setVisibility(View.VISIBLE);
+            holder.imgThumbnail.setVisibility(View.INVISIBLE);
+        } else {
+            holder.progressBar.setVisibility(View.GONE);
             Glide.with(mContext)
                     .load(song.getImageURL())
                     .into(holder.imgThumbnail);
-
-            holder.layoutItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    iClickSongRecyclerViewListener.onClickItemSong(song);
-                }
-            });
         }
+        holder.tvSongTitle.setText(song.getName());
+        holder.tvArtist.setText(song.getArtist());
+        holder.tvSongTitle.setSelected(true);
+        holder.tvArtist.setSelected(true);
 
+        holder.layoutItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iClickSongRecyclerViewListener.onClickItemSong(song);
+            }
+        });
 
 
     }
@@ -91,6 +96,7 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
         private LinearLayout layoutItem;
         private ImageView imgThumbnail;
         private TextView tvSongTitle, tvArtist;
+        private ProgressBar progressBar;
 
         public ThumbnailSongSmallViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -99,6 +105,9 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
             imgThumbnail = itemView.findViewById(R.id.img_thumbnail);
             tvSongTitle = itemView.findViewById(R.id.tv_song_title);
             tvArtist = itemView.findViewById(R.id.tv_artist);
+            progressBar = itemView.findViewById(R.id.rcv_progress_bar);
+            progressBar.setIndeterminateDrawable(new ChasingDots());
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
 }

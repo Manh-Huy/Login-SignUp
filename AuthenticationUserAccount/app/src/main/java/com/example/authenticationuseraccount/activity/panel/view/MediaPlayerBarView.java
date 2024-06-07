@@ -71,12 +71,12 @@ public class MediaPlayerBarView {
     }
 
     public void onPanelStateChanged(int panelSate) {
-        LogUtils.ApplicationLogE("MediaPlayerBarView onPanelStateChanged: " + panelSate);
+        //LogUtils.ApplicationLogE("MediaPlayerBarView onPanelStateChanged: " + panelSate);
         if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
             this.mRootView.setVisibility(View.VISIBLE);
         }
 
-        if (panelSate == MultiSlidingUpPanelLayout.EXPANDED){
+        if (panelSate == MultiSlidingUpPanelLayout.EXPANDED) {
             this.mRootView.setAlpha(0F);
             this.mBackgroundView.setAlpha(0F);
             this.mProgressIndicator.setAlpha(0F);
@@ -98,7 +98,7 @@ public class MediaPlayerBarView {
             this.mImageView_Art.setImageBitmap(album_art);
             this.mImageView_Art.setVisibility(View.VISIBLE);
             this.mProgressBar.setVisibility(View.INVISIBLE);
-        } else{
+        } else {
             this.mProgressBar.setVisibility(View.VISIBLE);
             this.mImageView_Art.setVisibility(View.INVISIBLE);
             //this.mImageView_Art.setImageDrawable(ResourcesCompat.getDrawable(this.mRootView.getResources(), leveldown.kyle.icon_packs.R.drawable.ic_album_24px, this.mRootView.getContext().getTheme()));

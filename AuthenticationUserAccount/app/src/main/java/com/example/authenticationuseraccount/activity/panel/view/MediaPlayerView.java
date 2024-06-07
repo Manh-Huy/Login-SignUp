@@ -110,7 +110,7 @@ public class MediaPlayerView {
     }
 
     public void onPanelStateChanged(int panelSate) {
-        LogUtils.ApplicationLogE("MediaPlayerView onPanelStateChanged: " + panelSate);
+        //LogUtils.ApplicationLogE("MediaPlayerView onPanelStateChanged: " + panelSate);
         mState = panelSate;
         if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
             this.mRootView.setVisibility(View.INVISIBLE);

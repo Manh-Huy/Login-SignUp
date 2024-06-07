@@ -61,7 +61,7 @@ public class RootMediaPlayerPanel extends BasePanelView {
 
     @Override
     public void onPanelStateChanged(int panelSate) {
-        LogUtils.ApplicationLogE("RootMedia: onPanelStateChanged: " + panelSate);
+        //LogUtils.ApplicationLogE("RootMedia: onPanelStateChanged: " + panelSate);
         UIThread.getInstance().onPanelStateChanged(this.getClass(), panelSate);
         if (panelSate == MultiSlidingUpPanelLayout.HIDDEN) {
             mParentView.setVisibility(INVISIBLE);

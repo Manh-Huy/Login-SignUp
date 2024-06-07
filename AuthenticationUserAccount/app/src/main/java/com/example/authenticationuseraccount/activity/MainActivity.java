@@ -12,6 +12,7 @@ import android.os.PersistableBundle;
 import android.provider.Settings;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.media3.common.MediaItem;
@@ -22,6 +23,7 @@ import androidx.media3.session.MediaSession;
 import androidx.media3.session.SessionToken;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.common.PermissionManager;
 import com.example.authenticationuseraccount.service.BackEventHandler;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         void onUpdateUIOnRestar(MediaController mediaController);
     }
 
+    @OptIn(markerClass = UnstableApi.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +69,26 @@ public class MainActivity extends AppCompatActivity {
         this.m_vThread = new UIThread(this);
         BackEventHandler.getInstance();
 
+        Intent intentFromFCM = getIntent();
+        String actionFromNotification = intentFromFCM.getAction();
+        if (actionFromNotification != null && actionFromNotification.equals(Constants.NOTIFICATION_ACTION_CLICK)) {
+            LogUtils.ApplicationLogI("Receive Action From Notfication");
+            String songURl = intentFromFCM.getStringExtra(Constants.NOTIFICATION_SONG_URL);
+            if (MediaItemHolder.getInstance().getMediaController() != null) {
+                //MediaItemHolder.getInstance().getListSongs().clear();
+                //MediaItemHolder.getInstance().getListSongs().add();
+                MediaItem mediaItem = MediaItem.fromUri(songURl);
+                MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+                LogUtils.ApplicationLogI("Receive Action From Notfication And App Already Open");
+            } else {
+                MediaItem mediaItem = MediaItem.fromUri(songURl);
+                MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+                LogUtils.ApplicationLogI("Receive Action From Notfication App Not Open");
+                //onStart();
+            }
+        } else {
+            LogUtils.ApplicationLogI("No Action From Any Notfication");
+        }
     }
 
     @UnstableApi

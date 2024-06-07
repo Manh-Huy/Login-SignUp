@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
+import androidx.media3.common.MediaItem;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -20,6 +21,7 @@ import com.example.authenticationuseraccount.model.ItemSearchOption;
 import com.example.authenticationuseraccount.model.business.Album;
 import com.example.authenticationuseraccount.model.business.Artist;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.service.MediaItemHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +81,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 searchedSongViewHold.tvOverflowMenu.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        clickOpenSearchOptionBottomSheetFragment();
+                        clickOpenSearchOptionBottomSheetFragment(song);
                     }
                 });
                 break;
@@ -105,7 +107,8 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    private void clickOpenSearchOptionBottomSheetFragment() {
+    MediaItem mediaItem = null;
+    private void clickOpenSearchOptionBottomSheetFragment(Song song) {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_heart, "Thích"));
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_download, "Tải xuống"));
@@ -116,7 +119,37 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         FragmentSearchOptionBottomSheet fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
             @Override
             public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
-                Toast.makeText(mContext, itemSearchOption.getText(), Toast.LENGTH_SHORT).show();
+                switch (itemSearchOption.getText()) {
+                    case "Thích":
+                        // Handle "Thích" action
+                        Toast.makeText(mContext, "Thích clicked", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "Tải xuống":
+                        // Handle "Tải xuống" action
+                        Toast.makeText(mContext, "Tải xuống clicked", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "Thêm vào danh sách phát":
+                        Toast.makeText(mContext, "Thêm vào danh sách phát clicked", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "Phát tiếp theo":
+                        int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+                        MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1 , song);
+                        mediaItem = MediaItem.fromUri(song.getSongURL());
+                        MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
+                        Toast.makeText(mContext, "Phát tiếp theo clicked", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "Thêm vào hàng đợi":
+                        MediaItemHolder.getInstance().getListSongs().add(song);
+                        mediaItem = MediaItem.fromUri(song.getSongURL());
+                        MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+                        Toast.makeText(mContext, "Thêm vào hàng đợi clicked", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        // Handle default action
+                        Toast.makeText(mContext, "Unknown option clicked", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+
             }
         });
         fragmentSearchOptionBottomSheet.show(fragmentActivity.getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());

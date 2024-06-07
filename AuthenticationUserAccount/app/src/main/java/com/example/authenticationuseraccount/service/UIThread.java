@@ -191,6 +191,9 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     public void onUpdateUIOnRestar(MediaController mediaController) {
         LogUtils.ApplicationLogI("UIThread onUpdateUIOnRestar");
         onMediaControllerConnect(MediaItemHolder.getInstance().getMediaController());
+        if (MediaItemHolder.getInstance().getMediaController().isPlaying()) {
+
+        }
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController().getMediaMetadata());
 
         byte[] art = MediaItemHolder.getInstance().getMediaController().getMediaMetadata().artworkData;

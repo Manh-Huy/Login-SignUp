@@ -250,6 +250,7 @@ public class MediaPlayerView {
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
         this.mProgressBar.setVisibility(View.VISIBLE);
+        this.m_vBtn_PlayPause.setImageResource(!MediaItemHolder.getInstance().getMediaController().isPlaying() ? leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px : leveldown.kyle.icon_packs.R.drawable.ic_pause_24px);
         m_vTextView_Artist.setSelected(true);
         m_vTextView_Title.setSelected(true);
         ImageView imgView = (ImageView) this.m_vCardView_Art.getChildAt(0);
@@ -322,9 +323,6 @@ public class MediaPlayerView {
     }
 
     public void onPlaybackStateChanged(boolean isPlaying) {
-        if (mMediaController == null) {
-            mMediaController = MediaItemHolder.getInstance().getMediaController();
-        }
         this.m_vBtn_PlayPause.setImageResource(!isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px : leveldown.kyle.icon_packs.R.drawable.ic_pause_24px);
     }
 
@@ -383,15 +381,12 @@ public class MediaPlayerView {
         String songID = "-1";
         String songName = "-1";
 
-        for (Song song : MediaItemHolder.getInstance().getListSongs()) {
-            LogUtils.ApplicationLogI("song in list: " + song.getName() + " song in media: " + currentSongName);
-            LogUtils.ApplicationLogI("artist in list: " + song.getArtist() + " artist in media: " + currentSongArtist);
-            if (song.getName().equals(currentSongName) && song.getArtist().equals(currentSongArtist)) {
-                songID = song.getSongID();
-                songName = song.getName();
-            }
-        }
-
+        int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+        Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
+        songID = song.getSongID();
+        songName = song.getName();
+        LogUtils.ApplicationLogI("song in list: " + song.getName() + " song in media: " + currentSongName);
+        LogUtils.ApplicationLogI("artist in list: " + song.getArtist() + " artist in media: " + currentSongArtist);
         LogUtils.ApplicationLogD("Song about to saved: " + songName);
 
         DateTimeFormatter formatter = null;

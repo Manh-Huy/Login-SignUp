@@ -99,8 +99,13 @@ public class MainActivity extends AppCompatActivity {
         LogUtils.ApplicationLogE("MainActivity onStart");
         if (MediaItemHolder.getInstance().getMediaController() != null) {
             LogUtils.ApplicationLogD("MediaItemHolder Instance Not Null");
-            m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController());
-            return;
+            if (MediaItemHolder.getInstance().getMediaController().getMediaMetadata().title != null) {
+                LogUtils.ApplicationLogD("MediaMetadata Not Null => App is playing music (pausing / playing)");
+                m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController());
+            }else{
+                LogUtils.ApplicationLogD("App not playing music. just restart");
+                return;
+            }
         }
 
         SessionToken sessionToken = new SessionToken(MainActivity.this, new ComponentName(MainActivity.this, MusicService.class));

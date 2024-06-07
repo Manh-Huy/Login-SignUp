@@ -93,18 +93,6 @@ public class RootMediaPlayerPanel extends BasePanelView {
         onSetupSeekBar();
     }
 
-    public void onUpdateUI(MediaMetadata currentMetaData) {
-        LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
-        mParentView.setVisibility(VISIBLE);
-        byte[] art = currentMetaData.artworkData;
-        Bitmap bitmap = null;
-        bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
-
-        this.mMediaPlayerBarView.onUpdateMetadata(currentMetaData, bitmap);
-        this.mMediaPlayerView.onUpdateMetadata(currentMetaData, bitmap);
-
-    }
-
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {
         LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
         mParentView.setVisibility(VISIBLE);

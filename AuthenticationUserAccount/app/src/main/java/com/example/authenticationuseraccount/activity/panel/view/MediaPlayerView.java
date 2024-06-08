@@ -1,7 +1,6 @@
 package com.example.authenticationuseraccount.activity.panel.view;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -14,12 +13,9 @@ import android.widget.Toast;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.FragmentManager;
 import androidx.media3.common.C;
-import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.session.MediaController;
 
@@ -29,12 +25,9 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.activity.MainActivity;
-import com.example.authenticationuseraccount.activity.SplashScreenActivity;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
-import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
@@ -320,8 +313,20 @@ public class MediaPlayerView {
             triggerAPICall(listenHistory);
             MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
         } else {
-            //triggerSaveLocal();
+            triggerSaveLocal();
             MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
+            showUserLocalHistory();
+        }
+    }
+
+    private void showUserLocalHistory() { // hàm này chỉ có tác dụng log ra để xem lưu local listen history thôi
+        LogUtils.ApplicationLogI("Show History!");
+        List<ListenHistory> listenHistories = DataLocalManager.getListenHistory();
+        for (ListenHistory history : listenHistories) {
+            String logMessage = "SongID: " + history.getSongID() +
+                    ", Count: " + history.getCount() +
+                    ", IsLove: " + history.isLove();
+            LogUtils.ApplicationLogI(logMessage);
         }
     }
 

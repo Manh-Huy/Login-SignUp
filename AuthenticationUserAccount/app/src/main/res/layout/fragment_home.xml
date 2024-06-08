@@ -169,6 +169,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:layout_marginHorizontal="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_forgottenFavorite"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="23dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Forgotten Favorite"
+                    android:textColor="@color/black"
+                    android:textSize="24dp"
+                    android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcv_forgotten_favorite"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_marginHorizontal="8dp" />
             </LinearLayout>
         </ScrollView>
 

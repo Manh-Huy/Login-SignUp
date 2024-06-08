@@ -76,7 +76,8 @@ public class SplashScreenActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                        LogUtils.ApplicationLogE("Call api love song error");
+                        LogUtils.ApplicationLogE("Call api love song error: " + e.getMessage());
+                        e.printStackTrace();
                     }
 
                     @Override

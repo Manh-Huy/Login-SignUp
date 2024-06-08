@@ -60,7 +60,8 @@ public interface ApiService {
             .addInterceptor(loggingIntercepter);
 
     ApiService apiService = new Retrofit.Builder()
-            .baseUrl("https://mobilebackendtestupload.onrender.com/")
+            //.baseUrl("https://mobilebackendtestupload.onrender.com/")
+            .baseUrl("https://mobilebackendtestupload-q7eh.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .client(okBuilder.build())
@@ -112,6 +113,13 @@ public interface ApiService {
 
     @GET("listenHistory/getSongLove")
     Observable<List<Song>> getUserLoveSong(@Query("userID") String userID);
+
+    @GET("songs/recent")
+    Observable<List<Song>> getUserRecentSong(@Query("userID") String userID);
+
+    @GET("songs/recommend")
+    Observable<List<Song>> getUserRecommendSong(@Query("userID") String userID);
+
 
 }
 

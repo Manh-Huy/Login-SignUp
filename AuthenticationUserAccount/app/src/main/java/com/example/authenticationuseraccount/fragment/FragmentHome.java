@@ -1,6 +1,7 @@
 package com.example.authenticationuseraccount.fragment;
 
-import android.content.ComponentName;
+import static android.view.View.GONE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,14 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.util.UnstableApi;
-import androidx.media3.session.MediaController;
-import androidx.media3.session.SessionToken;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,8 +24,6 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.CheckoutActivity;
-import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
-import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.activity.SearchActivity;
 import com.example.authenticationuseraccount.adapter.BannerAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailGenreAdapter;
@@ -41,9 +39,6 @@ import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
-import com.example.authenticationuseraccount.service.MusicService;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -56,7 +51,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
@@ -71,10 +65,12 @@ public class FragmentHome extends Fragment {
     private ViewPager2 viewPager;
     private CircleIndicator3 circleIndicator;
     private BannerAdapter bannerAdapter;
-    private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend, rcvNewRelease, rcvGenre;
+    private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend, rcvNewRelease, rcvGenre, rcvForgottenFavorite;
     private ImageView searchImageView, imgMenuIcon;
+    private TextView tvListenAgain, tvRecommend, tvForgottenFavorite;
     private Disposable mDisposable;
     private ThumbnailSongSmallAdapter mThumbnailSongSmallAdapter_QuickPick;
+    private ThumbnailSongSmallAdapter mThumbnailSongSmallAdapter_ForgottenFavorite;
     private ThumbnailGenreAdapter mThumbnailGenreAdapter;
     private ThumbnailSongAdapter mThumbnailSongAdapter_ListenAgain;
     private ThumbnailSongAdapter mThumbnailSongAdapter_Recommend;
@@ -82,10 +78,13 @@ public class FragmentHome extends Fragment {
     private List<Banner> mListBanner = new ArrayList<>();
     private List<Genre> mLisGenre = new ArrayList<>();
     private List<Song> mListSong = new ArrayList<>();
-    private List<Song> listSongQuickPick;
     private List<Song> listNewReleaseSong;
     private List<ListenHistory> mListUserListenHistory;
     private final int numberSongShowInQuickPick = 10;
+
+    private List<Song> listSongRecent = new ArrayList<>();
+    private List<Song> listSongRecommend = new ArrayList<>();
+    private List<Song> listSongQuickPick = new ArrayList<>();
 
     Timer mTimer;
 
@@ -100,6 +99,9 @@ public class FragmentHome extends Fragment {
         viewPager = view.findViewById(R.id.viewPager);
         circleIndicator = view.findViewById(R.id.circleIndicator);
         searchImageView = view.findViewById(R.id.searchIcon);
+        tvListenAgain = view.findViewById(R.id.tv_listen_again);
+        tvRecommend = view.findViewById(R.id.tv_recommend);
+        tvForgottenFavorite = view.findViewById(R.id.tv_forgottenFavorite);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
 
@@ -114,6 +116,8 @@ public class FragmentHome extends Fragment {
         rcvNewRelease.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rcvGenre = view.findViewById(R.id.rcv_genre);
         rcvGenre.setLayoutManager(gridLayoutManager);
+        rcvForgottenFavorite = view.findViewById(R.id.rcv_forgotten_favorite);
+        rcvForgottenFavorite.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
         mThumbnailSongSmallAdapter_QuickPick = new ThumbnailSongSmallAdapter(getContext(), mListSong, new IClickSongRecyclerViewListener() {
             @Override
@@ -150,6 +154,13 @@ public class FragmentHome extends Fragment {
             }
         });
 
+        mThumbnailSongSmallAdapter_ForgottenFavorite = new ThumbnailSongSmallAdapter(getContext(), mListSong, new IClickSongRecyclerViewListener() {
+            @Override
+            public void onClickItemSong(Song song) {
+                onClickGoToMP3Player(song);
+            }
+        });
+
         searchImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,12 +169,11 @@ public class FragmentHome extends Fragment {
             }
         });
 
-        if (mListSong.isEmpty()) {
-            LogUtils.ApplicationLogE("Keo API Song");
-            getListSong();
-        } else {
-            LogUtils.ApplicationLogE("ko Keo API Song");
-            showSongInRecyclerView();
+        if (user == null) {
+            ShowUIForLocal();
+        }
+        else {
+            getUserRecentAndRecommendSong(user.getUid());
         }
 
         if (mListBanner.isEmpty()) {
@@ -226,6 +236,24 @@ public class FragmentHome extends Fragment {
         return list;
     }
 
+    private void ShowUIForLocal() {
+        rcvListenAgain.setVisibility(GONE);
+        rcvRecommend.setVisibility(GONE);
+        rcvForgottenFavorite.setVisibility(GONE);
+
+        tvListenAgain.setVisibility(GONE);
+        tvRecommend.setVisibility(GONE);
+        tvForgottenFavorite.setVisibility(GONE);
+
+        if (mListSong.isEmpty()) {
+            LogUtils.ApplicationLogE("Keo API Song");
+            getListSong();
+        } else {
+            LogUtils.ApplicationLogE("ko Keo API Song");
+            showSongLocalInRecyclerView();
+        }
+    }
+
     private void getListBanner() {
         ApiService.apiService.getBanners()
                 .subscribeOn(Schedulers.io())
@@ -248,7 +276,7 @@ public class FragmentHome extends Fragment {
 
                     @Override
                     public void onComplete() {
-                       showBannerInRecyclerView();
+                        showBannerInRecyclerView();
                     }
                 });
 
@@ -277,10 +305,74 @@ public class FragmentHome extends Fragment {
                     @Override
                     public void onComplete() {
                         LogUtils.ApplicationLogD("Call api success");
+                        showSongLocalInRecyclerView();
+                    }
+                });
+    }
+
+    private void getUserRecentAndRecommendSong(String userID) {
+        ApiService.apiService.getUserRecentSong(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        listSongRecent = songs;
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api recent (listen again) error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.ApplicationLogE("Call api recent (listen again) complete");
+
+                        if(listSongRecent.size() == 0) {
+                            ShowUIForLocal();
+                        }
+                        else {
+                            getUserRecommendSong(user.getUid());
+
+                        }
+                    }
+                });
+    }
+
+    private void getUserRecommendSong(String userID) {
+        ApiService.apiService.getUserRecommendSong(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        listSongRecommend = songs;
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api recommend error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        createQuickPickRandomSongsList();
                         showSongInRecyclerView();
                     }
                 });
     }
+
 
     private void getUserListenHistory(String userID) {
         ApiService.apiService.getUserListenHistory(userID)
@@ -309,10 +401,62 @@ public class FragmentHome extends Fragment {
                 });
     }
 
+    private void createQuickPickRandomSongsList() {
+        int numberSongRecent = 3;
+        int numberSongRecommend = 3;
+
+        if (listSongRecent.size() < 3) {
+            numberSongRecent = listSongRecent.size();
+        }
+        if (listSongRecommend.size() < 3) {
+            numberSongRecommend = listSongRecommend.size();
+        }
+        List<Song> recentSongsSubset = getRandomSubset(listSongRecent, numberSongRecent);
+        List<Song> recommendSongsSubset = getRandomSubset(listSongRecommend, numberSongRecommend);
+
+        listSongQuickPick.clear();
+        listSongQuickPick.addAll(recentSongsSubset);
+        listSongQuickPick.addAll(recommendSongsSubset);
+    }
+
+    private List<Song> getRandomSubset(List<Song> sourceList, int count) {
+        if (sourceList.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Collections.shuffle(sourceList);
+        return sourceList.subList(0, Math.min(count, sourceList.size()));
+    }
+
     private void showSongInRecyclerView() {
+        mLisGenre = geListGenre();
+        listNewReleaseSong = takeNewReLeaseMusic(mListSong);
+
+        LogUtils.ApplicationLogE("Recent Count: " + listSongRecent.size());
+        LogUtils.ApplicationLogE("Recommend Count: "+ listSongRecommend.size());
+
+
+        mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
+        mThumbnailSongNewAdapter_NewRelease.setData(listNewReleaseSong);
+        mThumbnailGenreAdapter.setData(mLisGenre);
+        mThumbnailSongAdapter_ListenAgain.setData(listSongRecent);
+        mThumbnailSongAdapter_Recommend.setData(listSongRecommend);
+        mThumbnailSongSmallAdapter_ForgottenFavorite.setData(listSongQuickPick);
+
+        rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter_QuickPick);
+        rcvNewRelease.setAdapter(mThumbnailSongNewAdapter_NewRelease);
+        rcvGenre.setAdapter(mThumbnailGenreAdapter);
+        rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
+        rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
+        rcvForgottenFavorite.setAdapter(mThumbnailSongSmallAdapter_ForgottenFavorite);
+    }
+
+    private void showSongLocalInRecyclerView() {
         mLisGenre = geListGenre();
         listSongQuickPick = takeMusicWithHighView(numberSongShowInQuickPick, mListSong);
         listNewReleaseSong = takeNewReLeaseMusic(mListSong);
+
+        LogUtils.ApplicationLogE("Quick pick local Count: " + listSongQuickPick.size());
+        LogUtils.ApplicationLogE("New release Count: "+ listNewReleaseSong.size());
 
         mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
         mThumbnailSongNewAdapter_NewRelease.setData(listNewReleaseSong);
@@ -325,6 +469,7 @@ public class FragmentHome extends Fragment {
         rcvGenre.setAdapter(mThumbnailGenreAdapter);
         rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
         rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
+
     }
     private void showBannerInRecyclerView() {
         bannerAdapter = new BannerAdapter(getContext(), mListBanner);

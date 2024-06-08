@@ -85,21 +85,32 @@ public class DataLocalManager {
     public static List<ListenHistory> getListenHistory() {
         String strJsonArray = DataLocalManager.getInstance().mySharedPreferences.getStringValue(PREF_LISTEN_HISTORY);
         List<ListenHistory> listListenHistory = new ArrayList<>();
-        try {
-            JSONArray jsonArray = new JSONArray(strJsonArray);
-            JSONObject jsonObject;
-            ListenHistory listenHistory;
-            Gson gson = new Gson();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                listenHistory = gson.fromJson(jsonObject.toString(), ListenHistory.class);
-                listListenHistory.add(listenHistory);
-            }
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
 
+        // Kiểm tra xem chuỗi JSON có không và không rỗng
+        if (strJsonArray != null && !strJsonArray.isEmpty()) {
+            try {
+                JSONArray jsonArray = new JSONArray(strJsonArray);
+                JSONObject jsonObject;
+                ListenHistory listenHistory;
+                Gson gson = new Gson();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    jsonObject = jsonArray.getJSONObject(i);
+                    listenHistory = gson.fromJson(jsonObject.toString(), ListenHistory.class);
+                    listListenHistory.add(listenHistory);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         return listListenHistory;
+    }
+    public static void deleteListenHistory() {
+        List<ListenHistory> newList = new ArrayList<>();
+
+        Gson gson = new Gson();
+        JsonArray jsonArray = gson.toJsonTree(newList).getAsJsonArray();
+        String strJsonArray = jsonArray.toString();
+        DataLocalManager.getInstance().mySharedPreferences.putStringValue(PREF_LISTEN_HISTORY, strJsonArray);
     }
 
     public static void setNameAllInfoSong(Set<String> songInfo) {

@@ -21,17 +21,23 @@ import com.example.authenticationuseraccount.activity.panel.view.MediaPlayerBarV
 import com.example.authenticationuseraccount.activity.panel.view.MediaPlayerView;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.BackEventHandler;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.UIThread;
 import com.example.authenticationuseraccount.theme.AsyncPaletteBuilder;
 import com.example.authenticationuseraccount.theme.interfaces.PaletteStateListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.realgear.multislidinguppanel.BasePanelView;
 import com.realgear.multislidinguppanel.IPanel;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
+import java.util.List;
+
 
 public class RootMediaPlayerPanel extends BasePanelView {
+    private FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
     private MediaPlayerView mMediaPlayerView;
     private MediaPlayerBarView mMediaPlayerBarView;
     private View mParentView;
@@ -100,8 +106,8 @@ public class RootMediaPlayerPanel extends BasePanelView {
         Bitmap bitmap = null;
         bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
 
-        this.mMediaPlayerBarView.onUpdateMetadata(currentMetaData, bitmap);
-        this.mMediaPlayerView.onUpdateMetadata(currentMetaData, bitmap);
+        this.mMediaPlayerBarView.onUpdateMetadata(currentMetaData, bitmap, isLoveSong());
+        this.mMediaPlayerView.onUpdateMetadata(currentMetaData, bitmap, isLoveSong());
 
     }
 
@@ -109,10 +115,31 @@ public class RootMediaPlayerPanel extends BasePanelView {
         LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
         mParentView.setVisibility(VISIBLE);
 
-        this.mMediaPlayerBarView.onUpdateMetadata(mediaMetadata, bitmap);
-        this.mMediaPlayerView.onUpdateMetadata(mediaMetadata, bitmap);
+        this.mMediaPlayerBarView.onUpdateMetadata(mediaMetadata, bitmap, isLoveSong());
+        this.mMediaPlayerView.onUpdateMetadata(mediaMetadata, bitmap, isLoveSong());
 
     }
+
+    public boolean isLoveSong() {
+        int currentIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+        String songID = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getSongID();
+        String nameID = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getName();
+
+        LogUtils.ApplicationLogI("song iD: " + songID);
+        LogUtils.ApplicationLogI("song name: " + nameID);
+
+        List<Song> listSongLove = MediaItemHolder.getInstance().getListLoveSong();
+
+        if (mUser != null) {
+            for (Song song : listSongLove) {
+                if (song.getSongID().equals(songID)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     public void onSetupSeekBar() {
         this.mMediaPlayerBarView.onSetupSeekBar();
@@ -180,5 +207,14 @@ public class RootMediaPlayerPanel extends BasePanelView {
 
     public void giveUiThreadInstance(UIThread uiThread) {
         this.mMediaPlayerView.onReceiveUiThread(uiThread);
+        this.mMediaPlayerBarView.onReceiveUiThread(uiThread);
+    }
+
+    public void onUpdateLoveSong(boolean isLove) {
+        this.mMediaPlayerBarView.onUpdateLoveSong(isLove);
+    }
+
+    public void onUpdateLoveSongFromBarView(boolean isLove) {
+        this.mMediaPlayerView.onUpdateLoveSongFromBarView(isLove);
     }
 }

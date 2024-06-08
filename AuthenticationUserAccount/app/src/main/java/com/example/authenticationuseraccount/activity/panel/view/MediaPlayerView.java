@@ -1,6 +1,7 @@
 package com.example.authenticationuseraccount.activity.panel.view;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -28,6 +29,8 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.MainActivity;
+import com.example.authenticationuseraccount.activity.SplashScreenActivity;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
@@ -51,10 +54,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 
 public class MediaPlayerView {
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     public static final int STATE_NORMAL = 0;
     public static final int STATE_PARTIAL = 1;
     private final View mRootView;
@@ -217,18 +223,23 @@ public class MediaPlayerView {
         this.materialCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user == null) {
                     materialCheckBox.setChecked(false);
                     ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
                 } else {
                     if (materialCheckBox.isChecked()) {
-                        ListenHistory listenHistory = getSongHistory(user.getUid(), true);
+                        ListenHistory listenHistory = getSongHistory(user.getUid(), 3);
                         LogUtils.ApplicationLogI("Trigger Call Update History When Click Love!");
                         triggerAPICall(listenHistory);
+                        uiThread.onUpdateLoveSong(materialCheckBox.isChecked());
                         MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
                     } else {
                         Toast.makeText(mRootView.getContext(), "You have unliked the song", Toast.LENGTH_SHORT).show();
+                        ListenHistory listenHistory = getSongHistory(user.getUid(), -3);
+                        LogUtils.ApplicationLogI("Trigger Call Update History When Click UnLove!");
+                        triggerAPICall(listenHistory);
+                        uiThread.onUpdateLoveSong(materialCheckBox.isChecked());
+                        MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
                     }
                 }
             }
@@ -245,8 +256,8 @@ public class MediaPlayerView {
         this.uiThread = uiThread;
     }
 
-    public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {
-        this.materialCheckBox.setChecked(false);
+    public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap, boolean isLoveSong) {
+        this.materialCheckBox.setChecked(isLoveSong);
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
         this.mProgressBar.setVisibility(View.VISIBLE);
@@ -303,9 +314,8 @@ public class MediaPlayerView {
     }
 
     private void updateUserHistory() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            ListenHistory listenHistory = getSongHistory(user.getUid(), false);
+            ListenHistory listenHistory = getSongHistory(user.getUid(), 1);
             LogUtils.ApplicationLogI("Trigger Call Update History!");
             triggerAPICall(listenHistory);
             MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
@@ -317,7 +327,7 @@ public class MediaPlayerView {
 
     private void triggerSaveLocal() {
         LogUtils.ApplicationLogI("Trigger Local Call Update History!");
-        ListenHistory listenHistory = getSongHistory("Local", false);
+        ListenHistory listenHistory = getSongHistory("Local", 1);
         DataLocalManager.setListenHistory(listenHistory);
     }
 
@@ -371,27 +381,25 @@ public class MediaPlayerView {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
                     LogUtils.ApplicationLogD("Update User History! " + listenHistory.getSongID());
+                    getUserLoveSong(user.getUid());
                 }, throwable -> {
                     LogUtils.ApplicationLogE("Upload Failed");
                 });
     }
 
-    private ListenHistory getSongHistory(String uid, boolean isClickLove) {
+    private ListenHistory getSongHistory(String uid, int count) {
 
         String currentSongName = (String) mMediaController.getMediaMetadata().title;
         String currentSongArtist = (String) mMediaController.getMediaMetadata().artist;
         String songID = "-1";
         String songName = "-1";
 
-        for (Song song : MediaItemHolder.getInstance().getListSongs()) {
-            LogUtils.ApplicationLogI("song in list: " + song.getName() + " song in media: " + currentSongName);
-            LogUtils.ApplicationLogI("artist in list: " + song.getArtist() + " artist in media: " + currentSongArtist);
-            if (song.getName().equals(currentSongName) && song.getArtist().equals(currentSongArtist)) {
-                songID = song.getSongID();
-                songName = song.getName();
-            }
-        }
-
+        int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+        Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
+        songID = song.getSongID();
+        songName = song.getName();
+        LogUtils.ApplicationLogI("song in list: " + song.getName() + " song in media: " + currentSongName);
+        LogUtils.ApplicationLogI("artist in list: " + song.getArtist() + " artist in media: " + currentSongArtist);
         LogUtils.ApplicationLogD("Song about to saved: " + songName);
 
         DateTimeFormatter formatter = null;
@@ -400,12 +408,9 @@ public class MediaPlayerView {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         formattedDate = currentDate.format(formatter);
 
-        if (isClickLove) {
-            return new ListenHistory(uid, songID, 3, materialCheckBox.isChecked(), formattedDate);
-        }
-        else {
-            return new ListenHistory(uid, songID, 1, materialCheckBox.isChecked(), formattedDate);
-        }
+        LogUtils.ApplicationLogE("isLove: " + materialCheckBox.isChecked());
+
+        return new ListenHistory(uid, songID, count, materialCheckBox.isChecked(), formattedDate);
     }
 
     public void onUpdateVibrantColor(int vibrantColor) {
@@ -414,5 +419,38 @@ public class MediaPlayerView {
 
     public void onUpdateVibrantDarkColor(int vibrantDarkColor) {
         this.mControlsContainer.setBackgroundColor(vibrantDarkColor);
+    }
+
+    private void getUserLoveSong(String userID) {
+        ApiService.apiService.getUserLoveSong(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        MediaItemHolder.getInstance().setListLoveSong(songs);
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api love song error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.ApplicationLogE("Call api love song Complete");
+                        LogUtils.ApplicationLogE("Count: " + MediaItemHolder.getInstance().getListLoveSong().size());
+
+                    }
+                });
+    }
+
+    public void onUpdateLoveSongFromBarView(boolean isLove) {
+        LogUtils.ApplicationLogI("onUpdateLoveSongFromBarView: " + isLove);
+        this.materialCheckBox.setChecked(isLove);
     }
 }

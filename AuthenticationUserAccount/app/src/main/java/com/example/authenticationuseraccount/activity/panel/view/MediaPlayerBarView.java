@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.activity.panel.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.IdRes;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -26,16 +28,31 @@ import androidx.media3.session.MediaController;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
+import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.ListenHistory;
+import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.service.UIThread;
 import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class MediaPlayerBarView {
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
     public static final int STATE_NORMAL = 0;
     public static final int STATE_PARTIAL = 1;
     private final View mRootView;
@@ -70,6 +87,41 @@ public class MediaPlayerBarView {
         this.mProgressBar.setVisibility(View.VISIBLE);
     }
 
+    private boolean isFavoriteSong = false;
+
+    private void setOnListener() {
+        this.mImageBtn_Fav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (user == null) {
+                    mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
+                    ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
+                } else {
+
+                    if (isFavoriteSong) {
+                        mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
+
+                        Toast.makeText(mRootView.getContext(), "You have unliked the song", Toast.LENGTH_SHORT).show();
+                        ListenHistory listenHistory = getSongHistory(user.getUid(), -3);
+                        LogUtils.ApplicationLogI("Trigger Call Update History When Click UnLove!");
+                        triggerAPICall(listenHistory);
+                        uiThread.onUpdateLoveSongFromBarView(false);
+                        MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
+
+                    } else {
+                        mImageBtn_Fav.setImageResource(R.drawable.baseline_favorite_24);
+                        uiThread.onUpdateLoveSongFromBarView(true);
+                        ListenHistory listenHistory = getSongHistory(user.getUid(), 3);
+                        LogUtils.ApplicationLogI("Trigger Call Update History When Click Love!");
+                        triggerAPICall(listenHistory);
+                        MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
+                    }
+                    isFavoriteSong = !isFavoriteSong;
+                }
+            }
+        });
+    }
+
     public void onPanelStateChanged(int panelSate) {
         LogUtils.ApplicationLogE("MediaPlayerBarView onPanelStateChanged: " + panelSate);
         if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
@@ -84,9 +136,17 @@ public class MediaPlayerBarView {
 
     }
 
-    public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap album_art) {
-        //mImageBtn_Fav.setImageResource(R.drawable.baseline_favorite_24);
-        mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
+    public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap album_art, boolean isLoveSong) {
+
+        if (isLoveSong) {
+            isFavoriteSong = true;
+            mImageBtn_Fav.setImageResource(R.drawable.baseline_favorite_24);
+        }
+        else {
+            isFavoriteSong = false;
+            mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
+
+        }
         LogUtils.ApplicationLogE("MediaPlayerBarView onUpdateMetadata");
         this.mTextView_SongTitle.setText(mediaMetadata.title);
         this.mTextView_SongArtist.setText(mediaMetadata.artist);
@@ -117,6 +177,7 @@ public class MediaPlayerBarView {
         }
         mMediaController = mediaController;
         this.onInit();
+        setOnListener();
     }
 
     public void onInit() {
@@ -197,4 +258,90 @@ public class MediaPlayerBarView {
         this.mProgressIndicator.setTrackColor(mutedDarkColor);
     }
 
+    @SuppressLint("CheckResult")
+    private void triggerAPICall(ListenHistory listenHistory) {
+
+        ApiService.apiService.addUserListenHistory(listenHistory)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Update User History! " + listenHistory.getSongID());
+                    getUserLoveSong(user.getUid()); // cập nhật lại listSongLove
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Upload Failed");
+                });
+    }
+    private ListenHistory getSongHistory(String uid, int count) {
+
+        String currentSongName = (String) mMediaController.getMediaMetadata().title;
+        String currentSongArtist = (String) mMediaController.getMediaMetadata().artist;
+        String songID = "-1";
+        String songName = "-1";
+
+        int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+        Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
+        songID = song.getSongID();
+        songName = song.getName();
+        LogUtils.ApplicationLogI("song in list: " + song.getName() + " song in media: " + currentSongName);
+        LogUtils.ApplicationLogI("artist in list: " + song.getArtist() + " artist in media: " + currentSongArtist);
+        LogUtils.ApplicationLogD("Song about to saved: " + songName);
+
+        DateTimeFormatter formatter = null;
+        String formattedDate = "";
+        LocalDate currentDate = LocalDate.now();
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        formattedDate = currentDate.format(formatter);
+
+        if (count > 0) {
+            return new ListenHistory(uid, songID, count, true, formattedDate);
+
+        }
+        else {
+            return new ListenHistory(uid, songID, count, false, formattedDate);
+
+        }
+
+    }
+    private void getUserLoveSong(String userID) {
+        ApiService.apiService.getUserLoveSong(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        MediaItemHolder.getInstance().setListLoveSong(songs);
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api love song error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.ApplicationLogE("Call api love song Complete");
+                    }
+                });
+    }
+
+    public void onUpdateLoveSong(boolean isLove) {
+        if (isLove) {
+            isFavoriteSong = true;
+            mImageBtn_Fav.setImageResource(R.drawable.baseline_favorite_24);
+        }
+        else {
+            isFavoriteSong = false;
+            mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
+
+        }
+    }
+
+    private UIThread uiThread;
+    public void onReceiveUiThread(UIThread uiThread) {
+        this.uiThread = uiThread;
+    }
 }

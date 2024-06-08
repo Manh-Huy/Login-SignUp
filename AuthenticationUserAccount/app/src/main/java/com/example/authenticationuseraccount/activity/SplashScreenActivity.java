@@ -5,7 +5,6 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,6 +14,8 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -23,7 +24,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +39,6 @@ public class SplashScreenActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private Disposable mDisposable;
-
     private List<String> mListName = new ArrayList<>();
 
     @Override
@@ -58,6 +57,36 @@ public class SplashScreenActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         getNameAllInfoSongAndCheckUserLogin();
+    }
+
+    private void getUserLoveSong(String userID) {
+        ApiService.apiService.getUserLoveSong(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        MediaItemHolder.getInstance().setListLoveSong(songs);
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api love song error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.ApplicationLogE("Count: " + MediaItemHolder.getInstance().getListLoveSong().size());
+                        LogUtils.ApplicationLogE("Call api love song Complete");
+                        startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                        finish();
+                    }
+                });
     }
 
     private void getNameAllInfoSongAndCheckUserLogin() {
@@ -82,6 +111,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
+                        LogUtils.ApplicationLogE("Call api getNameAllInfoSong Complete");
                         // Save to shared preference
                         Set<String> stringSet = new HashSet<>(mListName);
                         DataLocalManager.setNameAllInfoSong(stringSet);
@@ -100,8 +130,15 @@ public class SplashScreenActivity extends AppCompatActivity {
                         }
                         else
                         {
-                            startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
-                            finish();
+                            if (mAuth.getCurrentUser() != null)
+                            {
+                                getUserLoveSong(mAuth.getCurrentUser().getUid());
+
+                            }
+                            else {
+                                startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                                finish();
+                            }
                         }
                     }
                 });

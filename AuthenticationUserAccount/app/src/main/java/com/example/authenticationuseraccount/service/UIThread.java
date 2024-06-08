@@ -244,4 +244,12 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         UIThread.this.mFragmentQueueBottomSheet.setListItems(MediaItemHolder.getInstance().getListSongs());
         UIThread.this.mFragmentQueueBottomSheet.show(m_vMainActivity.getSupportFragmentManager(), mFragmentQueueBottomSheet.getTag());
     }
+
+    public void onUpdateLoveSong(boolean isLove){
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateLoveSong(isLove);
+    }
+
+    public void onUpdateLoveSongFromBarView(boolean isLove){
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateLoveSongFromBarView(isLove);
+    }
 }

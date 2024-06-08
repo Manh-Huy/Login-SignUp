@@ -40,7 +40,7 @@
             android:id="@+id/playlist_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="YouTube Music"
+            android:text="THK Music"
             android:textSize="14sp"
             android:textColor="#CCCCCC"
             android:layout_marginTop="4dp" />
@@ -105,14 +105,14 @@
         </RelativeLayout>
 
         <!-- Playlist Description -->
-        <TextView
-            android:id="@+id/playlist_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Đến với một góc yên tĩnh của nhạc jazz và thưởng thức một tuyển tập những giai điệu nhẹ nhàng, đương đại thời k..."
-            android:textSize="14sp"
-            android:textColor="#CCCCCC"
-            android:layout_marginTop="16dp" />
+<!--        <TextView-->
+<!--            android:id="@+id/playlist_description"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Đến với một góc yên tĩnh của nhạc jazz và thưởng thức một tuyển tập những giai điệu nhẹ nhàng, đương đại thời k..."-->
+<!--            android:textSize="14sp"-->
+<!--            android:textColor="#CCCCCC"-->
+<!--            android:layout_marginTop="16dp" />-->
 
         <!-- Number of Songs -->
         <TextView

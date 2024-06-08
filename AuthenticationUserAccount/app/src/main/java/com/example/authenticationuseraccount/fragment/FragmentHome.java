@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.AlbumActivity;
 import com.example.authenticationuseraccount.activity.CheckoutActivity;
 import com.example.authenticationuseraccount.activity.SearchActivity;
 import com.example.authenticationuseraccount.adapter.BannerAdapter;
@@ -152,6 +153,9 @@ public class FragmentHome extends Fragment {
             @Override
             public void onClickItemGenre(Genre genre) {
                 // Handle genre click
+                Intent intent = new Intent(getContext(), AlbumActivity.class);
+                intent.putExtra("genre_key", genre);
+                startActivity(intent);
             }
         });
 

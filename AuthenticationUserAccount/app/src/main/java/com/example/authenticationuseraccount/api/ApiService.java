@@ -124,8 +124,11 @@ public interface ApiService {
     @GET("songs/forgotten")
     Observable<List<Song>> getUserForgottenSong(@Query("userID") String userID);
 
-    @GET("genres/getAllGenre")
+    @GET("genres")
     Observable<List<Genre>> getAllGenres();
+
+    @GET("songs/nameGenre")
+    Observable<List<Song>> getSongByGenre(@Query("nameGenre") String nameGenre);
 
 }
 

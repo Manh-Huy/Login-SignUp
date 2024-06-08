@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.api;
 
+import com.example.authenticationuseraccount.model.Genre;
 import com.example.authenticationuseraccount.model.ListenHistory;
 
 import com.example.authenticationuseraccount.model.SearchHistory;
@@ -120,6 +121,12 @@ public interface ApiService {
     @GET("songs/recommend")
     Observable<List<Song>> getUserRecommendSong(@Query("userID") String userID);
 
+    @GET("songs/forgotten")
+    Observable<List<Song>> getUserForgottenSong(@Query("userID") String userID);
+
+    @GET("genres/getAllGenre")
+    Observable<List<Genre>> getAllGenres();
 
 }
+
 

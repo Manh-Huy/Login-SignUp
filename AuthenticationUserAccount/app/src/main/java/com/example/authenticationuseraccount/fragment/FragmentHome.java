@@ -76,7 +76,7 @@ public class FragmentHome extends Fragment {
     private ThumbnailSongAdapter mThumbnailSongAdapter_Recommend;
     private ThumbnailSongNewAdapter mThumbnailSongNewAdapter_NewRelease;
     private List<Banner> mListBanner = new ArrayList<>();
-    private List<Genre> mLisGenre = new ArrayList<>();
+    private List<Genre> mListGenre = new ArrayList<>();
     private List<Song> mListSong = new ArrayList<>();
     private List<Song> listNewReleaseSong;
     private List<ListenHistory> mListUserListenHistory;
@@ -85,6 +85,7 @@ public class FragmentHome extends Fragment {
     private List<Song> listSongRecent = new ArrayList<>();
     private List<Song> listSongRecommend = new ArrayList<>();
     private List<Song> listSongQuickPick = new ArrayList<>();
+    private List<Song> listForgottenFavorite = new ArrayList<>();
 
     Timer mTimer;
 
@@ -147,7 +148,7 @@ public class FragmentHome extends Fragment {
             }
         });
 
-        mThumbnailGenreAdapter = new ThumbnailGenreAdapter(getContext(), mLisGenre, new IClickGenreRecyclerViewListener() {
+        mThumbnailGenreAdapter = new ThumbnailGenreAdapter(getContext(), mListGenre, new IClickGenreRecyclerViewListener() {
             @Override
             public void onClickItemGenre(Genre genre) {
                 // Handle genre click
@@ -182,6 +183,14 @@ public class FragmentHome extends Fragment {
         } else {
             LogUtils.ApplicationLogE("ko Keo API Banner");
             showBannerInRecyclerView();
+        }
+
+        if (mListGenre.isEmpty()) {
+            LogUtils.ApplicationLogE("Keo API Genre");
+            getListGenre();
+        } else {
+            LogUtils.ApplicationLogE("ko Keo API Genre");
+            showGenreInRecyclerView();
         }
 
         imgMenuIcon.setOnClickListener(new View.OnClickListener() {
@@ -220,20 +229,6 @@ public class FragmentHome extends Fragment {
                 });
             }
         }, 500, 3000);
-    }
-
-    private List<Genre> geListGenre() {
-        List<Genre> list = new ArrayList<>();
-        list.add(new Genre("01", "Nhạc Trẻ"));
-        list.add(new Genre("02", "Trữ Tình"));
-        list.add(new Genre("03", "Remix Việt"));
-        list.add(new Genre("04", "Rap Việt"));
-        list.add(new Genre("05", "Tiền Chiến"));
-        list.add(new Genre("06", "Nhạc Trịnh"));
-        list.add(new Genre("07", "Rock Việt"));
-        list.add(new Genre("08", "Cách Mạng"));
-
-        return list;
     }
 
     private void ShowUIForLocal() {
@@ -277,6 +272,33 @@ public class FragmentHome extends Fragment {
                     @Override
                     public void onComplete() {
                         showBannerInRecyclerView();
+                    }
+                });
+
+    }
+    private void getListGenre() {
+        ApiService.apiService.getAllGenres()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Genre>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Genre> genres) {
+                        mListGenre = genres;
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api Genre error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        showGenreInRecyclerView();
                     }
                 });
 
@@ -368,6 +390,33 @@ public class FragmentHome extends Fragment {
                     @Override
                     public void onComplete() {
                         createQuickPickRandomSongsList();
+                        getUserForgottenSong(user.getUid());
+                    }
+                });
+    }
+
+    private void getUserForgottenSong(String userID) {
+        ApiService.apiService.getUserForgottenSong(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        listForgottenFavorite = songs;
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api forgotten error");
+                    }
+
+                    @Override
+                    public void onComplete() {
                         showSongInRecyclerView();
                     }
                 });
@@ -428,19 +477,18 @@ public class FragmentHome extends Fragment {
     }
 
     private void showSongInRecyclerView() {
-        mLisGenre = geListGenre();
         listNewReleaseSong = takeNewReLeaseMusic(mListSong);
 
         LogUtils.ApplicationLogE("Recent Count: " + listSongRecent.size());
         LogUtils.ApplicationLogE("Recommend Count: "+ listSongRecommend.size());
-
+        LogUtils.ApplicationLogE("Forgotten Count: "+ listForgottenFavorite.size());
 
         mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
         mThumbnailSongNewAdapter_NewRelease.setData(listNewReleaseSong);
-        mThumbnailGenreAdapter.setData(mLisGenre);
+        mThumbnailGenreAdapter.setData(mListGenre);
         mThumbnailSongAdapter_ListenAgain.setData(listSongRecent);
         mThumbnailSongAdapter_Recommend.setData(listSongRecommend);
-        mThumbnailSongSmallAdapter_ForgottenFavorite.setData(listSongQuickPick);
+        mThumbnailSongSmallAdapter_ForgottenFavorite.setData(listForgottenFavorite);
 
         rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter_QuickPick);
         rcvNewRelease.setAdapter(mThumbnailSongNewAdapter_NewRelease);
@@ -451,7 +499,6 @@ public class FragmentHome extends Fragment {
     }
 
     private void showSongLocalInRecyclerView() {
-        mLisGenre = geListGenre();
         listSongQuickPick = takeMusicWithHighView(numberSongShowInQuickPick, mListSong);
         listNewReleaseSong = takeNewReLeaseMusic(mListSong);
 
@@ -460,13 +507,11 @@ public class FragmentHome extends Fragment {
 
         mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
         mThumbnailSongNewAdapter_NewRelease.setData(listNewReleaseSong);
-        mThumbnailGenreAdapter.setData(mLisGenre);
         mThumbnailSongAdapter_ListenAgain.setData(mListSong);
         mThumbnailSongAdapter_Recommend.setData(mListSong);
 
         rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter_QuickPick);
         rcvNewRelease.setAdapter(mThumbnailSongNewAdapter_NewRelease);
-        rcvGenre.setAdapter(mThumbnailGenreAdapter);
         rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
         rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
 
@@ -478,6 +523,11 @@ public class FragmentHome extends Fragment {
         bannerAdapter.registerAdapterDataObserver(circleIndicator.getAdapterDataObserver());
 
         autoSlideImages();
+    }
+
+    private void showGenreInRecyclerView() {
+        mThumbnailGenreAdapter.setData(mListGenre);
+        rcvGenre.setAdapter(mThumbnailGenreAdapter);
     }
 
 

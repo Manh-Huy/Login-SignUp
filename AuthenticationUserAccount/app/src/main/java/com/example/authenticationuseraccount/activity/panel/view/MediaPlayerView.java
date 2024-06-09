@@ -75,7 +75,7 @@ public class MediaPlayerView {
     private MediaController mMediaController;
 
     public MediaPlayerView(View rootView) {
-        LogUtils.ApplicationLogE("MediaPlayerView Constructor");
+        //LogUtils.ApplicationLogE("MediaPlayerView Constructor");
         this.mRootView = rootView;
         this.mControlsContainer = findViewById(R.id.media_player_controls_container);
         this.mRootView.setAlpha(0.0F);
@@ -109,7 +109,7 @@ public class MediaPlayerView {
     }
 
     public void onPanelStateChanged(int panelSate) {
-        LogUtils.ApplicationLogE("MediaPlayerView onPanelStateChanged: " + panelSate);
+        //LogUtils.ApplicationLogE("MediaPlayerView onPanelStateChanged: " + panelSate);
         mState = panelSate;
         if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
             this.mRootView.setVisibility(View.INVISIBLE);
@@ -254,6 +254,7 @@ public class MediaPlayerView {
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
         this.mProgressBar.setVisibility(View.VISIBLE);
+        this.m_vBtn_PlayPause.setImageResource(!MediaItemHolder.getInstance().getMediaController().isPlaying() ? leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px : leveldown.kyle.icon_packs.R.drawable.ic_pause_24px);
         m_vTextView_Artist.setSelected(true);
         m_vTextView_Title.setSelected(true);
         ImageView imgView = (ImageView) this.m_vCardView_Art.getChildAt(0);
@@ -337,9 +338,6 @@ public class MediaPlayerView {
     }
 
     public void onPlaybackStateChanged(boolean isPlaying) {
-        if (mMediaController == null) {
-            mMediaController = MediaItemHolder.getInstance().getMediaController();
-        }
         this.m_vBtn_PlayPause.setImageResource(!isPlaying ? leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px : leveldown.kyle.icon_packs.R.drawable.ic_pause_24px);
     }
 

@@ -78,7 +78,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     }
 
     public void onPanelStateChanged(Class<?> panel, int state) {
-        LogUtils.ApplicationLogI("UIThread onPanelStateChanged");
+        //LogUtils.ApplicationLogI("UIThread onPanelStateChanged");
         this.m_vCanUpdatePanelsUI = state != MultiSlidingUpPanelLayout.DRAGGING;
 
         for (OnPanelStateChanged listener : this.m_vOnPanelStateListeners) {
@@ -177,7 +177,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
             public void onTimelineChanged(Timeline timeline, int reason) {
                 Player.Listener.super.onTimelineChanged(timeline, reason);
                 if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
-                    LogUtils.ApplicationLogD("TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED");
+                    //LogUtils.ApplicationLogD("TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED");
                     LogUtils.ApplicationLogD("Song in Playlist: " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
                 }
             }
@@ -190,19 +190,17 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     @Override
     public void onUpdateUIOnRestar(MediaController mediaController) {
         LogUtils.ApplicationLogI("UIThread onUpdateUIOnRestar");
-        onMediaControllerConnect(MediaItemHolder.getInstance().getMediaController());
-        if (MediaItemHolder.getInstance().getMediaController().isPlaying()) {
+        onMediaControllerConnect(mediaController);
 
-        }
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController().getMediaMetadata());
-
         byte[] art = MediaItemHolder.getInstance().getMediaController().getMediaMetadata().artworkData;
         Bitmap bitmap = null;
         if (art != null) {
             bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
         }
-
         mAsyncPaletteBuilder.onStartAnimation(bitmap);
+
+
     }
 
     public void release() {

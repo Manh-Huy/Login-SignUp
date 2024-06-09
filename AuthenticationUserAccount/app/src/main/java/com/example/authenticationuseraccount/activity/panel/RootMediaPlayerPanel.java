@@ -45,14 +45,14 @@ public class RootMediaPlayerPanel extends BasePanelView {
 
     public RootMediaPlayerPanel(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
         super(context, panelLayout);
-        LogUtils.ApplicationLogE("RootMedia: Constructor");
+        //LogUtils.ApplicationLogE("RootMedia: Constructor");
         getContext().setTheme(R.style.Theme_AuthenticationUserAccount);
         mParentView = LayoutInflater.from(getContext()).inflate(R.layout.layout_root_mediaplayer, this, true);
     }
 
     @Override
     public void onCreateView() {
-        LogUtils.ApplicationLogE("RootMedia: onCreateView");
+        //LogUtils.ApplicationLogE("RootMedia: onCreateView");
         this.setPanelState(MultiSlidingUpPanelLayout.HIDDEN);
         this.setSlideDirection(MultiSlidingUpPanelLayout.SLIDE_VERTICAL);
         this.setPeakHeight(getNavigationBarHeight() + 102);
@@ -60,14 +60,14 @@ public class RootMediaPlayerPanel extends BasePanelView {
 
     @Override
     public void onBindView() {
-        LogUtils.ApplicationLogE("RootMedia: OnBindView");
+        //LogUtils.ApplicationLogE("RootMedia: OnBindView");
         mMediaPlayerView = new MediaPlayerView(findViewById(R.id.media_player_view));
         mMediaPlayerBarView = new MediaPlayerBarView(findViewById(R.id.media_player_bar_view));
     }
 
     @Override
     public void onPanelStateChanged(int panelSate) {
-        LogUtils.ApplicationLogE("RootMedia: onPanelStateChanged: " + panelSate);
+        //LogUtils.ApplicationLogE("RootMedia: onPanelStateChanged: " + panelSate);
         UIThread.getInstance().onPanelStateChanged(this.getClass(), panelSate);
         if (panelSate == MultiSlidingUpPanelLayout.HIDDEN) {
             mParentView.setVisibility(INVISIBLE);
@@ -83,7 +83,7 @@ public class RootMediaPlayerPanel extends BasePanelView {
     }
 
     public void onMediaControllerReady(MediaController mediaController) {
-        LogUtils.ApplicationLogE("RootMedia: onMediaControllerReady");
+        //LogUtils.ApplicationLogE("RootMedia: onMediaControllerReady");
         this.mMediaPlayerView.onMediaControllerConnect(mediaController);
         this.mMediaPlayerBarView.onMediaControllerCreate(mediaController);
     }

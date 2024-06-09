@@ -6,6 +6,7 @@ import android.content.Intent;
 import androidx.annotation.Nullable;
 import androidx.core.app.TaskStackBuilder;
 import androidx.media3.common.AudioAttributes;
+import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
@@ -36,8 +37,8 @@ public class MusicService extends MediaSessionService {
         /*intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(intent);*/
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         //PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
@@ -80,5 +81,19 @@ public class MusicService extends MediaSessionService {
         mediaSession = null;
         super.onDestroy();
     }
+
+    @Override
+    public void onTaskRemoved(@Nullable Intent rootIntent) {
+        LogUtils.ApplicationLogI("MusicService: App is dissmised");
+        Player player = mediaSession.getPlayer();
+        if (!player.getPlayWhenReady()
+                || player.getMediaItemCount() == 0
+                || player.getPlaybackState() == Player.STATE_ENDED) {
+            // Stop the service if not playing, continue playing in the background
+            // otherwise.
+            stopSelf();
+        }
+    }
+
 
 }

@@ -45,7 +45,7 @@ public class RootNavigationBarPanel extends BasePanelView {
 
         StateFragmentAdapter adapter = new StateFragmentAdapter(getSupportFragmentManager(),getLifecycle());
         adapter.addFragment(new FragmentHome());
-        adapter.addFragment(new FragmentForYou());
+        //adapter.addFragment(new FragmentForYou());
         adapter.addFragment(new FragmentCorner());
         adapter.addFragment(new FragmentLibrary());
         adapter.addFragment(new FragmentProfile());

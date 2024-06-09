@@ -70,7 +70,7 @@ public class MediaPlayerBarView {
     private ProgressBar mProgressBar;
 
     public MediaPlayerBarView(View rootView) {
-        LogUtils.ApplicationLogE("MediaPlayerBarView Constructor");
+        //LogUtils.ApplicationLogE("MediaPlayerBarView Constructor");
         this.mRootView = rootView;
         this.mBackgroundView = findViewById(R.id.media_player_bar_bg);
         this.mControlsContainer = findViewById(R.id.media_player_bar_controls_container);
@@ -123,12 +123,12 @@ public class MediaPlayerBarView {
     }
 
     public void onPanelStateChanged(int panelSate) {
-        LogUtils.ApplicationLogE("MediaPlayerBarView onPanelStateChanged: " + panelSate);
+        //LogUtils.ApplicationLogE("MediaPlayerBarView onPanelStateChanged: " + panelSate);
         if (panelSate == MultiSlidingUpPanelLayout.COLLAPSED) {
             this.mRootView.setVisibility(View.VISIBLE);
         }
 
-        if (panelSate == MultiSlidingUpPanelLayout.EXPANDED){
+        if (panelSate == MultiSlidingUpPanelLayout.EXPANDED) {
             this.mRootView.setAlpha(0F);
             this.mBackgroundView.setAlpha(0F);
             this.mProgressIndicator.setAlpha(0F);
@@ -152,13 +152,13 @@ public class MediaPlayerBarView {
         this.mTextView_SongArtist.setText(mediaMetadata.artist);
         this.mTextView_SongArtist.setSelected(true);
         this.mTextView_SongTitle.setSelected(true);
-
+        this.mImageBtn_PlayPause.setImageIcon(Icon.createWithResource(this.getContext(), MediaItemHolder.getInstance().getMediaController().isPlaying() ? leveldown.kyle.icon_packs.R.drawable.ic_pause_24px : leveldown.kyle.icon_packs.R.drawable.ic_play_arrow_24px));
         this.mProgressIndicator.setMax((int) MediaItemHolder.getInstance().getMediaController().getDuration());
         if (album_art != null) {
             this.mImageView_Art.setImageBitmap(album_art);
             this.mImageView_Art.setVisibility(View.VISIBLE);
             this.mProgressBar.setVisibility(View.INVISIBLE);
-        } else{
+        } else {
             this.mProgressBar.setVisibility(View.VISIBLE);
             this.mImageView_Art.setVisibility(View.INVISIBLE);
             //this.mImageView_Art.setImageDrawable(ResourcesCompat.getDrawable(this.mRootView.getResources(), leveldown.kyle.icon_packs.R.drawable.ic_album_24px, this.mRootView.getContext().getTheme()));
@@ -171,7 +171,7 @@ public class MediaPlayerBarView {
     }
 
     public void onMediaControllerCreate(MediaController mediaController) {
-        LogUtils.ApplicationLogE("MediaPlayerBarView onMediaControllerCreate");
+        //LogUtils.ApplicationLogE("MediaPlayerBarView onMediaControllerCreate");
         if (mMediaController != null) {
             return;
         }

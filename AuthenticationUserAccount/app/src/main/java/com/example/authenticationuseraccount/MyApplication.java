@@ -61,12 +61,13 @@ public class MyApplication extends Application {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Music Control Channel", importance);
             channel.setSound(null, null);
 
+            int importance2 = NotificationManager.IMPORTANCE_HIGH;
             Uri uri2 = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.rhyderrrr);
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
-            NotificationChannel channel2 = new NotificationChannel(CHANNEL_ID_2, "Notification From Firebase", importance);
-            channel.setSound(uri2, audioAttributes);
+            NotificationChannel channel2 = new NotificationChannel(CHANNEL_ID_2, "Notification From Firebase", importance2);
+            channel2.setSound(uri2, audioAttributes);
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);

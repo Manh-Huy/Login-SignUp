@@ -85,10 +85,17 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
                         Toast.makeText(mContext, "Thêm vào danh sách phát clicked", Toast.LENGTH_SHORT).show();
                         break;
                     case "Phát tiếp theo":
-                        int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
-                        MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1 , song);
-                        mediaItem = MediaItem.fromUri(song.getSongURL());
-                        MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
+                        if (MediaItemHolder.getInstance().getListSongs().isEmpty()) {
+                            MediaItemHolder.getInstance().getListSongs().add(song);
+                            mediaItem = MediaItem.fromUri(song.getSongURL());
+                            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+                        }
+                        else {
+                            int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+                            MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1 , song);
+                            mediaItem = MediaItem.fromUri(song.getSongURL());
+                            MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
+                        }
                         Toast.makeText(mContext, "Phát tiếp theo clicked", Toast.LENGTH_SHORT).show();
                         break;
                     case "Thêm vào hàng đợi":

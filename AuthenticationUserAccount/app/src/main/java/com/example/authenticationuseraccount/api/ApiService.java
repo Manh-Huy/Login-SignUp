@@ -85,7 +85,7 @@ public interface ApiService {
     @GET("history/{id}")
     Observable<List<ListenHistory>> getUserListenHistory(@Path("id") String userID);
 
-    @POST("history")
+    @POST("listenHistory")
     Completable addUserListenHistory(@Body ListenHistory listenHistory);
 
     @GET("search/getAllName")

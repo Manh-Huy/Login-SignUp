@@ -177,7 +177,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
             public void onTimelineChanged(Timeline timeline, int reason) {
                 Player.Listener.super.onTimelineChanged(timeline, reason);
                 if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
-                    LogUtils.ApplicationLogD("TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED");
+                    //LogUtils.ApplicationLogD("TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED");
                     LogUtils.ApplicationLogD("Song in Playlist: " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
                 }
             }

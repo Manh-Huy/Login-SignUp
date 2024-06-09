@@ -93,6 +93,10 @@ dependencies {
     //FCM
     implementation platform('com.google.firebase:firebase-bom:33.0.0')
     implementation 'com.google.firebase:firebase-messaging'
-    
+
+    //PeerJs x SocketIo
+    implementation 'io.socket:socket.io-client:1.0.0'
+
+
 }
 apply plugin: 'com.google.gms.google-services'

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="16dp"
+    tools:context=".activity.FavAndHisSongActivity">
+
+    <!-- Back Button -->
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_back"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Back"
+        android:layout_gravity="start" />
+
+    <!-- Album Art Placeholder -->
+    <ImageView
+        android:id="@+id/albumArt"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/logo"
+        android:contentDescription="Album Art" />
+
+    <!-- Song Title and Artist Info -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp"
+        android:gravity="start">
+
+        <!-- Song Title -->
+        <TextView
+            android:id="@+id/songTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Favorite"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#B0B0B0"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Artist Info -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- User Icon -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/userImage"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_profile"
+                app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+            <!-- User Name -->
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mạnh Huy Trần"
+                android:textSize="18sp"
+                android:textColor="#B0B0B0" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Additional Controls -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <ImageButton
+            android:id="@+id/like_button"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_love"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Like"
+            android:layout_alignParentStart="true" />
+
+        <ImageButton
+            android:id="@+id/play_button"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_play_arrow"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Play"
+            android:layout_toEndOf="@id/like_button"
+            android:layout_marginStart="16dp" />
+
+        <ImageButton
+            android:id="@+id/random_button"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/shuffle_24px"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Shuffle"
+            app:tint="#FFFFFF"
+            android:layout_toEndOf="@id/play_button"
+            android:layout_marginStart="16dp" />
+
+        <ImageButton
+            android:id="@+id/more_button"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_more"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="More"
+            app:tint="#FFFFFF"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+
+    <!-- No Data -->
+    <LinearLayout
+        android:id="@+id/layout_no_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/music_icon"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/music_icon"
+            app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+        <TextView
+            android:id="@+id/noDataMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Không có dữ liệu!"
+            android:textColor="#B0B0B0"
+            android:textSize="18sp"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <!-- RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewSong"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:scrollbars="vertical"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

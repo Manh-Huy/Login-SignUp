@@ -176,6 +176,7 @@
             app:cardCornerRadius="8dp">
 
             <LinearLayout
+                android:id="@+id/layout_love_song"
                 android:layout_width="264dp"
                 android:layout_height="97dp"
                 android:orientation="vertical"

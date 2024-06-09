@@ -69,7 +69,7 @@ public class AlbumActivity extends AppCompatActivity {
     private void clickOpenOptionBottomSheet() {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_playlist, "Thêm vào danh sách phát"));
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play, "Phát"));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_arrow, "Phát"));
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_heart, "Thích"));
         itemSearchOptionList.add(new ItemSearchOption(leveldown.kyle.icon_packs.R.drawable.shuffle_24px, "Phát ngẫu nhiên"));
 

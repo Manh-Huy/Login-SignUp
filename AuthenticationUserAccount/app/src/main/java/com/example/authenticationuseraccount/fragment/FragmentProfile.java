@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +23,9 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.AlbumActivity;
 import com.example.authenticationuseraccount.activity.EditProfileActivity;
+import com.example.authenticationuseraccount.activity.FavAndHisSongActivity;
 import com.example.authenticationuseraccount.activity.LoginActivity;
 import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
 import com.example.authenticationuseraccount.activity.MainActivity;
@@ -38,6 +41,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class FragmentProfile extends Fragment {
     private RelativeLayout layoutLogout, layoutLogin;
+    private LinearLayout layoutLoveSong;
     private Button loginButton, logoutButton, editProfileButton;
     private ImageView profileImage;
     private TextView profileName;
@@ -48,6 +52,8 @@ public class FragmentProfile extends Fragment {
 
         layoutLogin = view.findViewById(R.id.layout_Login);
         layoutLogout = view.findViewById(R.id.layout_Logout);
+
+        layoutLoveSong = view.findViewById(R.id.layout_love_song);
 
         loginButton = view.findViewById(R.id.loginButton);
         logoutButton = view.findViewById(R.id.logoutButton);
@@ -75,6 +81,16 @@ public class FragmentProfile extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), EditProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        layoutLoveSong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String typeShow = "Fav";
+                Intent intent = new Intent(getContext(), FavAndHisSongActivity.class);
+                intent.putExtra("type_show", typeShow);
                 startActivity(intent);
             }
         });

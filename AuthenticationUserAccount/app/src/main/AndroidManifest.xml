@@ -24,6 +24,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".activity.FavAndHisSongActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.AlbumActivity"
             android:exported="false" />
         <activity
@@ -84,8 +87,8 @@
         </service>
         <service
             android:name=".fcm.MyFirebaseMessagingService"
-            android:exported="false"
-            android:directBootAware="true">
+            android:directBootAware="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

@@ -105,6 +105,8 @@ public class PremiumActivity extends AppCompatActivity {
     private void onPaymentSheetResult(final PaymentSheetResult paymentSheetResult) {
         if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
             ErrorUtils.showError(this, "Payment complete!");
+            // api upgrade user prierum
+            // string userid , string yearly/ monthly, float  = > tins set thời gian prerium
             finish();
         } else if (paymentSheetResult instanceof PaymentSheetResult.Canceled) {
             ErrorUtils.showError(this, "Payment canceled!");

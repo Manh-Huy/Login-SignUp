@@ -12,9 +12,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.StateFragmentAdapter;
-import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentCorner;
-import com.example.authenticationuseraccount.fragment.FragmentForYou;
 import com.example.authenticationuseraccount.fragment.FragmentHome;
 import com.example.authenticationuseraccount.fragment.FragmentLibrary;
 import com.example.authenticationuseraccount.fragment.FragmentProfile;

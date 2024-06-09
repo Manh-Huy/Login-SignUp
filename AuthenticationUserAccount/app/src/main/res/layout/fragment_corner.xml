@@ -4,13 +4,30 @@
     android:layout_height="match_parent"
     android:background="#E61570">
 
-    <Button
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:id="@+id/btn_connect"
-        android:text="connect io"
-        android:textSize="24sp"
-        android:textColor="@color/black"/>
+        android:orientation="vertical">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_connect"
+            android:text="connect io"
+            android:textSize="24sp"
+            android:textColor="@color/black"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btn_emmit"
+            android:text="emit io"
+            android:textSize="24sp"
+            android:textColor="@color/black"/>
+
+    </LinearLayout>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

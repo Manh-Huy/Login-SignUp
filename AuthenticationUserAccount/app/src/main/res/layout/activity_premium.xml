@@ -32,7 +32,7 @@
             android:layout_gravity="center" />
 
         <!-- Try Free for 7 Days Text -->
-        <TextView
+        <!--<TextView
             android:id="@+id/tryFreeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
             android:textColor="@android:color/white"
             android:textSize="18sp"
             android:layout_marginTop="16dp"
-            android:gravity="center" />
+            android:gravity="center" />-->
 
         <!-- Access all tunings, tools & more, plus no ads Text -->
         <TextView
@@ -77,7 +77,7 @@
                 android:id="@+id/yearlyOption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="₫409,000 Yearly (₫34,083 / month)"
+                android:text="$17.99 Yearly ( $1.5 / month )"
                 android:textColor="@android:color/white"
                 android:background="@drawable/radio_button_selector"
                 android:buttonTint="@android:color/holo_orange_light"
@@ -89,7 +89,7 @@
                 android:id="@+id/monthlyOption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="₫57,000 Monthly"
+                android:text="$2.99 Monthly                             "
                 android:checked="true"
                 android:textColor="@android:color/white"
                 android:background="@drawable/radio_button_selector"
@@ -135,20 +135,12 @@
 
             <Button
                 android:id="@+id/buyVipButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:text="Buy VIP"
-                android:backgroundTint="@android:color/holo_purple"
+                android:backgroundTint="@color/mcgpalette0_900"
                 android:textColor="@android:color/white"
                 android:layout_marginEnd="8dp" />
-
-            <Button
-                android:id="@+id/tryForFreeButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Try for free"
-                android:backgroundTint="@android:color/holo_purple"
-                android:textColor="@android:color/white" />
 
         </LinearLayout>
 

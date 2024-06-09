@@ -48,6 +48,9 @@ public class Song implements Serializable {
         this.songURL = songURL;
     }
 
+    public Song() {
+    }
+
     public String getAlbum() {
         return this.album;
     }

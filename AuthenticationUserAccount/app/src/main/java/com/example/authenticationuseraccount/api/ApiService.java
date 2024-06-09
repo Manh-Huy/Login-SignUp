@@ -22,6 +22,8 @@ import io.reactivex.rxjava3.core.Observable;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -129,6 +131,10 @@ public interface ApiService {
 
     @GET("songs/nameGenre")
     Observable<List<Song>> getSongByGenre(@Query("nameGenre") String nameGenre);
+    @FormUrlEncoded
+    @POST("payment")
+    Call<ResponseBody> addItemsToCart(@Field("amountFromCLient") float amount);
+
 }
 
 

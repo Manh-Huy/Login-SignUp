@@ -84,8 +84,8 @@ public interface ApiService {
     @GET("users")
     Observable<List<User>> getUsers();
 
-    @GET("history/{id}")
-    Observable<List<ListenHistory>> getUserListenHistory(@Path("id") String userID);
+    @GET("listenHistory/getListenHistory")
+    Observable<List<Song>> getUserListenHistory(@Query("userID") String userID);
 
     @POST("listenHistory")
     Completable addUserListenHistory(@Body ListenHistory listenHistory);
@@ -129,7 +129,6 @@ public interface ApiService {
 
     @GET("songs/nameGenre")
     Observable<List<Song>> getSongByGenre(@Query("nameGenre") String nameGenre);
-
 }
 
 

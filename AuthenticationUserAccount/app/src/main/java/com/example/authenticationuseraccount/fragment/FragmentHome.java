@@ -80,9 +80,7 @@ public class FragmentHome extends Fragment {
     private List<Genre> mListGenre = new ArrayList<>();
     private List<Song> mListSong = new ArrayList<>();
     private List<Song> listNewReleaseSong;
-    private List<ListenHistory> mListUserListenHistory;
     private final int numberSongShowInQuickPick = 10;
-
     private List<Song> listSongRecent = new ArrayList<>();
     private List<Song> listSongRecommend = new ArrayList<>();
     private List<Song> listSongQuickPick = new ArrayList<>();
@@ -422,34 +420,6 @@ public class FragmentHome extends Fragment {
                     @Override
                     public void onComplete() {
                         showSongInRecyclerView();
-                    }
-                });
-    }
-
-
-    private void getUserListenHistory(String userID) {
-        ApiService.apiService.getUserListenHistory(userID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<ListenHistory>>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-                        mDisposable = d;
-                    }
-
-                    @Override
-                    public void onNext(@NonNull List<ListenHistory> listenHistories) {
-                        mListUserListenHistory = listenHistories;
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        LogUtils.ApplicationLogE("Call api user history error");
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        // Handle completion
                     }
                 });
     }

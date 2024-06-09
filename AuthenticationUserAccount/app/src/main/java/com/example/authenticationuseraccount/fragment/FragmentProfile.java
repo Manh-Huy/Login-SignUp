@@ -41,7 +41,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class FragmentProfile extends Fragment {
     private RelativeLayout layoutLogout, layoutLogin;
-    private LinearLayout layoutLoveSong;
+    private LinearLayout layoutLoveSong, layoutHistorySong;
     private Button loginButton, logoutButton, editProfileButton;
     private ImageView profileImage;
     private TextView profileName;
@@ -54,6 +54,7 @@ public class FragmentProfile extends Fragment {
         layoutLogout = view.findViewById(R.id.layout_Logout);
 
         layoutLoveSong = view.findViewById(R.id.layout_love_song);
+        layoutHistorySong = view.findViewById(R.id.layout_history_song);
 
         loginButton = view.findViewById(R.id.loginButton);
         logoutButton = view.findViewById(R.id.logoutButton);
@@ -89,6 +90,16 @@ public class FragmentProfile extends Fragment {
             @Override
             public void onClick(View v) {
                 String typeShow = "Fav";
+                Intent intent = new Intent(getContext(), FavAndHisSongActivity.class);
+                intent.putExtra("type_show", typeShow);
+                startActivity(intent);
+            }
+        });
+
+        layoutHistorySong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String typeShow = "His";
                 Intent intent = new Intent(getContext(), FavAndHisSongActivity.class);
                 intent.putExtra("type_show", typeShow);
                 startActivity(intent);

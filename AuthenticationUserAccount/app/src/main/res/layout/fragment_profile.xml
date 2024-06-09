@@ -252,6 +252,7 @@
             app:cardCornerRadius="8dp">
 
             <LinearLayout
+                android:id="@+id/layout_history_song"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"

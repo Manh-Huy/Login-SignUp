@@ -133,11 +133,11 @@ public interface ApiService {
     Observable<List<Song>> getSongByGenre(@Query("nameGenre") String nameGenre);
     @FormUrlEncoded
     @POST("payment")
-    Call<ResponseBody> addItemsToCart(@Field("amountFromCLient") float amount);
+    Call<ResponseBody> addItemsToCart(@Field("amountFromCLient") int amount);
 
     @FormUrlEncoded
     @POST("payment/upgradePremium")
-    Completable upgradePremium(@Field("userID") String userID, @Field("paymentType") String paymentType, @Field("balance") Float balance);
+    Completable upgradePremium(@Field("userID") String userID, @Field("paymentType") String paymentType, @Field("balance") int balance);
 
     @POST("payment/downgradePremium")
     Completable downgradePremium(@Query("userID") String userID);

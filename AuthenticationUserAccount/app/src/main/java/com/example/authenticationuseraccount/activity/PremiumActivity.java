@@ -39,7 +39,7 @@ public class PremiumActivity extends AppCompatActivity {
     private String paymentIntentClientSecret;
     private PaymentSheet paymentSheet;
     private RadioGroup pricingOptions;
-    private float mAmount;
+    private int mAmount;
     private String paymentType;
 
     @Override
@@ -48,6 +48,7 @@ public class PremiumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_premium);
         btnPayment = findViewById(R.id.buyVipButton);
         pricingOptions = findViewById(R.id.pricingOptions);
+        pricingOptions.clearCheck();
         mAmount = 0;
         pricingOptions.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -55,12 +56,14 @@ public class PremiumActivity extends AppCompatActivity {
                 // checkedId is the RadioButton ID that is selected
                 switch (checkedId) {
                     case R.id.yearlyOption:
-                        mAmount = 17.99f;
+                        mAmount = 1799;
                         paymentType = "Yearly";
+                        fetchPaymentIntent(mAmount);
                         break;
                     case R.id.monthlyOption:
-                        mAmount = 2.99f;
+                        mAmount = 299;
                         paymentType = "Monthly";
+                        fetchPaymentIntent(mAmount);
                         break;
                 }
             }
@@ -69,17 +72,21 @@ public class PremiumActivity extends AppCompatActivity {
         btnPayment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onPayClicked(v);
+                if (pricingOptions.getCheckedRadioButtonId() != -1) {
+                    onPayClicked();
+                }else{
+                    ErrorUtils.showError(PremiumActivity.this,"Please choose your plan!");
+                }
+
             }
         });
-        btnPayment.setEnabled(false);
+        //btnPayment.setEnabled(false);
         paymentSheet = new PaymentSheet(this, this::onPaymentSheetResult);
 
-        fetchPaymentIntent();
 
     }
 
-    private void onPayClicked(View view) {
+    private void onPayClicked() {
         PaymentSheet.Configuration configuration = new PaymentSheet.Configuration.Builder("Example, Inc.")
                 .build();
 
@@ -87,9 +94,8 @@ public class PremiumActivity extends AppCompatActivity {
         paymentSheet.presentWithPaymentIntent(paymentIntentClientSecret, configuration);
     }
 
-    private void fetchPaymentIntent() {
-        float amountSendToServer = mAmount;
-        ApiService.apiService.addItemsToCart(amountSendToServer).enqueue(new Callback<ResponseBody>() {
+    private void fetchPaymentIntent(int amount) {
+        ApiService.apiService.addItemsToCart(amount).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (!response.isSuccessful()) {
@@ -146,7 +152,7 @@ public class PremiumActivity extends AppCompatActivity {
     }
 
     @SuppressLint("CheckResult")
-    private void upgradePremium(String userID, String paymentType, Float balance) {
+    private void upgradePremium(String userID, String paymentType, int balance) {
         ApiService.apiService.upgradePremium(userID, paymentType, balance)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

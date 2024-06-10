@@ -177,10 +177,11 @@
             android:textSize="24sp" />
 
         <Button
-            android:id="@+id/btn_send_song"
+            android:id="@+id/btn_leave_room"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Emit Song"
+            android:text="Leave"
+            android:backgroundTint="#EA0B0B"
             android:textColor="@color/black"
             android:layout_margin="16dp"
             android:textSize="24sp" />

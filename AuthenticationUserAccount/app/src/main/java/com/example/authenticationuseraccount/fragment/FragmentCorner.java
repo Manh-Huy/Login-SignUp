@@ -31,7 +31,7 @@ public class FragmentCorner extends Fragment {
         return inflater.inflate(R.layout.fragment_corner, container, false);
     }
 
-    private Button btnCreatRoom, btnSendSong, btnJoinRoom;
+    private Button btnCreatRoom, btnLeaveRoom, btnJoinRoom;
     private FirebaseAuth mAuth;
     private EditText edtUserId;
     private TextView tvUserId;
@@ -43,7 +43,7 @@ public class FragmentCorner extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         edtUserId = view.findViewById(R.id.edt_enter_room);
         tvUserId = view.findViewById(R.id.tv_user_id);
-        btnSendSong = view.findViewById(R.id.btn_send_song);
+        btnLeaveRoom = view.findViewById(R.id.btn_leave_room);
         btnCreatRoom = view.findViewById(R.id.btn_create_room);
         btnJoinRoom = view.findViewById(R.id.btn_connet_room);
 
@@ -87,7 +87,7 @@ public class FragmentCorner extends Fragment {
             }
         });
 
-        btnSendSong.setOnClickListener(new View.OnClickListener() {
+        btnLeaveRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Song song = new Song();

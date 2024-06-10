@@ -14,22 +14,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.activity.AlbumActivity;
 import com.example.authenticationuseraccount.activity.EditProfileActivity;
 import com.example.authenticationuseraccount.activity.FavAndHisSongActivity;
-import com.example.authenticationuseraccount.activity.LoginActivity;
 import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
-import com.example.authenticationuseraccount.activity.MainActivity;
-import com.example.authenticationuseraccount.activity.SplashScreenActivity;
 import com.example.authenticationuseraccount.common.Constants;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;

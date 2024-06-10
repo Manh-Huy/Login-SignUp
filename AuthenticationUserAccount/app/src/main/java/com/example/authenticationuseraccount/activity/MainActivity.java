@@ -47,9 +47,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private UIThread m_vThread;
-
     private boolean isReceiveNotification;
-
     private Song mSong;
 
     public UIThread getM_vThread() {

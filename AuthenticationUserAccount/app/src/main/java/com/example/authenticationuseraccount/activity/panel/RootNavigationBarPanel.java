@@ -23,6 +23,7 @@ import com.realgear.readable_bottom_bar.ReadableBottomBar;
 public class RootNavigationBarPanel extends BasePanelView {
     private ViewPager2 rootViewPager;
     private ReadableBottomBar rootNavigationBar;
+
     public RootNavigationBarPanel(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
         super(context, panelLayout);
         getContext().setTheme(R.style.Theme_AuthenticationUserAccount);
@@ -41,20 +42,25 @@ public class RootNavigationBarPanel extends BasePanelView {
         rootViewPager = getMultiSlidingUpPanel().findViewById(R.id.root_view_pager);
         rootNavigationBar = findViewById(R.id.root_navigation_bar);
 
-        StateFragmentAdapter adapter = new StateFragmentAdapter(getSupportFragmentManager(),getLifecycle());
+        StateFragmentAdapter adapter = new StateFragmentAdapter(getSupportFragmentManager(), getLifecycle());
         adapter.addFragment(new FragmentHome());
-        //adapter.addFragment(new FragmentForYou());
         adapter.addFragment(new FragmentCorner());
         adapter.addFragment(new FragmentLibrary());
         adapter.addFragment(new FragmentProfile());
 
         rootViewPager.setAdapter(adapter);
         rootNavigationBar.setupWithViewPager2(rootViewPager);
+
     }
 
     @Override
     public void onPanelStateChanged(int i) {
 
+    }
+
+    public void changeFragment(int index){
+        rootViewPager.setCurrentItem(index);
+        rootNavigationBar.setupWithViewPager2(rootViewPager);
     }
 
     public int getNavigationBarHeight() {

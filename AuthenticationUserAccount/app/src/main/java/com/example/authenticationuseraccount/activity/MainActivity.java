@@ -21,6 +21,7 @@ import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.common.PermissionManager;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.service.SocketIoManager;
 import com.example.authenticationuseraccount.utils.BackEventHandler;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
-        this.m_vThread = new UIThread(this);
+        this.m_vThread = UIThread.getInstanceSingleTon(this);// new UIThread(this);
         BackEventHandler.getInstance();
         Intent intentFromFCM = getIntent();
         String actionFromNotification = intentFromFCM.getAction();
@@ -188,6 +189,10 @@ public class MainActivity extends AppCompatActivity {
             MediaItemHolder.getInstance().getMediaController().removeListener(m_vThread.getListener());
         m_vThread.release();
         m_vThread = null;
+        if (SocketIoManager.getInstance() != null) {
+            SocketIoManager.getInstance().disconnect();
+        }
+
         super.onDestroy();
     }
 }

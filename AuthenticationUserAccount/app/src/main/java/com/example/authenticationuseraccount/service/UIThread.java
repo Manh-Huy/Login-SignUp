@@ -32,6 +32,11 @@ import java.util.List;
 public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteStateListener {
     private static UIThread instance;
     private MainActivity m_vMainActivity;
+
+    public MainActivity getM_vMainActivity() {
+        return m_vMainActivity;
+    }
+
     private MultiSlidingUpPanelLayout m_vMultiSlidingPanel;
     private boolean m_vCanUpdatePanelsUI;
     public List<OnPanelStateChanged> m_vOnPanelStateListeners;
@@ -39,7 +44,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     private FragmentQueueBottomSheet mFragmentQueueBottomSheet;
     private AsyncPaletteBuilder mAsyncPaletteBuilder;
 
-    public UIThread(MainActivity activity) {
+    private UIThread(MainActivity activity) {
         LogUtils.ApplicationLogI("UIThread onCreate");
         instance = this;
         this.m_vOnPanelStateListeners = new ArrayList<>();
@@ -49,6 +54,13 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         onCreate();
 
         //LibraryManager.initLibrary(activity.getApplicationContext());
+    }
+
+    public static synchronized UIThread getInstanceSingleTon(MainActivity activity) {
+        if (instance == null) {
+            instance = new UIThread(activity);
+        }
+        return instance;
     }
 
     public Player.Listener getListener() {

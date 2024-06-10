@@ -51,7 +51,7 @@ public class FragmentCorner extends Fragment {
     private TextView tvUserId;
     private String userID, userName;
     private Context mContext;
-    private SocketIoManager mSocketIoManager;
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -63,8 +63,7 @@ public class FragmentCorner extends Fragment {
         btnJoinRoom = view.findViewById(R.id.btn_connet_room);
 
         mContext = getContext();
-        mSocketIoManager = SocketIoManager.getInstance();
-        listenForRoomEvent(mSocketIoManager.getmSocket());
+        SocketIoManager.getInstance();
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
@@ -82,7 +81,7 @@ public class FragmentCorner extends Fragment {
                 FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) {
                     userID = user.getUid();
-                    mSocketIoManager.createRoom(userID);
+                    SocketIoManager.getInstance().createRoom(userID);
                     tvUserId.setText(userID);
                 } else {
                     ErrorUtils.showError(getContext(), "Please Login To Create Room");
@@ -97,7 +96,7 @@ public class FragmentCorner extends Fragment {
                 if (roomId.isEmpty()) {
                     ErrorUtils.showError(mContext, "Room ID cannot be empty");
                 } else {
-                    mSocketIoManager.joinRoom(roomId, userID);
+                    SocketIoManager.getInstance().joinRoom(roomId, userID);
                 }
             }
         });
@@ -108,31 +107,10 @@ public class FragmentCorner extends Fragment {
                 Song song = new Song();
                 song.setName("KhaiTran");
                 song.setArtist("TinNguyen");
-                mSocketIoManager.onAddSong(userID, song);
+                SocketIoManager.getInstance().onAddSong(userID, song);
             }
         });
 
-    }
-
-    public void listenForRoomEvent(Socket socket) {
-        socket.on("on-create-room", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                LogUtils.ApplicationLogI("on-create-room: roomId has been created: " + (String) args[0]);
-            }
-        }).on("on-join-room", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                setMediaConrner();
-
-                LogUtils.ApplicationLogI("on-join-room: this user has joined room: " + (String) args[0]);
-            }
-        }).on("on-song-added", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                LogUtils.ApplicationLogI("on-song-added " + (String) args[0]);
-            }
-        });
     }
 
     private void setMediaConrner() {

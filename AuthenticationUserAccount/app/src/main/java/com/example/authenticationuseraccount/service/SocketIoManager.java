@@ -15,14 +15,9 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 public class SocketIoManager {
-    private SocketEventListener listener;
 
     public Socket getmSocket() {
         return mSocket;
-    }
-
-    public void setmSocket(Socket mSocket) {
-        this.mSocket = mSocket;
     }
 
     private Socket mSocket;
@@ -51,6 +46,7 @@ public class SocketIoManager {
                     LogUtils.ApplicationLogI("Connection Error!");
                 }
             });
+            listenForRoomEvent();
             mSocket.connect();
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -73,6 +69,31 @@ public class SocketIoManager {
             @Override
             public void call(Object... args) {
                 LogUtils.ApplicationLogI("user-chat: " + (String) args[0]);
+            }
+        });
+    }
+
+    public void listenForRoomEvent(){
+        mSocket.on("on-create-room", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UIThread.getInstance().onRoomCreate();
+                    }
+                });
+                LogUtils.ApplicationLogI("on-create-room: roomId has been created: " + (String) args[0]);
+            }
+        }).on("on-join-room", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                LogUtils.ApplicationLogI("on-join-room: this user has joined room: " + (String) args[0]);
+            }
+        }).on("on-song-added", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                LogUtils.ApplicationLogI("on-song-added " + (String) args[0]);
             }
         });
     }
@@ -104,37 +125,6 @@ public class SocketIoManager {
         //LogUtils.ApplicationLogI("on-add-song: " + data.toString());
         mSocket.emit("on-add-song", data);
     }
-
-
-    private void handleSocketEvent(String eventName, Object... args) {
-        // Handle the socket event
-        if (listener != null) {
-            switch (eventName) {
-                case "on-create-room":
-                    if (args.length > 0 && args[0] instanceof String) {
-                        listener.onCreateRoom((String) args[0]);
-                    }
-                    break;
-                case "on-join-room":
-                    if (args.length > 0 && args[0] instanceof String) {
-                        listener.onJoinRoom((String) args[0]);
-                    }
-                    break;
-                case "on-song-added":
-                    if (args.length > 0 && args[0] instanceof String) {
-                        listener.onSongAdded((String) args[0]);
-                    }
-                    break;
-                // Handle other events if needed
-            }
-        }
-    }
-
-    public void setSocketEventListener(SocketEventListener listener) {
-        this.listener = listener;
-    }
-
-
 
     public void disconnect() {
         if (mSocket != null) {

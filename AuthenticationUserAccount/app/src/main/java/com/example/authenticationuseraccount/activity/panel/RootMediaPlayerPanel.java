@@ -209,4 +209,10 @@ public class RootMediaPlayerPanel extends BasePanelView {
     public void onUpdateLoveSongFromBarView(boolean isLove) {
         this.mMediaPlayerView.onUpdateLoveSongFromBarView(isLove);
     }
+
+    public void onRoomCreate() {
+        this.setPanelState(MultiSlidingUpPanelLayout.COLLAPSED);
+        this.setSlideDirection(MultiSlidingUpPanelLayout.SLIDE_VERTICAL);
+        this.setPeakHeight(getNavigationBarHeight() + 102);
+    }
 }

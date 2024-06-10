@@ -17,6 +17,7 @@ import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.panel.RootMediaPlayerPanel;
 import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
 import com.example.authenticationuseraccount.activity.panel.view.MediaPlayerView;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.theme.AsyncPaletteBuilder;
@@ -64,17 +65,6 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         items.add(RootMediaPlayerPanel.class);
         items.add(RootNavigationBarPanel.class);
         this.m_vMultiSlidingPanel.setAdapter(new MultiSlidingPanelAdapter(this.m_vMainActivity, items));
-    }
-
-    public void addOnPanelStateChangedListener(OnPanelStateChanged listener) {
-        if (this.m_vOnPanelStateListeners.contains(listener))
-            return;
-        this.m_vOnPanelStateListeners.add(listener);
-    }
-
-    public void removeOnPanelStateChangedListener(OnPanelStateChanged listener) {
-        if (this.m_vOnPanelStateListeners.contains(listener))
-            this.m_vOnPanelStateListeners.remove(listener);
     }
 
     public void onPanelStateChanged(Class<?> panel, int state) {
@@ -249,5 +239,12 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
 
     public void onUpdateLoveSongFromBarView(boolean isLove){
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateLoveSongFromBarView(isLove);
+    }
+
+    public void onRoomCreate(){
+        LogUtils.ApplicationLogD("onRoomCreate");
+        ErrorUtils.showError(m_vMainActivity,"Room Created! Let's add a song");
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRoomCreate();
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomCreate();
     }
 }

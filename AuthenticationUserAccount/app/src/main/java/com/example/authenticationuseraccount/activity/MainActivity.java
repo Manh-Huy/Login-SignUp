@@ -37,6 +37,10 @@ public class MainActivity extends AppCompatActivity {
 
     private Song mSong;
 
+    public UIThread getM_vThread() {
+        return m_vThread;
+    }
+
     public static interface OnMediaControllerConnect {
         void onMediaControllerConnect(MediaController controller);
 

@@ -45,7 +45,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseUser user ;
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private UIThread m_vThread;
     private boolean isReceiveNotification;
     private Song mSong;
@@ -69,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
         isReceiveNotification = false;
         mSong = null;
-        user = FirebaseAuth.getInstance().getCurrentUser();
-
 
         PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -86,11 +84,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
-        this.m_vThread = new UIThread(this);
-        //SocketIoManager.getInstance().setmUiThread(this.m_vThread);
-        //UIThread.getInstanceSingleTon(this);// new UIThread(this);
+        this.m_vThread = UIThread.getInstanceSingleTon(this);// new UIThread(this);
         BackEventHandler.getInstance();
-
         Intent intentFromFCM = getIntent();
         String actionFromNotification = intentFromFCM.getAction();
         if (actionFromNotification != null && actionFromNotification.equals(Constants.NOTIFICATION_ACTION_CLICK)) {

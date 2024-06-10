@@ -43,9 +43,8 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     private Player.Listener mListener;
     private FragmentQueueBottomSheet mFragmentQueueBottomSheet;
     private AsyncPaletteBuilder mAsyncPaletteBuilder;
-    private MultiSlidingPanelAdapter mMultiSlidingPanelAdapter;
 
-    public UIThread(MainActivity activity) {
+    private UIThread(MainActivity activity) {
         LogUtils.ApplicationLogI("UIThread onCreate");
         instance = this;
         this.m_vOnPanelStateListeners = new ArrayList<>();
@@ -57,12 +56,18 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         //LibraryManager.initLibrary(activity.getApplicationContext());
     }
 
+    public static synchronized UIThread getInstanceSingleTon(MainActivity activity) {
+        if (instance == null) {
+            instance = new UIThread(activity);
+        }
+        return instance;
+    }
 
     public Player.Listener getListener() {
         return this.mListener;
     }
 
-    public static  UIThread getInstance() {
+    public static UIThread getInstance() {
         return instance;
     }
 
@@ -71,8 +76,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         List<Class<?>> items = new ArrayList<>();
         items.add(RootMediaPlayerPanel.class);
         items.add(RootNavigationBarPanel.class);
-        mMultiSlidingPanelAdapter = new MultiSlidingPanelAdapter(this.m_vMainActivity, items);
-        this.m_vMultiSlidingPanel.setAdapter(mMultiSlidingPanelAdapter);
+        this.m_vMultiSlidingPanel.setAdapter(new MultiSlidingPanelAdapter(this.m_vMainActivity, items));
     }
 
     public void onPanelStateChanged(Class<?> panel, int state) {
@@ -203,10 +207,6 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
 
     public void release() {
         this.mListener = null;
-        this.mMultiSlidingPanelAdapter = null;
-        this.m_vMultiSlidingPanel.removeAllViewsInLayout();
-        this.m_vMultiSlidingPanel.setAdapter(null);
-        this.m_vMultiSlidingPanel.removeAllViews();
         this.m_vMultiSlidingPanel = null;
         this.m_vMainActivity = null;
         this.m_vOnPanelStateListeners = null;

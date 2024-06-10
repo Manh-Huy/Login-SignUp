@@ -34,7 +34,5 @@ public class LoginSignUpActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-
-
     }
 }

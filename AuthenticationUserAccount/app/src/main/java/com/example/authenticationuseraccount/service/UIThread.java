@@ -17,6 +17,7 @@ import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.panel.RootMediaPlayerPanel;
 import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
 import com.example.authenticationuseraccount.activity.panel.view.MediaPlayerView;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.theme.AsyncPaletteBuilder;
@@ -31,6 +32,11 @@ import java.util.List;
 public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteStateListener {
     private static UIThread instance;
     private MainActivity m_vMainActivity;
+
+    public MainActivity getM_vMainActivity() {
+        return m_vMainActivity;
+    }
+
     private MultiSlidingUpPanelLayout m_vMultiSlidingPanel;
     private boolean m_vCanUpdatePanelsUI;
     public List<OnPanelStateChanged> m_vOnPanelStateListeners;
@@ -38,7 +44,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     private FragmentQueueBottomSheet mFragmentQueueBottomSheet;
     private AsyncPaletteBuilder mAsyncPaletteBuilder;
 
-    public UIThread(MainActivity activity) {
+    private UIThread(MainActivity activity) {
         LogUtils.ApplicationLogI("UIThread onCreate");
         instance = this;
         this.m_vOnPanelStateListeners = new ArrayList<>();
@@ -48,6 +54,13 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         onCreate();
 
         //LibraryManager.initLibrary(activity.getApplicationContext());
+    }
+
+    public static synchronized UIThread getInstanceSingleTon(MainActivity activity) {
+        if (instance == null) {
+            instance = new UIThread(activity);
+        }
+        return instance;
     }
 
     public Player.Listener getListener() {
@@ -64,17 +77,6 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         items.add(RootMediaPlayerPanel.class);
         items.add(RootNavigationBarPanel.class);
         this.m_vMultiSlidingPanel.setAdapter(new MultiSlidingPanelAdapter(this.m_vMainActivity, items));
-    }
-
-    public void addOnPanelStateChangedListener(OnPanelStateChanged listener) {
-        if (this.m_vOnPanelStateListeners.contains(listener))
-            return;
-        this.m_vOnPanelStateListeners.add(listener);
-    }
-
-    public void removeOnPanelStateChangedListener(OnPanelStateChanged listener) {
-        if (this.m_vOnPanelStateListeners.contains(listener))
-            this.m_vOnPanelStateListeners.remove(listener);
     }
 
     public void onPanelStateChanged(Class<?> panel, int state) {
@@ -249,5 +251,11 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
 
     public void onUpdateLoveSongFromBarView(boolean isLove){
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateLoveSongFromBarView(isLove);
+    }
+
+    public void onRoomCreate(){
+        LogUtils.ApplicationLogD("onRoomCreate");
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRoomCreate();
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomCreate();
     }
 }

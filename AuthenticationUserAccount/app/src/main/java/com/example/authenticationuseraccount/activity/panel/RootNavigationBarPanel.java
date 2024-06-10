@@ -78,5 +78,9 @@ public class RootNavigationBarPanel extends BasePanelView {
         return 0;
     }
 
+    public void onRoomCreate() {
+        rootViewPager.setCurrentItem(0);
+        rootNavigationBar.setupWithViewPager2(rootViewPager);
+    }
 }
 

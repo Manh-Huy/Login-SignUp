@@ -12,29 +12,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.media3.common.MediaItem;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.common.ErrorUtils;
-import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.Song;
-import com.example.authenticationuseraccount.model.business.User;
-import com.example.authenticationuseraccount.service.MediaItemHolder;
-import com.example.authenticationuseraccount.service.SocketIoManager;
-import com.example.authenticationuseraccount.service.UIThread;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URISyntaxException;
-
-import io.socket.client.IO;
-import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 
 
 public class FragmentCorner extends Fragment {
@@ -51,7 +37,6 @@ public class FragmentCorner extends Fragment {
     private TextView tvUserId;
     private String userID, userName;
     private Context mContext;
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -97,6 +82,7 @@ public class FragmentCorner extends Fragment {
                     ErrorUtils.showError(mContext, "Room ID cannot be empty");
                 } else {
                     SocketIoManager.getInstance().joinRoom(roomId, userID);
+                    edtUserId.setText("");
                 }
             }
         });

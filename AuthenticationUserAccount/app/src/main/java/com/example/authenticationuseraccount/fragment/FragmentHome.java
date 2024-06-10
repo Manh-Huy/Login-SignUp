@@ -32,6 +32,7 @@ import com.example.authenticationuseraccount.adapter.ThumbnailSongAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailSongNewAdapter;
 import com.example.authenticationuseraccount.adapter.ThumbnailSongSmallAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.Genre;
 import com.example.authenticationuseraccount.model.IClickGenreRecyclerViewListener;
@@ -40,6 +41,8 @@ import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -559,10 +562,23 @@ public class FragmentHome extends Fragment {
     }
 
     private void onClickGoToMP3Player(Song song) {
-        MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
-        MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
-        MediaItemHolder.getInstance().getListSongs().clear();
-        MediaItemHolder.getInstance().getListSongs().add(song);
+        //No Room
+        if(ChillCornerRoomManager.getInstance().getCurrentUserId() == null){
+            MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+            MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+            MediaItemHolder.getInstance().getListSongs().clear();
+            MediaItemHolder.getInstance().getListSongs().add(song);
+        }else{
+            //Host Room
+            if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                SocketIoManager.getInstance().onAddSong(userID, song);
+            }else{
+                //Guest Room
+                ErrorUtils.showError(getContext(),"Please Upgrade To Premium To Control Room Media!");
+            }
+        }
+
     }
 
     @UnstableApi

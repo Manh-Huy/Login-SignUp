@@ -21,7 +21,7 @@ import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.common.PermissionManager;
 import com.example.authenticationuseraccount.model.business.Song;
-import com.example.authenticationuseraccount.service.SocketIoManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.example.authenticationuseraccount.utils.BackEventHandler;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;

@@ -1,8 +1,14 @@
-package com.example.authenticationuseraccount.service;
+package com.example.authenticationuseraccount.utils;
 
+import android.util.Log;
+
+import androidx.media3.common.MediaItem;
+
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
-import com.example.authenticationuseraccount.interfaces.SocketEventListener;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.service.UIThread;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -26,6 +32,9 @@ public class SocketIoManager {
 
     private SocketIoManager() {
         gson = new Gson();
+
+        ChillCornerRoomManager.getInstance();
+
         try {
             mSocket = IO.socket("https://mobilebackendtestupload.onrender.com/");
             LogUtils.ApplicationLogI("Trying to connect to Server");
@@ -73,14 +82,19 @@ public class SocketIoManager {
         });
     }
 
-    public void listenForRoomEvent(){
+    public void listenForRoomEvent() {
         mSocket.on("on-create-room", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+                //Only host receive this event
+                LogUtils.ApplicationLogI("setRoomId: " + args[0].toString());
+                ChillCornerRoomManager.getInstance().setRoomId(args[0].toString());
+                ChillCornerRoomManager.getInstance().setCreated(true);
                 UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         UIThread.getInstance().onRoomCreate();
+                        ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(),"Room Created! Let's add a song");
                     }
                 });
                 LogUtils.ApplicationLogI("on-create-room: roomId has been created: " + (String) args[0]);
@@ -88,12 +102,56 @@ public class SocketIoManager {
         }).on("on-join-room", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+                //Add useriD from Server
+                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                    ChillCornerRoomManager.getInstance().setCurrentUserId(args[0].toString());
+                    LogUtils.ApplicationLogI("setCurrentUserId: " + args[0].toString());
+                }
+                //Add useriD from Server to list
+                ChillCornerRoomManager.getInstance().getListUser().add(args[0].toString());
                 LogUtils.ApplicationLogI("on-join-room: this user has joined room: " + (String) args[0]);
+
+                //Open Ui for guest
+                if(!ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                    UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            UIThread.getInstance().onRoomCreate();
+                            ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(),"Room Joined! Let's listen together!");
+                        }
+                    });
+                }
+
             }
         }).on("on-song-added", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                LogUtils.ApplicationLogI("on-song-added " + (String) args[0]);
+                try {
+                    LogUtils.ApplicationLogI("on-song-added " + (String) args[0]);
+                    String data = (String) args[0];
+                    JSONObject jsonData = new JSONObject(data);
+                    Song song = gson.fromJson(jsonData.toString(), Song.class);
+
+
+                    LogUtils.ApplicationLogI("on-song-added Deserialise name: " + song.getName() + " artist: " + song.getArtist());
+                    ChillCornerRoomManager.getInstance().setCurrentPlaySong(song);
+
+                    UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+                            MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+                            MediaItemHolder.getInstance().getListSongs().clear();
+                            MediaItemHolder.getInstance().getListSongs().add(song);
+                        }
+                    });
+
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
         });
     }

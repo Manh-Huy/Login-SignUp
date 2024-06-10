@@ -255,7 +255,6 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
 
     public void onRoomCreate(){
         LogUtils.ApplicationLogD("onRoomCreate");
-        ErrorUtils.showError(m_vMainActivity,"Room Created! Let's add a song");
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRoomCreate();
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomCreate();
     }

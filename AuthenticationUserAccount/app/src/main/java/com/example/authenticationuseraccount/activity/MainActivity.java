@@ -3,23 +3,17 @@ package com.example.authenticationuseraccount.activity;
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.media.browse.MediaBrowser;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
 import android.provider.Settings;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.media3.common.MediaItem;
-import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.session.MediaController;
-import androidx.media3.session.MediaSession;
 import androidx.media3.session.SessionToken;
 
 import com.example.authenticationuseraccount.R;
@@ -27,11 +21,10 @@ import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.common.PermissionManager;
 import com.example.authenticationuseraccount.model.business.Song;
-import com.example.authenticationuseraccount.service.BackEventHandler;
+import com.example.authenticationuseraccount.utils.BackEventHandler;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
 import com.example.authenticationuseraccount.service.UIThread;
-import com.example.authenticationuseraccount.utils.MySharedPreferences;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 

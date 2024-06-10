@@ -185,25 +185,6 @@
             android:layout_margin="16dp"
             android:textSize="24sp" />
 
-        <Button
-            android:visibility="gone"
-            android:id="@+id/btn_connect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="connect io"
-            android:textColor="@color/black"
-            android:textSize="24sp" />
-
-        <Button
-            android:visibility="gone"
-            android:id="@+id/btn_emmit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="emit io"
-            android:textColor="@color/black"
-            android:textSize="24sp" />
-
     </LinearLayout>
 
 

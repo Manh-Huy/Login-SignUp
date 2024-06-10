@@ -1,4 +1,4 @@
-package com.example.authenticationuseraccount.service;
+package com.example.authenticationuseraccount.utils;
 
 public class ClassManager {
     private static ClassManager instance;

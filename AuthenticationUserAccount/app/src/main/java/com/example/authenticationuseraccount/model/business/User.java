@@ -1,23 +1,17 @@
 package com.example.authenticationuseraccount.model.business;
 
+import java.util.Date;
+
 public class User {
     private String userID;
     private String username;
     private String email;
+    private String role;
+    private Date expiredDatePremium;
     private String signInMethod;
     private String imageURL;
 
-    public User(String userID, String username, String email, String signInMethod, String imageUrl) {
-        this.userID = userID;
-        this.username = username;
-        this.email = email;
-        this.signInMethod = signInMethod;
-        this.imageURL = imageUrl;
-    }
-
-    public User()
-    {}
-
+    public User() {}
 
     public String getUserID() {
         return userID;
@@ -41,6 +35,22 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Date getExpiredDatePremium() {
+        return expiredDatePremium;
+    }
+
+    public void setExpiredDatePremium(Date expiredDatePremium) {
+        this.expiredDatePremium = expiredDatePremium;
     }
 
     public String getSignInMethod() {

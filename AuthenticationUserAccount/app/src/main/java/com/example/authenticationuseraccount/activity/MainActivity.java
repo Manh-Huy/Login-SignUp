@@ -1,6 +1,7 @@
 package com.example.authenticationuseraccount.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
@@ -8,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,20 +19,32 @@ import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.common.PermissionManager;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.utils.BackEventHandler;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
 import com.example.authenticationuseraccount.service.UIThread;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity {
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private UIThread m_vThread;
 
     private boolean isReceiveNotification;
@@ -93,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             LogUtils.ApplicationLogI("No Action From Any Notfication");
         }
+        checkUserPremiumTime(user);
     }
 
 
@@ -150,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }, MoreExecutors.directExecutor());
-
     }
 
     @Override
@@ -186,4 +200,47 @@ public class MainActivity extends AppCompatActivity {
         m_vThread = null;
         super.onDestroy();
     }
+
+    private void checkUserPremiumTime(FirebaseUser user) {
+        String id = user.getUid();
+        ApiService.apiService.getUserById(id).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                User mUser = response.body();
+                LogUtils.ApplicationLogD("Call API check time thanh cong");
+                if (mUser != null) {
+                    Date now = new Date();
+                    Date expiredDatePremium = mUser.getExpiredDatePremium();
+
+                    if (expiredDatePremium != null) {
+                        if (expiredDatePremium.before(now)) {
+                            LogUtils.ApplicationLogD("Het han");
+                            downgradePremium(mUser.getUserID());
+
+                        } else {
+                            LogUtils.ApplicationLogD("Van con han");
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                LogUtils.ApplicationLogD("Call API check time that bai: " + t.getMessage());
+                // Xử lý trường hợp gọi API thất bại
+            }
+        });
+    }
+
+    @SuppressLint("CheckResult")
+    private void downgradePremium(String userID) {
+        ApiService.apiService.downgradePremium(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Succefully");
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Failed");
+                });
+    }
+
 }

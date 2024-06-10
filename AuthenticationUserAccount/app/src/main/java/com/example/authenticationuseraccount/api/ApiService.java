@@ -139,6 +139,8 @@ public interface ApiService {
     @POST("payment/upgradePremium")
     Completable upgradePremium(@Field("userID") String userID, @Field("paymentType") String paymentType, @Field("balance") Float balance);
 
+    @POST("payment/downgradePremium")
+    Completable downgradePremium(@Query("userID") String userID);
 }
 
 

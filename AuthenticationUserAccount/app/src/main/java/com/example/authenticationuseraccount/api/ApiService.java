@@ -135,6 +135,10 @@ public interface ApiService {
     @POST("payment")
     Call<ResponseBody> addItemsToCart(@Field("amountFromCLient") float amount);
 
+    @FormUrlEncoded
+    @POST("payment/upgradePremium")
+    Completable upgradePremium(@Field("userID") String userID, @Field("paymentType") String paymentType, @Field("balance") Float balance);
+
 }
 
 

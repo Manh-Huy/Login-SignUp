@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +15,8 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.stripe.android.paymentsheet.PaymentSheet;
 import com.stripe.android.paymentsheet.PaymentSheetResult;
 
@@ -22,20 +25,22 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.http.Field;
 
 public class PremiumActivity extends AppCompatActivity {
-
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private Button btnPayment;
     private String paymentIntentClientSecret;
     private PaymentSheet paymentSheet;
-
     private RadioGroup pricingOptions;
-
     private float mAmount;
+    private String paymentType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +56,11 @@ public class PremiumActivity extends AppCompatActivity {
                 switch (checkedId) {
                     case R.id.yearlyOption:
                         mAmount = 17.99f;
+                        paymentType = "Yearly";
                         break;
                     case R.id.monthlyOption:
                         mAmount = 2.99f;
+                        paymentType = "Monthly";
                         break;
                 }
             }
@@ -105,8 +112,8 @@ public class PremiumActivity extends AppCompatActivity {
     private void onPaymentSheetResult(final PaymentSheetResult paymentSheetResult) {
         if (paymentSheetResult instanceof PaymentSheetResult.Completed) {
             ErrorUtils.showError(this, "Payment complete!");
-            // api upgrade user prierum
-            // string userid , string yearly/ monthly, float  = > tins set thời gian prerium
+            // api upgrade user premium
+            upgradePremium(user.getUid(), paymentType, mAmount);
             finish();
         } else if (paymentSheetResult instanceof PaymentSheetResult.Canceled) {
             ErrorUtils.showError(this, "Payment canceled!");
@@ -136,5 +143,17 @@ public class PremiumActivity extends AppCompatActivity {
             }
         }
         return new JSONObject();
+    }
+
+    @SuppressLint("CheckResult")
+    private void upgradePremium(String userID, String paymentType, Float balance) {
+        ApiService.apiService.upgradePremium(userID, paymentType, balance)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Succefully");
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Failed");
+                });
     }
 }

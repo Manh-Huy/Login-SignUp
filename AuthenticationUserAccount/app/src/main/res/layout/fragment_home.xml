@@ -142,7 +142,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="23dp"
                     android:layout_marginBottom="8dp"
-                    android:text="Listen again"
+                    android:text="Recent"
                     android:textColor="@color/black"
                     android:textSize="24dp"
                     android:textStyle="bold" />

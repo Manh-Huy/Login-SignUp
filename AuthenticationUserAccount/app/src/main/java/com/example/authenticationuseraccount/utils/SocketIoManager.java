@@ -26,6 +26,7 @@ public class SocketIoManager {
         return mSocket;
     }
 
+
     private Socket mSocket;
     private static SocketIoManager instance;
     private Gson gson;

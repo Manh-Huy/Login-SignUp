@@ -79,7 +79,7 @@ public class MediaPlayerBarView {
         this.mTextView_SongTitle = this.mControlsContainer.findViewById(R.id.text_view_song_title);
         this.mTextView_SongArtist = this.mControlsContainer.findViewById(R.id.text_view_song_artist);
         this.mImageBtn_Fav = this.mControlsContainer.findViewById(R.id.btn_favorite);
-        this.mImageBtn_PlayPause = this.mControlsContainer.findViewById(R.id.btn_play_pause);
+        this.mImageBtn_PlayPause = this.mControlsContainer.findViewById(R.id.btn_play_pause_bar);
         this.mRootView.setAlpha(1.0F);
         this.mProgressBar = findViewById(R.id.progress_bar);
         this.mProgressBar.setIndeterminateDrawable(new Wave());

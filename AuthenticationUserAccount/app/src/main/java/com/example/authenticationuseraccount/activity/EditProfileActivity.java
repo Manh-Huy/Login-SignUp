@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -238,11 +239,11 @@ public class EditProfileActivity extends AppCompatActivity {
         ApiService.apiService.updateUserProfile(userID, requestBodyUsername, multipartBodyAvt).enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                LogUtils.ApplicationLogE("Call API thanh cong");
+                LogUtils.ApplicationLogD("Call API thanh cong");
                 imageURLChange = response.body();
-
+                LogUtils.ApplicationLogI("ImgUrl: " + imageURLChange);
                 if (mFile != null) {
-                    UpdateAvatarUserInFirebase(imageURLChange);
+                    //UpdateAvatarUserInFirebase(imageURLChange);
                 }
             }
 

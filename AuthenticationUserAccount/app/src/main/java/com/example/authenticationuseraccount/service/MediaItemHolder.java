@@ -75,6 +75,7 @@ public class MediaItemHolder {
     private MediaItemHolder() {
         listMediaItem = new ArrayList<>();
         listSongs = new ArrayList<>();
+        listLoveSong = new ArrayList<>();
         isShuffle = false;
         isRepeatSingle = false;
         isRepeatPlaylist = false;

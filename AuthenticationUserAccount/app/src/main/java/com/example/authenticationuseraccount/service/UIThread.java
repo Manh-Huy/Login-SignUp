@@ -71,8 +71,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         List<Class<?>> items = new ArrayList<>();
         items.add(RootMediaPlayerPanel.class);
         items.add(RootNavigationBarPanel.class);
-        mMultiSlidingPanelAdapter = new MultiSlidingPanelAdapter(this.m_vMainActivity, items);
-        this.m_vMultiSlidingPanel.setAdapter(mMultiSlidingPanelAdapter);
+        this.m_vMultiSlidingPanel.setAdapter(new MultiSlidingPanelAdapter(this.m_vMainActivity, items));
     }
 
     public void onPanelStateChanged(Class<?> panel, int state) {

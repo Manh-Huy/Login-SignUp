@@ -122,7 +122,7 @@ public class RootMediaPlayerPanel extends BasePanelView {
 
         List<Song> listSongLove = MediaItemHolder.getInstance().getListLoveSong();
 
-        if (mUser != null) {
+        if (mUser != null && !listSongLove.isEmpty()) {
             for (Song song : listSongLove) {
                 if (song.getSongID().equals(songID)) {
                     return true;

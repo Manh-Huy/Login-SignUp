@@ -56,7 +56,7 @@ public class FragmentProfile extends Fragment {
         profileImage = view.findViewById(R.id.profileImage);
         profileName = view.findViewById(R.id.profileName);
 
-        updateUI(FirebaseAuth.getInstance().getCurrentUser());
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -154,5 +154,6 @@ public class FragmentProfile extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        updateUI(FirebaseAuth.getInstance().getCurrentUser());
     }
 }

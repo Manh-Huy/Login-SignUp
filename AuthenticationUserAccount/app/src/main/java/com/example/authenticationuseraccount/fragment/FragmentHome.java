@@ -49,7 +49,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -176,7 +180,7 @@ public class FragmentHome extends Fragment {
             ShowUIForLocal();
         }
         else {
-            getUserRecentAndRecommendSong(user.getUid());
+            getListSong();
         }
 
         if (mListBanner.isEmpty()) {
@@ -329,7 +333,14 @@ public class FragmentHome extends Fragment {
                     @Override
                     public void onComplete() {
                         LogUtils.ApplicationLogD("Call api success");
-                        showSongLocalInRecyclerView();
+
+                        if (user == null)
+                        {
+                            showSongLocalInRecyclerView();
+                        }
+                        else {
+                            getUserRecentAndRecommendSong(user.getUid());
+                        }
                     }
                 });
     }
@@ -440,6 +451,17 @@ public class FragmentHome extends Fragment {
         listSongQuickPick.clear();
         listSongQuickPick.addAll(recentSongsSubset);
         listSongQuickPick.addAll(recommendSongsSubset);
+
+        Set<String> songIDs = new HashSet<>();
+        Iterator<Song> iterator = listSongQuickPick.iterator();
+
+        while (iterator.hasNext()) {
+            Song song = iterator.next();
+            if (!songIDs.add(song.getSongID())) {
+                // Nếu songID đã tồn tại trong set, xóa bài hát
+                iterator.remove();
+            }
+        }
     }
 
     private List<Song> getRandomSubset(List<Song> sourceList, int count) {
@@ -481,14 +503,9 @@ public class FragmentHome extends Fragment {
 
         mThumbnailSongSmallAdapter_QuickPick.setData(listSongQuickPick);
         mThumbnailSongNewAdapter_NewRelease.setData(listNewReleaseSong);
-        mThumbnailSongAdapter_ListenAgain.setData(mListSong);
-        mThumbnailSongAdapter_Recommend.setData(mListSong);
 
         rcvQuickPick.setAdapter(mThumbnailSongSmallAdapter_QuickPick);
         rcvNewRelease.setAdapter(mThumbnailSongNewAdapter_NewRelease);
-        rcvListenAgain.setAdapter(mThumbnailSongAdapter_ListenAgain);
-        rcvRecommend.setAdapter(mThumbnailSongAdapter_Recommend);
-
     }
     private void showBannerInRecyclerView() {
         bannerAdapter = new BannerAdapter(getContext(), mListBanner);

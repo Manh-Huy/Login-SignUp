@@ -107,7 +107,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             LogUtils.ApplicationLogI("No Action From Any Notfication");
         }
-        checkUserPremiumTime(user);
+
+        if (user != null) {
+            checkUserPremiumTime(user);
+        }
     }
 
 

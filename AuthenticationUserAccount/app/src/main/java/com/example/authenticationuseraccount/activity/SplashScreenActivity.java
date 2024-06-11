@@ -108,6 +108,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                     @Override
                     public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
                         LogUtils.ApplicationLogE("Call api error");
+                        /*startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+                        finish();*/
                     }
 
                     @Override

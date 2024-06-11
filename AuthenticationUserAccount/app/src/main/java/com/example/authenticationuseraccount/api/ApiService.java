@@ -68,8 +68,8 @@ public interface ApiService {
             .addInterceptor(loggingIntercepter);
 
     ApiService apiService = new Retrofit.Builder()
-            //.baseUrl("https://mobilebackendtestupload.onrender.com/")
-            .baseUrl("https://mobilebackendtestupload-q7eh.onrender.com/")
+            .baseUrl("https://mobilebackendtestupload.onrender.com/")
+            //.baseUrl("https://mobilebackendtestupload-q7eh.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .client(okBuilder.build())

@@ -71,21 +71,6 @@ public class MainActivity extends AppCompatActivity {
         mSong = null;
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-
-        PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            PermissionManager.requestPermission(this, Manifest.permission.FOREGROUND_SERVICE, 100);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            PermissionManager.requestPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE, 100);
-            if (!Environment.isExternalStorageManager()) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                intent.setData(uri);
-                startActivity(intent);
-            }
-        }
         this.m_vThread = new UIThread(this);
         //SocketIoManager.getInstance().setmUiThread(this.m_vThread);
         //UIThread.getInstanceSingleTon(this);// new UIThread(this);
@@ -93,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intentFromFCM = getIntent();
         String actionFromNotification = intentFromFCM.getAction();
+
         if (actionFromNotification != null && actionFromNotification.equals(Constants.NOTIFICATION_ACTION_CLICK)) {
             LogUtils.ApplicationLogI("Receive Action From Notfication");
             Bundle songBundle = intentFromFCM.getExtras();

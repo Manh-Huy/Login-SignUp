@@ -74,6 +74,22 @@ public class MainActivity extends AppCompatActivity {
         this.m_vThread = new UIThread(this);
         //SocketIoManager.getInstance().setmUiThread(this.m_vThread);
         //UIThread.getInstanceSingleTon(this);// new UIThread(this);
+
+        PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            PermissionManager.requestPermission(this, Manifest.permission.FOREGROUND_SERVICE, 100);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            PermissionManager.requestPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE, 100);
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                startActivity(intent);
+            }
+        }
+
         BackEventHandler.getInstance();
 
         Intent intentFromFCM = getIntent();
@@ -191,15 +207,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         LogUtils.ApplicationLogE("MainActivity onDestroy");
-        if (m_vThread.getListener() != null)
+        if (m_vThread.getListener() != null) {
             MediaItemHolder.getInstance().getMediaController().removeListener(m_vThread.getListener());
-        m_vThread.release();
-        m_vThread = null;
+        }
+        if (MediaItemHolder.getInstance().getMediaController() != null) {
+            MediaItemHolder.getInstance().getMediaController().release();
+            MediaItemHolder.getInstance().destroy();
+        }
+        if (m_vThread != null) {
+            m_vThread.release();
+            m_vThread = null;
+        }
         if (SocketIoManager.getInstance() != null) {
             SocketIoManager.getInstance().disconnect();
         }
 
-        Intent intent = new Intent(MainActivity.this,MusicService.class);
+        Intent intent = new Intent(MainActivity.this, MusicService.class);
         stopService(intent);
 
         super.onDestroy();

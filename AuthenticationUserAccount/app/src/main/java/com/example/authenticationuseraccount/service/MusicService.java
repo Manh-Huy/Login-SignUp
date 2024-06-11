@@ -74,25 +74,33 @@ public class MusicService extends MediaSessionService {
     @Override
     public void onDestroy() {
         LogUtils.ApplicationLogI("OnDestroy Service Killed");
-        MediaItemHolder.getInstance().getMediaController().release();
-        MediaItemHolder.getInstance().destroy();
-        mediaSession.getPlayer().release();
-        mediaSession.release();
-        mediaSession = null;
+        if (mediaSession != null) {
+            mediaSession.release();
+            mediaSession.getPlayer().release();
+            mediaSession = null;
+        }
+        if (mPlayer != null) {
+            mPlayer.release();
+            mPlayer = null;
+        }
+        stopSelf();
         super.onDestroy();
     }
 
     @Override
     public void onTaskRemoved(@Nullable Intent rootIntent) {
-        LogUtils.ApplicationLogI("MusicService: App is dissmised");
-        Player player = mediaSession.getPlayer();
-        if (!player.getPlayWhenReady()
-                || player.getMediaItemCount() == 0
-                || player.getPlaybackState() == Player.STATE_ENDED) {
-            // Stop the service if not playing, continue playing in the background
-            // otherwise.
-            stopSelf();
+        LogUtils.ApplicationLogI("MusicService: App is dismissed");
+        if (mediaSession != null) {
+            mediaSession.release();
+            mediaSession.getPlayer().release();
+            mediaSession = null;
         }
+        if (mPlayer != null) {
+            mPlayer.release();
+            mPlayer = null;
+        }
+        stopSelf();
+        super.onTaskRemoved(rootIntent);
     }
 
 

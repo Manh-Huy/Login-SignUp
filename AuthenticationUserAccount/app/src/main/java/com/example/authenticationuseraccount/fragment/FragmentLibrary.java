@@ -40,6 +40,7 @@ public class FragmentLibrary extends Fragment {
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+
         musicList = loadMusic();
         LocalMusicAdapter adapter = new LocalMusicAdapter(mContext, musicList);
         recyclerView.setAdapter(adapter);

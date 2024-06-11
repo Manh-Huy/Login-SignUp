@@ -201,12 +201,19 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     }
 
     public void release() {
+        if (mListener != null && MediaItemHolder.getInstance().getMediaController() != null) {
+            MediaItemHolder.getInstance().getMediaController().removeListener(mListener);
+        }
+
         this.mListener = null;
         this.mMultiSlidingPanelAdapter = null;
-        this.m_vMultiSlidingPanel.removeAllViewsInLayout();
-        this.m_vMultiSlidingPanel.setAdapter(null);
-        this.m_vMultiSlidingPanel.removeAllViews();
-        this.m_vMultiSlidingPanel = null;
+
+        if (this.m_vMultiSlidingPanel != null) {
+            this.m_vMultiSlidingPanel.removeAllViewsInLayout();
+            this.m_vMultiSlidingPanel.removeAllViews();
+            this.m_vMultiSlidingPanel = null;
+        }
+
         this.m_vMainActivity = null;
         this.m_vOnPanelStateListeners = null;
     }

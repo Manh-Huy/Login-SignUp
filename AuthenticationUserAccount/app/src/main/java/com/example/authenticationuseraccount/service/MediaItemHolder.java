@@ -95,6 +95,7 @@ public class MediaItemHolder {
     }
 
     public void destroy(){
+        mediaController = null;
         instance = null;
     }
 

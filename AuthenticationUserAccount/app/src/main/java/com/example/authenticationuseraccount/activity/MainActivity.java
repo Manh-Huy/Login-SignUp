@@ -45,7 +45,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseUser user ;
+    private FirebaseUser user;
     private UIThread m_vThread;
     private boolean isReceiveNotification;
     private Song mSong;
@@ -71,7 +71,9 @@ public class MainActivity extends AppCompatActivity {
         mSong = null;
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-        this.m_vThread = new UIThread(this);
+        if (this.m_vThread == null) {
+            this.m_vThread = new UIThread(this);
+        }
         //SocketIoManager.getInstance().setmUiThread(this.m_vThread);
         //UIThread.getInstanceSingleTon(this);// new UIThread(this);
 
@@ -250,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 LogUtils.ApplicationLogD("Call API check time that bai: " + t.getMessage());

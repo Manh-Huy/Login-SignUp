@@ -2,9 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/selector_item_local"
     android:id="@+id/layout_container"
     android:padding="10dp"
-    android:background="#000000">
+    >
 
     <ImageView
         android:id="@+id/imageview_song"
@@ -13,7 +14,7 @@
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher_background" /> <!-- Placeholder image -->
+        android:src="@drawable/logo" /> <!-- Placeholder image -->
 
     <TextView
         android:id="@+id/tv_nameSong"
@@ -21,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/imageview_song"
         android:layout_marginStart="10dp"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="16sp"
         android:textStyle="bold"
         android:text="Đi Họp Lớp" />
@@ -33,7 +34,7 @@
         android:layout_below="@id/tv_nameSong"
         android:layout_toEndOf="@id/imageview_song"
         android:layout_marginStart="10dp"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="14sp"
         android:text="HIEUTHUHAI" />
 
@@ -44,7 +45,7 @@
         android:layout_below="@id/tv_name_artist"
         android:layout_toEndOf="@id/imageview_song"
         android:layout_marginStart="10dp"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="12sp"
         android:text="Ai Cũng Phải Bắt Đầu Từ Đâu Đó" />
 
@@ -55,9 +56,10 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:padding="5dp"
+        android:layout_marginEnd="16dp"
         android:gravity="center"
         android:text="⋮"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="24sp"
         android:textStyle="bold" />
 

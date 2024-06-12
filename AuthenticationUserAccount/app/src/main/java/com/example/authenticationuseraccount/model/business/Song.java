@@ -21,6 +21,16 @@ public class Song implements Serializable {
 
     private String songURL;
 
+    private byte[] imageData;
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
+
+    public byte[] getImageData() {
+        return imageData;
+    }
+
     public String getCreatedAt() {
         return this.createdAt;
     }

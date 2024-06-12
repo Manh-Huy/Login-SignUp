@@ -78,6 +78,8 @@ public class FragmentLibrary extends Fragment {
                 if (displayName.contains("AUD-") && !title.isEmpty())
                     displayName = title;
 
+                Uri songUri = Uri.parse(data);
+
                 songs.add(new LocalSong(
                         id,
                         title,
@@ -85,15 +87,19 @@ public class FragmentLibrary extends Fragment {
                         data,
                         albumName,
                         artistName,
-                        displayName));
+                        displayName,
+                        songUri));
 
-                Uri songUri = Uri.parse(data);
-
-                LogUtils.ApplicationLogI("Local Music title: " + title + " artist: " + artistName + "songuri: " + songUri );
+                LogUtils.ApplicationLogI("Local Music title: " + title + " artist: " + artistName + " songUri: " + songUri + " data: " + data);
             }
         }
 
         return songs;
+    }
+
+    private Uri getAlbumArtUri(long albumId) {
+        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart");
+        return Uri.withAppendedPath(albumArtUri, String.valueOf(albumId));
     }
 
     private String getCursorStringByIndex(Cursor cursor, String columnName) {

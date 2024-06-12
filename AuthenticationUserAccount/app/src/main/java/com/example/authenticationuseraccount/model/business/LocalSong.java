@@ -12,6 +12,8 @@ public class LocalSong {
     private String artistName;
     private String displayName;
 
+
+
     public long getId() {
         return id;
     }
@@ -68,7 +70,17 @@ public class LocalSong {
         this.displayName = displayName;
     }
 
-    public LocalSong(long id, String title, long duration, String data, String albumName, String artistName, String displayName) {
+    private Uri songUri;
+
+    public Uri getSongUri() {
+        return songUri;
+    }
+
+    public void setSongUri(Uri songUri) {
+        this.songUri = songUri;
+    }
+
+    public LocalSong(long id, String title, long duration, String data, String albumName, String artistName, String displayName,Uri songUri) {
         this.id = id;
         this.title = title;
         this.duration = duration;
@@ -76,5 +88,7 @@ public class LocalSong {
         this.albumName = albumName;
         this.artistName = artistName;
         this.displayName = displayName;
+        this.songUri = songUri;
     }
+
 }

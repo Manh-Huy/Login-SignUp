@@ -1,6 +1,8 @@
 package com.example.authenticationuseraccount.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.example.authenticationuseraccount.model.business.LocalSong;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,31 +46,54 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         LocalSong song = musicList.get(position);
+
+        Song songLocalTest = new Song();
+        songLocalTest.setName(song.getTitle());
+        songLocalTest.setArtist(song.getArtistName());
+        songLocalTest.setSongURL(song.getData());
+
         holder.tvSongName.setText(song.getTitle());
         holder.tvArtistName.setText(song.getArtistName());
         holder.tvAlbumName.setText(song.getAlbumName());
+
+        byte[] image = null;
+        try {
+            image = getAlbumArt(song.getData());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (image != null) {
+            songLocalTest.setImageData(image);
+            Glide.with(mContext)
+                    .load(image)
+                    .into(holder.imgSong);
+        }else {
+            Glide.with(mContext)
+                    .load(R.drawable.logo)
+                    .into(holder.imgSong);
+        }
+
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ErrorUtils.showError(mContext, "Clicked");
 
-                Song songtest = new Song();
-                MediaItemHolder.getInstance().getListSongs().add(songtest);
-
+                MediaItemHolder.getInstance().getListSongs().clear();
+                MediaItemHolder.getInstance().getListSongs().add(songLocalTest);
                 Uri songUri = Uri.parse(song.getData());
                 MediaItem mediaItem = MediaItem.fromUri(songUri);
                 MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
             }
         });
-        /*Glide.with(mContext)
-                .load(song.getImageURL())
-                .into(holder.imgSong);
+
         holder.tvOverflowMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clickOpenOptionBottomSheetFragment(song);
+                //clickOpenOptionBottomSheetFragment(song);
+                ErrorUtils.showError(mContext, "3 dot clicked");
+
             }
-        });*/
+        });
     }
 
     @Override
@@ -92,6 +118,14 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
             imgSong = itemView.findViewById(R.id.imageview_song);
             tvOverflowMenu = itemView.findViewById(R.id.overflow_menu);
         }
+    }
+
+    private byte[] getAlbumArt(String path) throws IOException {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(path);
+        byte[] art = retriever.getEmbeddedPicture();
+        retriever.release();
+        return art;
     }
 }
 

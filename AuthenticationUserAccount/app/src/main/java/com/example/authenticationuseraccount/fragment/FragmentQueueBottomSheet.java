@@ -59,6 +59,7 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment {
         BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
         View view = LayoutInflater.from(getContext()).inflate(R.layout.layout_queue_bottom_sheet, null);
 
+        //Current Playing
         ImageView imgCurrentSong = view.findViewById(R.id.currently_playing_image);
         byte[] art = currentMedia.artworkData;
         Bitmap bitmap = null;
@@ -74,6 +75,7 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment {
 
         bottomSheetDialog.setContentView(view);
 
+        //Current Queue Playlist
         RecyclerView rcvData = view.findViewById(R.id.recycler_view_queue);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rcvData.setLayoutManager(linearLayoutManager);

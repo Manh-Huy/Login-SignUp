@@ -240,6 +240,12 @@ public class FragmentHome extends Fragment {
         }, 500, 3000);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mThumbnailSongSmallAdapter_QuickPick.notifyDataSetChanged();
+    }
+
     private void ShowUIForLocal() {
         rcvListenAgain.setVisibility(GONE);
         rcvRecommend.setVisibility(GONE);

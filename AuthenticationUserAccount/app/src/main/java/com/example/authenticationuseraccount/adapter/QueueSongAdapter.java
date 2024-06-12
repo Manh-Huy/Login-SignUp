@@ -56,9 +56,16 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
         LogUtils.ApplicationLogE("Holder Index: " + position);
         LogUtils.ApplicationLogE("Media Index: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
 
-        Glide.with(mContext)
-                .load(song.getImageURL())
-                .into(holder.imgThumbnail);
+        //Online Song
+        if (song.getImageURL() != null) {
+            Glide.with(mContext)
+                    .load(song.getImageURL())
+                    .into(holder.imgThumbnail);
+        }else{ //Local Song
+            Glide.with(mContext)
+                    .load(song.getImageData())
+                    .into(holder.imgThumbnail);
+        }
         holder.tvSongTitle.setText(song.getName());
         holder.tvArtist.setText(song.getArtist());
         holder.tvSongTitle.setSelected(true);

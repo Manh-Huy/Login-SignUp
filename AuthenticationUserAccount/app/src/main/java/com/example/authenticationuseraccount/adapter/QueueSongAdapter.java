@@ -1,6 +1,7 @@
 package com.example.authenticationuseraccount.adapter;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
@@ -29,14 +31,17 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
     private List<Song> mSongs;
     private Context mContext;
 
+    private IClickSongRecyclerViewListener iClickSongRecyclerViewListener;
+
     public void setData(List<Song> list) {
         this.mSongs = list;
         notifyDataSetChanged();
     }
 
-    public QueueSongAdapter(Context mContext, List<Song> mListSong) {
+    public QueueSongAdapter(Context mContext, List<Song> mListSong, IClickSongRecyclerViewListener listener) {
         this.mSongs = mListSong;
         this.mContext = mContext;
+        this.iClickSongRecyclerViewListener = listener;
     }
 
     @NonNull
@@ -61,7 +66,7 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
             Glide.with(mContext)
                     .load(song.getImageURL())
                     .into(holder.imgThumbnail);
-        }else{ //Local Song
+        } else { //Local Song
             Glide.with(mContext)
                     .load(song.getImageData())
                     .into(holder.imgThumbnail);
@@ -80,14 +85,15 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
             holder.imgThumbnail.setVisibility(View.VISIBLE);
         }
 
+
         holder.layoutItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                iClickSongRecyclerViewListener.onClickItemSong(song);
                 MediaItemHolder.getInstance().getMediaController().seekToDefaultPosition(position);
                 notifyDataSetChanged();
             }
         });
-
 
     }
 

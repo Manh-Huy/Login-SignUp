@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,7 +43,10 @@ public class FragmentLibrary extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
         musicList = loadMusic();
-        LocalMusicAdapter adapter = new LocalMusicAdapter(mContext, musicList);
+
+        FragmentActivity fragmentActivity = (FragmentActivity) getActivity();
+
+        LocalMusicAdapter adapter = new LocalMusicAdapter(mContext,fragmentActivity, musicList);
         recyclerView.setAdapter(adapter);
 
         return view;

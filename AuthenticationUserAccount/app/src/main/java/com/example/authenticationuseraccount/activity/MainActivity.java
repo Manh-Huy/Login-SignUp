@@ -19,6 +19,7 @@ import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.adapter.SongAlbumAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
             SocketIoManager.getInstance();
             checkUserPremiumTime(User.getInstance());
             getUserLoveSong(User.getInstance().getUserID());
+            getUserListenHistory(User.getInstance().getUserID());
         }else{
             LogUtils.ApplicationLogE("MainActivity: User Has Not Signed In!");
         }
@@ -224,6 +226,33 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete() {
                         LogUtils.ApplicationLogI("Love Song Count: " + MediaItemHolder.getInstance().getListLoveSong().size());
                         LogUtils.ApplicationLogI("Call api love song Complete");
+                    }
+                });
+    }
+
+    private void getUserListenHistory(String userID) {
+        ApiService.apiService.getUserListenHistory(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        MediaItemHolder.getInstance().setListRecentSong(songs);
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api listen user history error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.ApplicationLogE("Call api listen history complete");
                     }
                 });
     }

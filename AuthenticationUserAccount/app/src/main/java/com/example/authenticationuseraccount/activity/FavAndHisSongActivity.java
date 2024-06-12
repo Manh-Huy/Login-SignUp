@@ -1,10 +1,5 @@
 package com.example.authenticationuseraccount.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,11 +10,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SongAlbumAdapter;
-import com.example.authenticationuseraccount.api.ApiService;
-import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
 import com.example.authenticationuseraccount.model.ItemSearchOption;
@@ -32,10 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class FavAndHisSongActivity extends AppCompatActivity {
     FragmentActivity fragmentActivity;
@@ -70,16 +65,18 @@ public class FavAndHisSongActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String typeShow = (String) intent.getSerializableExtra("type_show");
 
-        if (Objects.equals(typeShow, "Fav")){
+        if (Objects.equals(typeShow, "Fav")) {
             tvSongTitle.setText("YOUR FAVORITE");
             listSong = MediaItemHolder.getInstance().getListLoveSong();
             updateUI();
             songAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong);
             songRecyclerView.setAdapter(songAdapter);
-        }
-        else if (Objects.equals(typeShow, "His")) {
+        } else if (Objects.equals(typeShow, "His")) {
             tvSongTitle.setText("YOUR HISTORY");
-            getUserListenHistory(user.getUid());
+            listSong = MediaItemHolder.getInstance().getListRecentSong();
+            updateUI();
+            songAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong);
+            songRecyclerView.setAdapter(songAdapter);
         }
 
         btnMore.setOnClickListener(new View.OnClickListener() {
@@ -107,12 +104,12 @@ public class FavAndHisSongActivity extends AppCompatActivity {
         }
         tvUserName.setText(user.getDisplayName());
     }
+
     private void updateUI() {
         if (listSong.isEmpty()) {
             layoutNoData.setVisibility(View.VISIBLE);
             songRecyclerView.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             layoutNoData.setVisibility(View.GONE);
             songRecyclerView.setVisibility(View.VISIBLE);
         }
@@ -146,36 +143,7 @@ public class FavAndHisSongActivity extends AppCompatActivity {
         fragmentSearchOptionBottomSheet.show(getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
     }
 
-    private void getUserListenHistory(String userID) {
-        ApiService.apiService.getUserListenHistory(userID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Song>>() {
-                    @Override
-                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-                        mDisposable = d;
-                    }
 
-                    @Override
-                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
-                        listSong = songs;
-                    }
-
-                    @Override
-                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                        LogUtils.ApplicationLogE("Call api listen user history error");
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        LogUtils.ApplicationLogE("Call api listen history complete");
-
-                        updateUI();
-                        songAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong);
-                        songRecyclerView.setAdapter(songAdapter);
-                    }
-                });
-    }
     @Override
     public void onDestroy() {
         if (mDisposable != null) {

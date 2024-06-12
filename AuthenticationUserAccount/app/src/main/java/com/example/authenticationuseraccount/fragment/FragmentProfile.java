@@ -36,11 +36,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class FragmentProfile extends Fragment {
-    private RelativeLayout layoutLogout, layoutLogin;
-    private LinearLayout layoutLoveSong, layoutHistorySong;
+    private RelativeLayout layoutLogout;
+    private LinearLayout layoutLoveSong, layoutHistorySong, layoutLogin;
     private Button loginButton, logoutButton, editProfileButton;
     private ImageView profileImage;
-    private TextView profileName, tvRole, tvNumLove;
+    private TextView profileName, tvRole, tvNumLove, tvNumHistory;
 
     @Nullable
     @Override
@@ -51,6 +51,7 @@ public class FragmentProfile extends Fragment {
         layoutLogout = view.findViewById(R.id.layout_Logout);
         tvRole = view.findViewById(R.id.tv_Role);
         tvNumLove = view.findViewById(R.id.tv_num_love_song);
+        tvNumHistory = view.findViewById(R.id.tv_num_history);
         layoutLoveSong = view.findViewById(R.id.layout_love_song);
         layoutHistorySong = view.findViewById(R.id.layout_history_song);
 
@@ -143,10 +144,11 @@ public class FragmentProfile extends Fragment {
 
             if (User.getInstance().getRole().equals(Constants.PREMIUM_USER))
                 tvRole.setText(Constants.PREMIUM_USER + " 🔥");
-            else{
+            else {
                 tvRole.setText(Constants.NORMAL_USER + " 🎉");
             }
             tvNumLove.setText(MediaItemHolder.getInstance().getListLoveSong().size() + " songs");
+            tvNumHistory.setText(MediaItemHolder.getInstance().getListRecentSong().size() + " songs");
 
             Uri photoUrl = user.getPhotoUrl();
             if (photoUrl != null && !photoUrl.toString().equals("")) {

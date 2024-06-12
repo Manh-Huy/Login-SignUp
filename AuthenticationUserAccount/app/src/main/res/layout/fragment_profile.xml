@@ -146,7 +146,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/selector_item_local"
+                android:background="@android:color/transparent"
+                android:backgroundTint="@android:color/transparent"
                 app:cardCornerRadius="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -163,6 +164,7 @@
                         android:src="@drawable/ic_premium" />
 
                     <TextView
+                        android:textColor="@color/black"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Role 🙍‍♂️"
@@ -170,6 +172,8 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:textColor="@color/black"
+
                         android:id="@+id/tv_Role"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -187,7 +191,8 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_toEndOf="@id/premiumCard"
-                android:background="@drawable/selector_item_local"
+                android:background="@android:color/transparent"
+                android:backgroundTint="@android:color/transparent"
                 app:cardCornerRadius="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/premiumCard"
@@ -209,10 +214,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Love"
+                        android:textColor="@color/black"
+
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
+                        android:textColor="@color/black"
                         android:id="@+id/tv_num_love_song"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -230,7 +238,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/selector_item_local"
+                android:background="@android:color/transparent"
+                android:backgroundTint="@android:color/transparent"
                 app:cardCornerRadius="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/premiumCard">
@@ -247,6 +256,7 @@
                         android:src="@drawable/ic_download" />
 
                     <TextView
+                        android:textColor="@color/black"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Download"
@@ -254,6 +264,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:textColor="@color/black"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 song"
@@ -272,6 +283,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_toEndOf="@id/downloadCard"
                 android:background="@drawable/selector_item_local"
+                android:backgroundTint="@android:color/transparent"
                 app:cardCornerRadius="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/downloadCard"
@@ -290,6 +302,8 @@
                         android:src="@drawable/ic_history" />
 
                     <TextView
+                        android:textColor="@color/black"
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="History"
@@ -297,6 +311,8 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_num_history"
+                        android:textColor="@color/black"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 song"

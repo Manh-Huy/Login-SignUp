@@ -25,6 +25,8 @@ import com.example.authenticationuseraccount.activity.EditProfileActivity;
 import com.example.authenticationuseraccount.activity.FavAndHisSongActivity;
 import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
 import com.example.authenticationuseraccount.common.Constants;
+import com.example.authenticationuseraccount.model.business.User;
+import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -38,7 +40,8 @@ public class FragmentProfile extends Fragment {
     private LinearLayout layoutLoveSong, layoutHistorySong;
     private Button loginButton, logoutButton, editProfileButton;
     private ImageView profileImage;
-    private TextView profileName;
+    private TextView profileName, tvRole, tvNumLove;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,7 +49,8 @@ public class FragmentProfile extends Fragment {
 
         layoutLogin = view.findViewById(R.id.layout_Login);
         layoutLogout = view.findViewById(R.id.layout_Logout);
-
+        tvRole = view.findViewById(R.id.tv_Role);
+        tvNumLove = view.findViewById(R.id.tv_num_love_song);
         layoutLoveSong = view.findViewById(R.id.layout_love_song);
         layoutHistorySong = view.findViewById(R.id.layout_history_song);
 
@@ -128,15 +132,21 @@ public class FragmentProfile extends Fragment {
             }
         });
     }
+
     private void updateUI(FirebaseUser user) {
-        if (user == null)
-        {
+        if (user == null) {
             layoutLogin.setVisibility(View.GONE);
             layoutLogout.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             layoutLogin.setVisibility(View.VISIBLE);
             layoutLogout.setVisibility(View.GONE);
+
+            if (User.getInstance().getRole().equals(Constants.PREMIUM_USER))
+                tvRole.setText(Constants.PREMIUM_USER + " 🔥");
+            else{
+                tvRole.setText(Constants.NORMAL_USER + " 🎉");
+            }
+            tvNumLove.setText(MediaItemHolder.getInstance().getListLoveSong().size() + " songs");
 
             Uri photoUrl = user.getPhotoUrl();
             if (photoUrl != null && !photoUrl.toString().equals("")) {

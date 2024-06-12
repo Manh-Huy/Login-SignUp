@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
+import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
@@ -62,7 +63,7 @@ public class FragmentCorner extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mAuth.getCurrentUser() != null) {
-                    if (userSingleTon.getRole().equals("Premium")) {
+                    if (userSingleTon.getRole().equals(Constants.PREMIUM_USER)) {
                         SocketIoManager.getInstance().createRoom(userID);
                     } else {
                         ErrorUtils.showError(getContext(), "Please Upgrad To Premium To Continue");

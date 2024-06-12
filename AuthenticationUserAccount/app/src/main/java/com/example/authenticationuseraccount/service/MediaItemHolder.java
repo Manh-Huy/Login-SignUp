@@ -6,6 +6,7 @@ import androidx.media3.common.Player;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.MediaSession;
 
+import com.example.authenticationuseraccount.model.business.LocalSong;
 import com.example.authenticationuseraccount.model.business.Song;
 
 import java.lang.annotation.Retention;
@@ -19,6 +20,9 @@ public class MediaItemHolder {
     public static final int REPEAT_TYPE_ALL = Player.REPEAT_MODE_ALL;
 
     private List<Song> listLoveSong;
+    private List<Song> listRecentSong;
+
+    private List<LocalSong> listLocalSong;
 
     public List<Song> getListLoveSong() {
         return listLoveSong;
@@ -46,7 +50,7 @@ public class MediaItemHolder {
     private List<MediaItem> listMediaItem;
     private List<Song> listSongs;
     private boolean isSetupMetaData;
-    private boolean isSaveUserHistoryTriggered ;
+    private boolean isSaveUserHistoryTriggered;
     private boolean isShuffle;
 
     public static void setInstance(MediaItemHolder instance) {
@@ -72,10 +76,28 @@ public class MediaItemHolder {
     private boolean isRepeatSingle;
     private boolean isRepeatPlaylist;
 
+    public List<LocalSong> getListLocalSong() {
+        return listLocalSong;
+    }
+
+    public void setListLocalSong(List<LocalSong> listLocalSong) {
+        this.listLocalSong = listLocalSong;
+    }
+
+    public List<Song> getListRecentSong() {
+        return listRecentSong;
+    }
+
+    public void setListRecentSong(List<Song> listRecentSong) {
+        this.listRecentSong = listRecentSong;
+    }
+
     private MediaItemHolder() {
         listMediaItem = new ArrayList<>();
         listSongs = new ArrayList<>();
         listLoveSong = new ArrayList<>();
+        listLocalSong = new ArrayList<>();
+        listRecentSong = new ArrayList<>();
         isShuffle = false;
         isRepeatSingle = false;
         isRepeatPlaylist = false;
@@ -94,7 +116,7 @@ public class MediaItemHolder {
         return instance;
     }
 
-    public void destroy(){
+    public void destroy() {
         mediaController = null;
         instance = null;
     }
@@ -139,7 +161,7 @@ public class MediaItemHolder {
         isRepeatPlaylist = repeatPlaylist;
     }
 
-    public void setMediaItem(Song song){
+    public void setMediaItem(Song song) {
         this.listSongs.clear();
         this.listSongs.add(song);
         MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());

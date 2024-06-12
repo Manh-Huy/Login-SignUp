@@ -37,9 +37,12 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isReceiveNotification;
     private Song mSong;
     private FirebaseAuth firebaseAuth;
+    private Disposable mDisposable;
 
     public static interface OnMediaControllerConnect {
         void onMediaControllerConnect(MediaController controller);
@@ -77,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
             LogUtils.ApplicationLogI("MainActivity: User Has Signed In!");
             SocketIoManager.getInstance();
             checkUserPremiumTime(User.getInstance());
+            getUserLoveSong(User.getInstance().getUserID());
         }else{
             LogUtils.ApplicationLogE("MainActivity: User Has Not Signed In!");
         }
@@ -192,6 +197,35 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private void getUserLoveSong(String userID) {
+        ApiService.apiService.getUserLoveSong(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        MediaItemHolder.getInstance().setListLoveSong(songs);
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api love song error: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.ApplicationLogI("Love Song Count: " + MediaItemHolder.getInstance().getListLoveSong().size());
+                        LogUtils.ApplicationLogI("Call api love song Complete");
+                    }
+                });
     }
 
     private void checkUserPremiumTime(User user) {

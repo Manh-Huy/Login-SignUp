@@ -3,9 +3,12 @@ package com.example.authenticationuseraccount.activity;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,6 +20,7 @@ import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.business.LocalSong;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
@@ -72,6 +76,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         // Build a GoogleSignInClient with the options specified by gso
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
+        MediaItemHolder.getInstance().setListLocalSong(loadMusic());
         getNameAllSongInfo();
         checkUserLogin();
     }
@@ -129,7 +134,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         } else {
             if (mAuth.getCurrentUser() != null) {
                 String Uid = mAuth.getCurrentUser().getUid();
-                getUserLoveSong(Uid);
+//                getUserLoveSong(Uid);
                 getUserByID(Uid);
             } else {
                 new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -176,44 +181,14 @@ public class SplashScreenActivity extends AppCompatActivity {
         });
     }
 
-    private void getUserLoveSong(String userID) {
-        ApiService.apiService.getUserLoveSong(userID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Song>>() {
-                    @Override
-                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-                        mDisposable = d;
-                    }
-
-                    @Override
-                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
-                        MediaItemHolder.getInstance().setListLoveSong(songs);
-                    }
-
-                    @Override
-                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                        LogUtils.ApplicationLogE("Call api love song error: " + e.getMessage());
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        LogUtils.ApplicationLogI("Love Song Count: " + MediaItemHolder.getInstance().getListLoveSong().size());
-                        LogUtils.ApplicationLogI("Call api love song Complete");
-                        isCallApiGetUserLoveSong = true;
-                        isActivityDone();
-                    }
-                });
-    }
 
     private void isActivityDone() {
-        if (isCallApiGetUserLoveSong && isCallApiGetUser && isCallApiGetAllSongInfo) {
-            LogUtils.ApplicationLogI("ApiLoveSong: " + isCallApiGetUserLoveSong + " ApiGetUser: " + isCallApiGetUser + " ApiGetAllSong: " + isCallApiGetAllSongInfo);
+        if (isCallApiGetUser && isCallApiGetAllSongInfo) {
+            LogUtils.ApplicationLogI("ApiGetUser: " + isCallApiGetUser + " ApiGetAllSong: " + isCallApiGetAllSongInfo);
             startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
             finish();
         } else {
-            LogUtils.ApplicationLogI("ApiLoveSong: " + isCallApiGetUserLoveSong + " ApiGetUser: " + isCallApiGetUser + " ApiGetAllSong: " + isCallApiGetAllSongInfo);
+            LogUtils.ApplicationLogI("ApiGetUser: " + isCallApiGetUser + " ApiGetAllSong: " + isCallApiGetAllSongInfo);
         }
 
     }
@@ -233,6 +208,61 @@ public class SplashScreenActivity extends AppCompatActivity {
             }
         });
     }
+
+    private List<LocalSong> loadMusic() {
+        List<LocalSong> songs = new ArrayList<>();
+
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String[] CURSOR_PROJECTION = new String[]{"_id", "artist", "album", "title", "duration", "_display_name", "_data", "_size"};
+        String selection = "is_music != 0";
+        String sortOrder = "_display_name ASC";
+        Cursor cursor = SplashScreenActivity.this.getContentResolver().query(uri, CURSOR_PROJECTION, selection, null, sortOrder);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                int id = Integer.parseInt(getCursorStringByIndex(cursor, "_id"));
+                String artistName = getCursorStringByIndex(cursor, "artist");
+                String albumName = getCursorStringByIndex(cursor, "album");
+                String title = getCursorStringByIndex(cursor, "title");
+                String displayName = getCursorStringByIndex(cursor, "_display_name");
+                String data = getCursorStringByIndex(cursor, "_data");
+                long duration = getCursorLongByIndex(cursor, "duration");
+
+                if (artistName == null || artistName.isEmpty())
+                    artistName = "<unknown>";
+
+                if (displayName.contains("AUD-") && !title.isEmpty())
+                    displayName = title;
+
+                Uri songUri = Uri.parse(data);
+
+                songs.add(new LocalSong(
+                        id,
+                        title,
+                        duration,
+                        data,
+                        albumName,
+                        artistName,
+                        displayName,
+                        songUri));
+
+                LogUtils.ApplicationLogI("Local Music title: " + title + " artist: " + artistName + " songUri: " + songUri + " data: " + data);
+            }
+        }
+
+        return songs;
+    }
+
+    private String getCursorStringByIndex(Cursor cursor, String columnName) {
+        int index = cursor.getColumnIndex(columnName);
+        return (index > -1) ? cursor.getString(index) : "";
+    }
+
+    private static long getCursorLongByIndex(Cursor cursor, String columnName) {
+        int index = cursor.getColumnIndex(columnName);
+        return (index > -1) ? cursor.getLong(index) : -1L;
+    }
+
 
     @Override
     protected void onDestroy() {

@@ -13,6 +13,7 @@ import android.widget.RadioGroup;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.User;
@@ -162,7 +163,7 @@ public class PremiumActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
-                    User.getInstance().setRole("Premium");
+                    User.getInstance().setRole(Constants.PREMIUM_USER);
                     LogUtils.ApplicationLogD("Succefully");
                 }, throwable -> {
                     LogUtils.ApplicationLogE("Failed");

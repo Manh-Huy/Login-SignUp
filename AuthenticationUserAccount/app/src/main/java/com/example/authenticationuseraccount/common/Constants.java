@@ -5,4 +5,6 @@ public class Constants {
     public static String APP_NAME = "THKChillMusicConrer";
     public static String NOTIFICATION_ACTION_CLICK = "NOTIFICATION_ACTION_CLICK";
     public static String NOTIFICATION_SONG_OBJECT = "NOTIFICATION_SONG_OBJECT";
+    public static String PREMIUM_USER = "Premium";
+    public static String NORMAL_USER = "Normal";
 }

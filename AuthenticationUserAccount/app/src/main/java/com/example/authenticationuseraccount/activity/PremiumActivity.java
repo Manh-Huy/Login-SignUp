@@ -80,7 +80,7 @@ public class PremiumActivity extends AppCompatActivity {
 
             }
         });
-        //btnPayment.setEnabled(false);
+        btnPayment.setEnabled(false);
         paymentSheet = new PaymentSheet(this, this::onPaymentSheetResult);
 
 
@@ -123,7 +123,9 @@ public class PremiumActivity extends AppCompatActivity {
             finish();
         } else if (paymentSheetResult instanceof PaymentSheetResult.Canceled) {
             ErrorUtils.showError(this, "Payment canceled!");
+            btnPayment.setEnabled(false);
         } else if (paymentSheetResult instanceof PaymentSheetResult.Failed) {
+            btnPayment.setEnabled(false);
             Throwable error = ((PaymentSheetResult.Failed) paymentSheetResult).getError();
             showAlert("Payment failed", error.getLocalizedMessage());
         }

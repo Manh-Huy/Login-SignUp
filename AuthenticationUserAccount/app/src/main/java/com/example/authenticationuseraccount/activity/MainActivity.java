@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,6 +36,12 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
@@ -232,22 +239,33 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkUserPremiumTime(FirebaseUser user) {
         String id = user.getUid();
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String formattedDateNow = sdf.format(now);
+        LogUtils.ApplicationLogI("Date From Local: " + formattedDateNow);
         ApiService.apiService.getUserById(id).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 User mUser = response.body();
                 LogUtils.ApplicationLogD("Call API check time thanh cong");
                 if (mUser != null) {
-                    Date now = new Date();
-                    Date expiredDatePremium = mUser.getExpiredDatePremium();
 
-                    if (expiredDatePremium != null) {
-                        if (expiredDatePremium.before(now)) {
-                            LogUtils.ApplicationLogD("Het han");
+                    String expiredDatePremium = mUser.getExpiredDatePremium();
+                    LogUtils.ApplicationLogI("Date From Apis: " + mUser.getExpiredDatePremium());
+                    Date dateFromServer;
+
+                    try {
+                        dateFromServer = sdf.parse(expiredDatePremium);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    if (dateFromServer != null) {
+                        if (dateFromServer.before(now)) {
+                            LogUtils.ApplicationLogD("Premium expired");
                             downgradePremium(mUser.getUserID());
-
                         } else {
-                            LogUtils.ApplicationLogD("Van con han");
+                            LogUtils.ApplicationLogD("Premium Still Premium");
                         }
                     }
                 }
@@ -256,10 +274,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 LogUtils.ApplicationLogD("Call API check time that bai: " + t.getMessage());
-                // Xử lý trường hợp gọi API thất bại
             }
         });
     }
+
 
     @SuppressLint("CheckResult")
     private void downgradePremium(String userID) {
@@ -267,9 +285,9 @@ public class MainActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
-                    LogUtils.ApplicationLogD("Succefully");
+                    LogUtils.ApplicationLogD("DownGrade User Succefully");
                 }, throwable -> {
-                    LogUtils.ApplicationLogE("Failed");
+                    LogUtils.ApplicationLogE("Failed To DownGrade User");
                 });
     }
 

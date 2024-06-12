@@ -7,7 +7,7 @@ public class User {
     private String username;
     private String email;
     private String role;
-    private Date expiredDatePremium;
+    private String expiredDatePremium;
     private String signInMethod;
     private String imageURL;
 
@@ -45,11 +45,11 @@ public class User {
         this.role = role;
     }
 
-    public Date getExpiredDatePremium() {
+    public String getExpiredDatePremium() {
         return expiredDatePremium;
     }
 
-    public void setExpiredDatePremium(Date expiredDatePremium) {
+    public void setExpiredDatePremium(String expiredDatePremium) {
         this.expiredDatePremium = expiredDatePremium;
     }
 

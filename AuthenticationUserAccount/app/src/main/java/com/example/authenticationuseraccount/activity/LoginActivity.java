@@ -39,16 +39,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
-
     private EditText inputEmail, inputPassword;
-
     private CheckBox checkBoxRememberMe;
     private TextView textViewForgotPass;
     private FirebaseAuth mAuth;
-
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
     GoogleSignInClient mGoogleSignInClient;
+    private Button btnLogin;
+    private ImageView imageViewSignWithGoogle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +58,11 @@ public class LoginActivity extends AppCompatActivity {
         inputPassword = findViewById(R.id.editTextPassword);
         checkBoxRememberMe = findViewById(R.id.checkbox_remember_me);
         textViewForgotPass = findViewById(R.id.textView_forgot_pass);
-
-        Button btnLogin = findViewById(R.id.btnLogin);
-        ImageView imageViewSignWithGoogle = findViewById(R.id.signWithGoogle);
+        btnLogin = findViewById(R.id.btnLogin);
+        imageViewSignWithGoogle = findViewById(R.id.signWithGoogle);
 
         mAuth = FirebaseAuth.getInstance();
+
         // Configure google Sign in
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(Constants.DEFAULT_WEB_CLIENT_ID)
@@ -123,11 +122,13 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null && user.isEmailVerified()) {
 
+                                //user logged in => check mail vertification
                                 checkFirstTimeLogin(user, "Email");
 
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
+
                             } else {
                                 Toast.makeText(getApplicationContext(), "Please verify your email", Toast.LENGTH_SHORT).show();
                             }
@@ -135,7 +136,6 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -187,14 +187,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private User getUserInfo(FirebaseUser user, String signInMethod) {
-        User userInfo = new User();
-//        for (UserInfo profile : user.getProviderData()) {
-//            userInfo.setUserID(profile.getUid());
-//            userInfo.setUsername(profile.getDisplayName());
-//            userInfo.setEmail(profile.getEmail());
-//            userInfo.setImageURL(profile.getPhotoUrl().toString());
-//            userInfo.setSignInMethod(signInMethod);
-//        }
+        User userInfo = User.getInstance();
 
         userInfo.setUserID(user.getUid());
         userInfo.setUsername(user.getDisplayName());
@@ -212,7 +205,7 @@ public class LoginActivity extends AppCompatActivity {
         ApiService.apiService.addUser(user).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                Toast.makeText(LoginActivity.this, "Call Api Success ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Call Api Add New User Success ", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -228,7 +221,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 User mUser = response.body();
-                LogUtils.ApplicationLogD("Call thanh cong");
+                LogUtils.ApplicationLogD("Call getUserById for checkFirstTimeLogin thanh cong");
+                //Lan dau login => chua co data tren firestore
                 if (mUser == null)
                 {
                     User userInfo = getUserInfo(user, signInMethod);
@@ -237,6 +231,27 @@ public class LoginActivity extends AppCompatActivity {
                             + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: "
                             + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
                 }
+
+/*                if (response.isSuccessful() && response.body() != null) {
+                    User apiUser = response.body();
+                    User.getInstance();
+
+                    // Update singleton instance with data from API
+                    User.getInstance().setUserID(apiUser.getUserID());
+                    User.getInstance().setUsername(apiUser.getUsername());
+                    User.getInstance().setEmail(apiUser.getEmail());
+                    User.getInstance().setRole(apiUser.getRole());
+                    User.getInstance().setSignInMethod(apiUser.getSignInMethod());
+                    if (apiUser.getExpiredDatePremium() != null) {
+                        User.getInstance().setExpiredDatePremium(apiUser.getExpiredDatePremium());
+                    }
+                    if (apiUser.getImageURL() != null) {
+                        User.getInstance().setImageURL(apiUser.getImageURL());
+                    }
+
+                }*/
+
+
 
             }
             @Override

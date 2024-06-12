@@ -76,8 +76,6 @@ public interface ApiService {
             .build()
             .create(ApiService.class);
 
-    @GET("users")
-    Call<List<User>> callTestAPI();
 
     @GET("songs")
     Observable<List<Song>> getSongs();

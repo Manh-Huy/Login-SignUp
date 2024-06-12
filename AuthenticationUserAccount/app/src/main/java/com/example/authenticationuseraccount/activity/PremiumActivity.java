@@ -56,11 +56,13 @@ public class PremiumActivity extends AppCompatActivity {
                 // checkedId is the RadioButton ID that is selected
                 switch (checkedId) {
                     case R.id.yearlyOption:
+                        btnPayment.setEnabled(false);
                         mAmount = 1799;
                         paymentType = "Yearly";
                         fetchPaymentIntent(mAmount);
                         break;
                     case R.id.monthlyOption:
+                        btnPayment.setEnabled(false);
                         mAmount = 299;
                         paymentType = "Monthly";
                         fetchPaymentIntent(mAmount);
@@ -74,8 +76,8 @@ public class PremiumActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (pricingOptions.getCheckedRadioButtonId() != -1) {
                     onPayClicked();
-                }else{
-                    ErrorUtils.showError(PremiumActivity.this,"Please choose your plan!");
+                } else {
+                    ErrorUtils.showError(PremiumActivity.this, "Please choose your plan!");
                 }
 
             }

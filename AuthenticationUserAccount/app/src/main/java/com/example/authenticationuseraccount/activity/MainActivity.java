@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
-import android.widget.Toast;
 
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,22 +25,17 @@ import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.common.PermissionManager;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
-import com.example.authenticationuseraccount.utils.SocketIoManager;
-import com.example.authenticationuseraccount.utils.BackEventHandler;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
 import com.example.authenticationuseraccount.service.UIThread;
+import com.example.authenticationuseraccount.utils.BackEventHandler;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
@@ -138,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        LogUtils.ApplicationLogE("MainActivity onStart");
+        LogUtils.ApplicationLogD("MainActivity onStart");
         if (MediaItemHolder.getInstance().getMediaController() != null) {
             LogUtils.ApplicationLogD("MediaItemHolder Instance Not Null");
             if (isReceiveNotification && mSong != null) {
@@ -192,13 +186,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        LogUtils.ApplicationLogE("MainActivity onPause");
+        LogUtils.ApplicationLogD("MainActivity onPause");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        LogUtils.ApplicationLogE("MainActivity onResume");
+        LogUtils.ApplicationLogD("MainActivity onResume");
     }
 
     @Override
@@ -247,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 User mUser = response.body();
-                LogUtils.ApplicationLogD("Call API check time thanh cong");
+                LogUtils.ApplicationLogI("Call API check time thanh cong");
                 if (mUser != null) {
 
                     String expiredDatePremium = mUser.getExpiredDatePremium();
@@ -255,18 +249,24 @@ public class MainActivity extends AppCompatActivity {
                     Date dateFromServer;
 
                     try {
-                        dateFromServer = sdf.parse(expiredDatePremium);
+                        if ("aN-aN-NaN".equals(expiredDatePremium)) {
+                            dateFromServer = null;
+                        } else {
+                            dateFromServer = sdf.parse(expiredDatePremium);
+                        }
                     } catch (ParseException e) {
                         throw new RuntimeException(e);
                     }
 
                     if (dateFromServer != null) {
                         if (dateFromServer.before(now)) {
-                            LogUtils.ApplicationLogD("Premium expired");
+                            LogUtils.ApplicationLogI("Premium expired");
                             downgradePremium(mUser.getUserID());
                         } else {
-                            LogUtils.ApplicationLogD("Premium Still Premium");
+                            LogUtils.ApplicationLogI("Premium Still Premium");
                         }
+                    }else{
+                        LogUtils.ApplicationLogI("aN-aN-NaN => NormalUser");
                     }
                 }
             }

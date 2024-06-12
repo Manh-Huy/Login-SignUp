@@ -187,18 +187,18 @@ public class FragmentHome extends Fragment {
         }
 
         if (mListBanner.isEmpty()) {
-            LogUtils.ApplicationLogE("Keo API Banner");
+            LogUtils.ApplicationLogD("Keo API Banner");
             getListBanner();
         } else {
-            LogUtils.ApplicationLogE("ko Keo API Banner");
+            LogUtils.ApplicationLogI("ko Keo API Banner");
             showBannerInRecyclerView();
         }
 
         if (mListGenre.isEmpty()) {
-            LogUtils.ApplicationLogE("Keo API Genre");
+            LogUtils.ApplicationLogD("Keo API Genre");
             getListGenre();
         } else {
-            LogUtils.ApplicationLogE("ko Keo API Genre");
+            LogUtils.ApplicationLogI("ko Keo API Genre");
             showGenreInRecyclerView();
         }
 
@@ -336,12 +336,12 @@ public class FragmentHome extends Fragment {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        LogUtils.ApplicationLogE("Call api error");
+                        LogUtils.ApplicationLogE("Call api song error");
                     }
 
                     @Override
                     public void onComplete() {
-                        LogUtils.ApplicationLogD("Call api success");
+                        LogUtils.ApplicationLogI("Call api song success");
 
                         if (user == null)
                         {
@@ -376,7 +376,7 @@ public class FragmentHome extends Fragment {
 
                     @Override
                     public void onComplete() {
-                        LogUtils.ApplicationLogE("Call api recent (listen again) complete");
+                        LogUtils.ApplicationLogI("Call api recent (listen again) complete");
 
                         if(listSongRecent.size() == 0) {
                             ShowUIForLocal();

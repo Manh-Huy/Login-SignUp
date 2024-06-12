@@ -11,7 +11,23 @@ public class User {
     private String signInMethod;
     private String imageURL;
 
-    public User() {}
+    // Step 2: Create a private static instance of the class
+    private static User instance;
+
+    // Step 1: Make the constructor private to prevent instantiation
+    private User() {}
+
+    // Step 3: Provide a public static method to return the single instance of the class
+    public static User getInstance() {
+        if (instance == null) {
+            synchronized (User.class) {
+                if (instance == null) {
+                    instance = new User();
+                }
+            }
+        }
+        return instance;
+    }
 
     public String getUserID() {
         return userID;

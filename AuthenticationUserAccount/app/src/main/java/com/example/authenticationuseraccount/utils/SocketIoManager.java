@@ -95,7 +95,7 @@ public class SocketIoManager {
                     @Override
                     public void run() {
                         UIThread.getInstance().onRoomCreate();
-                        ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(),"Room Created! Let's add a song");
+                        ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), "Room Created! Let's add a song");
                     }
                 });
                 LogUtils.ApplicationLogI("on-create-room: roomId has been created: " + (String) args[0]);
@@ -113,12 +113,12 @@ public class SocketIoManager {
                 LogUtils.ApplicationLogI("on-join-room: this user has joined room: " + (String) args[0]);
 
                 //Open Ui for guest
-                if(!ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                if (!ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                     UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             UIThread.getInstance().onRoomCreate();
-                            ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(),"Room Joined! Let's listen together!");
+                            ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), "Room Joined! Let's listen together!");
                         }
                     });
                 }
@@ -140,13 +140,9 @@ public class SocketIoManager {
                     UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
-                            MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
-                            MediaItemHolder.getInstance().getListSongs().clear();
-                            MediaItemHolder.getInstance().getListSongs().add(song);
+                            MediaItemHolder.getInstance().setMediaItem(song);
                         }
                     });
-
 
 
                 } catch (JSONException e) {

@@ -17,6 +17,7 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,26 +49,21 @@ public class FragmentCorner extends Fragment {
         btnJoinRoom = view.findViewById(R.id.btn_connet_room);
 
         mContext = getContext();
-        SocketIoManager.getInstance();
 
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            userID = user.getUid();
-            userName = user.getDisplayName();
-            tvUserId.setText(userID);
-        } else {
-            tvUserId.setText("");
+        User userSingleTon = User.getInstance();
+        if (userSingleTon != null) {
+            userID = userSingleTon.getUserID();
+            userName = userSingleTon.getUsername();
+            tvUserId.setText(userSingleTon.getUserID());
         }
 
         btnCreatRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseUser user = mAuth.getCurrentUser();
-                if (user != null) {
-                    userID = user.getUid();
-                    SocketIoManager.getInstance().createRoom(userID);
+                if (userSingleTon != null) {
+                    userID = userSingleTon.getUserID();
                     tvUserId.setText(userID);
+                    SocketIoManager.getInstance().createRoom(userID);
                 } else {
                     ErrorUtils.showError(getContext(), "Please Login To Create Room");
                 }

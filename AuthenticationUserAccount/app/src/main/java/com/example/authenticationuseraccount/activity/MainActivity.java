@@ -75,8 +75,10 @@ public class MainActivity extends AppCompatActivity {
         if (this.m_vThread == null) {
             this.m_vThread = new UIThread(this);
         }
-        //SocketIoManager.getInstance().setmUiThread(this.m_vThread);
-        //UIThread.getInstanceSingleTon(this);// new UIThread(this);
+
+        if (User.getInstance() != null) {
+            SocketIoManager.getInstance();
+        }
 
         PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -98,16 +100,21 @@ public class MainActivity extends AppCompatActivity {
         Intent intentFromFCM = getIntent();
         String actionFromNotification = intentFromFCM.getAction();
 
+        HandleNotification(actionFromNotification, intentFromFCM);
+
+        if (user != null) {
+            checkUserPremiumTime(user);
+        }
+    }
+
+    private void HandleNotification(String actionFromNotification, Intent intentFromFCM) {
         if (actionFromNotification != null && actionFromNotification.equals(Constants.NOTIFICATION_ACTION_CLICK)) {
             LogUtils.ApplicationLogI("Receive Action From Notfication");
             Bundle songBundle = intentFromFCM.getExtras();
             Song song = (Song) songBundle.getSerializable(Constants.NOTIFICATION_SONG_OBJECT);
             if (MediaItemHolder.getInstance().getMediaController() != null) {
                 LogUtils.ApplicationLogI("Receive Action From Notfication And App Already Open");
-                MediaItemHolder.getInstance().getListSongs().clear();
-                MediaItemHolder.getInstance().getListSongs().add(song);
-                MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
-                MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+                MediaItemHolder.getInstance().setMediaItem(song);
                 m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController());
                 isReceiveNotification = false;
                 mSong = null;
@@ -119,10 +126,6 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             LogUtils.ApplicationLogI("No Action From Any Notfication");
-        }
-
-        if (user != null) {
-            checkUserPremiumTime(user);
         }
     }
 
@@ -137,10 +140,7 @@ public class MainActivity extends AppCompatActivity {
             LogUtils.ApplicationLogD("MediaItemHolder Instance Not Null");
             if (isReceiveNotification && mSong != null) {
                 LogUtils.ApplicationLogI("Receive noti and start playing");
-                MediaItemHolder.getInstance().getListSongs().clear();
-                MediaItemHolder.getInstance().getListSongs().add(mSong);
-                MediaItem mediaItem = MediaItem.fromUri(mSong.getSongURL());
-                MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+                MediaItemHolder.getInstance().setMediaItem(mSong);
 
                 isReceiveNotification = false;
                 mSong = null;
@@ -168,10 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (isReceiveNotification && mSong != null) {
                         LogUtils.ApplicationLogI("Receive noti and start playing");
-                        MediaItem mediaItem = MediaItem.fromUri(mSong.getSongURL());
-                        MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
-                        MediaItemHolder.getInstance().getListSongs().clear();
-                        MediaItemHolder.getInstance().getListSongs().add(mSong);
+                        MediaItemHolder.getInstance().setMediaItem(mSong);
 
                         isReceiveNotification = false;
                         mSong = null;
@@ -265,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             LogUtils.ApplicationLogI("Premium Still Premium");
                         }
-                    }else{
+                    } else {
                         LogUtils.ApplicationLogI("aN-aN-NaN => NormalUser");
                     }
                 }

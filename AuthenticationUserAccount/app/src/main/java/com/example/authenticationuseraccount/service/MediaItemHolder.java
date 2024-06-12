@@ -139,4 +139,11 @@ public class MediaItemHolder {
         isRepeatPlaylist = repeatPlaylist;
     }
 
+    public void setMediaItem(Song song){
+        this.listSongs.clear();
+        this.listSongs.add(song);
+        MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+        MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+    }
+
 }

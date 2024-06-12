@@ -85,12 +85,7 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
             @Override
             public void onClick(View v) {
                 ErrorUtils.showError(mContext, "Clicked");
-
-                MediaItemHolder.getInstance().getListSongs().clear();
-                MediaItemHolder.getInstance().getListSongs().add(songLocalTest);
-                Uri songUri = Uri.parse(song.getData());
-                MediaItem mediaItem = MediaItem.fromUri(songUri);
-                MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+                MediaItemHolder.getInstance().setMediaItem(songLocalTest);
             }
         });
 

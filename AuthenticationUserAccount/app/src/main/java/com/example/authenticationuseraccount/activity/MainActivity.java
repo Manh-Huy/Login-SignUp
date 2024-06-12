@@ -46,14 +46,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseUser user;
     private UIThread m_vThread;
     private boolean isReceiveNotification;
     private Song mSong;
-
-    public UIThread getM_vThread() {
-        return m_vThread;
-    }
+    private FirebaseAuth firebaseAuth;
 
     public static interface OnMediaControllerConnect {
         void onMediaControllerConnect(MediaController controller);
@@ -70,15 +66,32 @@ public class MainActivity extends AppCompatActivity {
 
         isReceiveNotification = false;
         mSong = null;
-        user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (this.m_vThread == null) {
             this.m_vThread = new UIThread(this);
         }
 
-        if (User.getInstance() != null) {
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        if (firebaseAuth.getCurrentUser() != null) {
+            LogUtils.ApplicationLogI("MainActivity: User Has Signed In!");
             SocketIoManager.getInstance();
+            checkUserPremiumTime(User.getInstance());
+        }else{
+            LogUtils.ApplicationLogE("MainActivity: User Has Not Signed In!");
         }
+
+        askingPermission();
+
+        //Notification
+        Intent intentFromFCM = getIntent();
+        String actionFromNotification = intentFromFCM.getAction();
+        HandleNotification(actionFromNotification, intentFromFCM);
+
+        BackEventHandler.getInstance();
+    }
+
+    private void askingPermission() {
 
         PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -94,35 +107,27 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         }
-
-        BackEventHandler.getInstance();
-
-        Intent intentFromFCM = getIntent();
-        String actionFromNotification = intentFromFCM.getAction();
-
-        HandleNotification(actionFromNotification, intentFromFCM);
-
-        if (user != null) {
-            checkUserPremiumTime(user);
-        }
     }
 
     private void HandleNotification(String actionFromNotification, Intent intentFromFCM) {
         if (actionFromNotification != null && actionFromNotification.equals(Constants.NOTIFICATION_ACTION_CLICK)) {
             LogUtils.ApplicationLogI("Receive Action From Notfication");
+
             Bundle songBundle = intentFromFCM.getExtras();
             Song song = (Song) songBundle.getSerializable(Constants.NOTIFICATION_SONG_OBJECT);
+
             if (MediaItemHolder.getInstance().getMediaController() != null) {
                 LogUtils.ApplicationLogI("Receive Action From Notfication And App Already Open");
+
                 MediaItemHolder.getInstance().setMediaItem(song);
                 m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController());
                 isReceiveNotification = false;
                 mSong = null;
 
             } else {
+                LogUtils.ApplicationLogI("Receive Action From Notfication mediaController null: " + song.getName());
                 isReceiveNotification = true;
                 mSong = song;
-                LogUtils.ApplicationLogI("Receive Action From Notfication mediaController null: " + song.getName());
             }
         } else {
             LogUtils.ApplicationLogI("No Action From Any Notfication");
@@ -137,23 +142,32 @@ public class MainActivity extends AppCompatActivity {
 
         LogUtils.ApplicationLogD("MainActivity onStart");
         if (MediaItemHolder.getInstance().getMediaController() != null) {
-            LogUtils.ApplicationLogD("MediaItemHolder Instance Not Null");
-            if (isReceiveNotification && mSong != null) {
-                LogUtils.ApplicationLogI("Receive noti and start playing");
-                MediaItemHolder.getInstance().setMediaItem(mSong);
-
-                isReceiveNotification = false;
-                mSong = null;
-            }
-            if (MediaItemHolder.getInstance().getMediaController().getMediaMetadata().title != null) {
-                LogUtils.ApplicationLogD("MediaMetadata Not Null => App is playing music (pausing / playing)");
-                m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController());
-            } else {
-                LogUtils.ApplicationLogD("App not playing music. just restart");
-            }
+            HandleExoPlayerState();
             return;
         }
 
+        getExoMediaController();
+    }
+
+    private void HandleExoPlayerState() {
+        LogUtils.ApplicationLogI("MediaItemHolder Instance Not Null");
+
+        if (isReceiveNotification && mSong != null) {
+            LogUtils.ApplicationLogI("Receive noti and start playing");
+
+            MediaItemHolder.getInstance().setMediaItem(mSong);
+            isReceiveNotification = false;
+            mSong = null;
+        }
+        if (MediaItemHolder.getInstance().getMediaController().getMediaMetadata().title != null) {
+            LogUtils.ApplicationLogD("MediaMetadata Not Null => App is playing music (pausing / playing)");
+            m_vThread.onUpdateUIOnRestar(MediaItemHolder.getInstance().getMediaController());
+        } else {
+            LogUtils.ApplicationLogD("App not playing music. just restart");
+        }
+    }
+
+    private void getExoMediaController() {
         SessionToken sessionToken = new SessionToken(MainActivity.this, new ComponentName(MainActivity.this, MusicService.class));
         MediaController.Builder builder = new MediaController.Builder(MainActivity.this, sessionToken);
         ListenableFuture<MediaController> controllerFuture = builder.buildAsync();
@@ -168,8 +182,8 @@ public class MainActivity extends AppCompatActivity {
 
                     if (isReceiveNotification && mSong != null) {
                         LogUtils.ApplicationLogI("Receive noti and start playing");
-                        MediaItemHolder.getInstance().setMediaItem(mSong);
 
+                        MediaItemHolder.getInstance().setMediaItem(mSong);
                         isReceiveNotification = false;
                         mSong = null;
                     }
@@ -178,6 +192,51 @@ public class MainActivity extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }, MoreExecutors.directExecutor());
+    }
+
+    private void checkUserPremiumTime(User user) {
+
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String formattedDateNow = sdf.format(now);
+        LogUtils.ApplicationLogI("Date From Local: " + formattedDateNow);
+        String expiredDatePremium = user.getExpiredDatePremium();
+        LogUtils.ApplicationLogI("Date From Logged In User: " + user.getExpiredDatePremium());
+        Date dateFromServer;
+
+        try {
+            if ("aN-aN-NaN".equals(expiredDatePremium)) {
+                dateFromServer = null;
+            } else {
+                dateFromServer = sdf.parse(expiredDatePremium);
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (dateFromServer != null) {
+            if (dateFromServer.before(now)) {
+                LogUtils.ApplicationLogI("Premium expired");
+                downgradePremium(user.getUserID());
+            } else {
+                LogUtils.ApplicationLogI("Premium Still Premium");
+            }
+        } else {
+            LogUtils.ApplicationLogI("aN-aN-NaN => NormalUser");
+        }
+
+    }
+
+    @SuppressLint("CheckResult")
+    private void downgradePremium(String userID) {
+        ApiService.apiService.downgradePremium(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("DownGrade User Succefully");
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Failed To DownGrade User");
+                });
     }
 
     @Override
@@ -226,66 +285,6 @@ public class MainActivity extends AppCompatActivity {
         stopService(intent);
 
         super.onDestroy();
-    }
-
-    private void checkUserPremiumTime(FirebaseUser user) {
-        String id = user.getUid();
-        Date now = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        String formattedDateNow = sdf.format(now);
-        LogUtils.ApplicationLogI("Date From Local: " + formattedDateNow);
-        ApiService.apiService.getUserById(id).enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                User mUser = response.body();
-                LogUtils.ApplicationLogI("Call API check time thanh cong");
-                if (mUser != null) {
-
-                    String expiredDatePremium = mUser.getExpiredDatePremium();
-                    LogUtils.ApplicationLogI("Date From Apis: " + mUser.getExpiredDatePremium());
-                    Date dateFromServer;
-
-                    try {
-                        if ("aN-aN-NaN".equals(expiredDatePremium)) {
-                            dateFromServer = null;
-                        } else {
-                            dateFromServer = sdf.parse(expiredDatePremium);
-                        }
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    if (dateFromServer != null) {
-                        if (dateFromServer.before(now)) {
-                            LogUtils.ApplicationLogI("Premium expired");
-                            downgradePremium(mUser.getUserID());
-                        } else {
-                            LogUtils.ApplicationLogI("Premium Still Premium");
-                        }
-                    } else {
-                        LogUtils.ApplicationLogI("aN-aN-NaN => NormalUser");
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                LogUtils.ApplicationLogD("Call API check time that bai: " + t.getMessage());
-            }
-        });
-    }
-
-
-    @SuppressLint("CheckResult")
-    private void downgradePremium(String userID) {
-        ApiService.apiService.downgradePremium(userID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    LogUtils.ApplicationLogD("DownGrade User Succefully");
-                }, throwable -> {
-                    LogUtils.ApplicationLogE("Failed To DownGrade User");
-                });
     }
 
 }

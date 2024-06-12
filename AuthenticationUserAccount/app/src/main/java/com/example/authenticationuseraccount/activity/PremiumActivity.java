@@ -15,6 +15,7 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.business.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.stripe.android.paymentsheet.PaymentSheet;
@@ -161,6 +162,7 @@ public class PremiumActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
+                    User.getInstance().setRole("Premium");
                     LogUtils.ApplicationLogD("Succefully");
                 }, throwable -> {
                     LogUtils.ApplicationLogE("Failed");

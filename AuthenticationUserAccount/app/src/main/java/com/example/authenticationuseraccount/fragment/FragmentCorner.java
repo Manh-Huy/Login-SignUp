@@ -49,6 +49,7 @@ public class FragmentCorner extends Fragment {
         btnJoinRoom = view.findViewById(R.id.btn_connet_room);
 
         mContext = getContext();
+        mAuth = FirebaseAuth.getInstance();
 
         User userSingleTon = User.getInstance();
         if (userSingleTon != null) {
@@ -60,10 +61,12 @@ public class FragmentCorner extends Fragment {
         btnCreatRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (userSingleTon != null) {
-                    userID = userSingleTon.getUserID();
-                    tvUserId.setText(userID);
-                    SocketIoManager.getInstance().createRoom(userID);
+                if (mAuth.getCurrentUser() != null) {
+                    if (userSingleTon.getRole().equals("Premium")) {
+                        SocketIoManager.getInstance().createRoom(userID);
+                    } else {
+                        ErrorUtils.showError(getContext(), "Please Upgrad To Premium To Continue");
+                    }
                 } else {
                     ErrorUtils.showError(getContext(), "Please Login To Create Room");
                 }
@@ -77,8 +80,13 @@ public class FragmentCorner extends Fragment {
                 if (roomId.isEmpty()) {
                     ErrorUtils.showError(mContext, "Room ID cannot be empty");
                 } else {
-                    SocketIoManager.getInstance().joinRoom(roomId, userID);
-                    edtUserId.setText("");
+                    if (mAuth.getCurrentUser() != null) {
+                        SocketIoManager.getInstance().joinRoom(roomId, userID);
+                        edtUserId.setText("");
+                    } else {
+                        ErrorUtils.showError(getContext(), "Please Login To Join Room");
+                    }
+
                 }
             }
         });
@@ -99,8 +107,8 @@ public class FragmentCorner extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                MainActivity mainActivity = (MainActivity) getActivity();
-                mainActivity.getM_vThread().onRoomCreate();
+                /*MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.getM_vThread().onRoomCreate();*/
                 /*Song song = new Song();
                 song.setAlbum("Đánh Đổi");
                 song.setArtist("Obito");

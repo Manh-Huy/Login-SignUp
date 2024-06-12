@@ -121,14 +121,8 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null && user.isEmailVerified()) {
-
                                 //user logged in => check mail vertification
                                 checkFirstTimeLogin(user, "Email");
-
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
-
                             } else {
                                 Toast.makeText(getApplicationContext(), "Please verify your email", Toast.LENGTH_SHORT).show();
                             }
@@ -167,16 +161,13 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Log.d(TAG, "signInWithCredential:success: currentUser: " + user.getEmail());
+                            LogUtils.ApplicationLogI("signInWithCredential:success: currentUser: " + user.getEmail());
                             Toast.makeText(LoginActivity.this, "Firebase Authentication Succeeded ", Toast.LENGTH_LONG).show();
-
-                            checkFirstTimeLogin(user, "Google");
 
                             boolean isRememberMe = checkBoxRememberMe.isChecked();
                             DataLocalManager.setRememberMeAccount(isRememberMe);
+                            checkFirstTimeLogin(user, "Google");
 
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -187,18 +178,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private User getUserInfo(FirebaseUser user, String signInMethod) {
-        User userInfo = User.getInstance();
-
-        userInfo.setUserID(user.getUid());
-        userInfo.setUsername(user.getDisplayName());
-        userInfo.setEmail(user.getEmail());
+        User.getInstance();
+        User.getInstance().setUserID(user.getUid());
+        User.getInstance().setUsername(user.getDisplayName());
+        User.getInstance().setEmail(user.getEmail());
         if (user.getPhotoUrl() != null) {
-            userInfo.setImageURL(user.getPhotoUrl().toString());
+            User.getInstance().setImageURL(user.getPhotoUrl().toString());
         } else {
-            userInfo.setImageURL("");
+            User.getInstance().setImageURL("");
         }
-        userInfo.setSignInMethod(signInMethod);
-        return userInfo;
+        User.getInstance().setSignInMethod(signInMethod);
+        return User.getInstance();
     }
 
     private void addUser(User user) {
@@ -223,37 +213,40 @@ public class LoginActivity extends AppCompatActivity {
                 User mUser = response.body();
                 LogUtils.ApplicationLogD("Call getUserById for checkFirstTimeLogin thanh cong");
                 //Lan dau login => chua co data tren firestore
-                if (mUser == null)
-                {
+                if (mUser == null) {
                     User userInfo = getUserInfo(user, signInMethod);
                     addUser(userInfo);
                     Toast.makeText(getApplicationContext(), "UID: " + userInfo.getUserID() + "\nName: "
                             + userInfo.getUsername() + "\nEmail: " + userInfo.getEmail() + "\nPhotoUrl: "
                             + userInfo.getImageURL() + "\nsignInMethod: " + userInfo.getSignInMethod(), Toast.LENGTH_LONG).show();
+                } else {
+                    if (response.isSuccessful() && response.body() != null) {
+                        User apiUser = response.body();
+                        User.getInstance();
+
+                        // Update singleton instance with data from API
+                        User.getInstance().setUserID(apiUser.getUserID());
+                        User.getInstance().setUsername(apiUser.getUsername());
+                        User.getInstance().setEmail(apiUser.getEmail());
+                        User.getInstance().setRole(apiUser.getRole());
+                        User.getInstance().setSignInMethod(apiUser.getSignInMethod());
+                        if (apiUser.getExpiredDatePremium() != null) {
+                            LogUtils.ApplicationLogI("apiUser.getExpiredDatePremium() not Null " + apiUser.getExpiredDatePremium());
+                            User.getInstance().setExpiredDatePremium(apiUser.getExpiredDatePremium());
+                        } else {
+                            LogUtils.ApplicationLogI("apiUser.getExpiredDatePremium() NULL");
+                        }
+                        if (apiUser.getImageURL() != null) {
+                            User.getInstance().setImageURL(apiUser.getImageURL());
+                        }
+
+                    }
                 }
-
-/*                if (response.isSuccessful() && response.body() != null) {
-                    User apiUser = response.body();
-                    User.getInstance();
-
-                    // Update singleton instance with data from API
-                    User.getInstance().setUserID(apiUser.getUserID());
-                    User.getInstance().setUsername(apiUser.getUsername());
-                    User.getInstance().setEmail(apiUser.getEmail());
-                    User.getInstance().setRole(apiUser.getRole());
-                    User.getInstance().setSignInMethod(apiUser.getSignInMethod());
-                    if (apiUser.getExpiredDatePremium() != null) {
-                        User.getInstance().setExpiredDatePremium(apiUser.getExpiredDatePremium());
-                    }
-                    if (apiUser.getImageURL() != null) {
-                        User.getInstance().setImageURL(apiUser.getImageURL());
-                    }
-
-                }*/
-
-
-
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
             }
+
             @Override
             public void onFailure(Call<User> call, Throwable t) {
             }

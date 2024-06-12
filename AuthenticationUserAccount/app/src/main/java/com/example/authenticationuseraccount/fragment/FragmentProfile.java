@@ -24,7 +24,9 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.EditProfileActivity;
 import com.example.authenticationuseraccount.activity.FavAndHisSongActivity;
 import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
+import com.example.authenticationuseraccount.activity.PremiumActivity;
 import com.example.authenticationuseraccount.common.Constants;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -37,7 +39,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class FragmentProfile extends Fragment {
     private RelativeLayout layoutLogout;
-    private LinearLayout layoutLoveSong, layoutHistorySong, layoutLogin;
+    private LinearLayout layoutLoveSong, layoutHistorySong, layoutLogin, layoutRole;
     private Button loginButton, logoutButton, editProfileButton;
     private ImageView profileImage;
     private TextView profileName, tvRole, tvNumLove, tvNumHistory;
@@ -49,6 +51,7 @@ public class FragmentProfile extends Fragment {
 
         layoutLogin = view.findViewById(R.id.layout_Login);
         layoutLogout = view.findViewById(R.id.layout_Logout);
+        layoutRole = view.findViewById(R.id.layout_Role);
         tvRole = view.findViewById(R.id.tv_Role);
         tvNumLove = view.findViewById(R.id.tv_num_love_song);
         tvNumHistory = view.findViewById(R.id.tv_num_history);
@@ -104,6 +107,19 @@ public class FragmentProfile extends Fragment {
                 startActivity(intent);
             }
         });
+
+        layoutRole.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (User.getInstance().getRole().equals(Constants.PREMIUM_USER))
+                    ErrorUtils.showError(getContext()," 🔥🔥🔥 You Are Premium 🔥🔥🔥");
+                else {
+                    Intent intent = new Intent(getContext(),PremiumActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+
         return view;
     }
 
@@ -128,7 +144,6 @@ public class FragmentProfile extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Log.w(TAG, "Signed out of google");
-
                 updateUI(FirebaseAuth.getInstance().getCurrentUser());
             }
         });

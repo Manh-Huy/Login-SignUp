@@ -205,8 +205,8 @@ public class FragmentHome extends Fragment {
         imgMenuIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), PremiumActivity.class);
-                getContext().startActivity(intent);
+                //Intent intent = new Intent(getContext(), PremiumActivity.class);
+                //getContext().startActivity(intent);
             }
         });
 

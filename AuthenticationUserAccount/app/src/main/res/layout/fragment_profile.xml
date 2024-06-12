@@ -153,6 +153,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <LinearLayout
+                    android:id="@+id/layout_Role"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -200,8 +201,8 @@
 
                 <LinearLayout
                     android:id="@+id/layout_love_song"
-                    android:layout_width="264dp"
-                    android:layout_height="97dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:padding="16dp">
 

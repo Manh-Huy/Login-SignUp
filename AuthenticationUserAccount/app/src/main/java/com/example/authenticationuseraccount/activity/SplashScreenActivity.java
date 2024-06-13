@@ -2,13 +2,17 @@ package com.example.authenticationuseraccount.activity;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
+import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,10 +22,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
-import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.common.PermissionManager;
 import com.example.authenticationuseraccount.model.business.LocalSong;
-import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
@@ -62,6 +65,8 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
+        askingPermission();
+
         isCallApiGetUser = false;
         isCallApiGetUserLoveSong = false;
         isCallApiGetAllSongInfo = false;
@@ -79,6 +84,24 @@ public class SplashScreenActivity extends AppCompatActivity {
         MediaItemHolder.getInstance().setListLocalSong(loadMusic());
         getNameAllSongInfo();
         checkUserLogin();
+    }
+
+    private void askingPermission() {
+
+        PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            PermissionManager.requestPermission(this, Manifest.permission.FOREGROUND_SERVICE, 100);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            PermissionManager.requestPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE, 100);
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                startActivity(intent);
+            }
+        }
     }
 
     private void getNameAllSongInfo() {

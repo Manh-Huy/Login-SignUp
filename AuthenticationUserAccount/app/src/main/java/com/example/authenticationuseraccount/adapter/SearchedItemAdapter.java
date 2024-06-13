@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,13 +71,21 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_SONG:
                 Song song = (Song) item;
-                SearchedSongViewHolder searchedSongViewHold =(SearchedSongViewHolder) holder;
+                SearchedSongViewHolder searchedSongViewHold = (SearchedSongViewHolder) holder;
                 searchedSongViewHold.tvSongName.setText(song.getName());
                 searchedSongViewHold.tvArtistName.setText(song.getArtist());
                 searchedSongViewHold.tvAlbumName.setText(song.getAlbum());
                 Glide.with(mContext)
                         .load(song.getImageURL())
                         .into(searchedSongViewHold.imgSong);
+
+                searchedSongViewHold.container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        MediaItemHolder.getInstance().setMediaItem(song);
+                        fragmentActivity.finish();
+                    }
+                });
 
                 searchedSongViewHold.tvOverflowMenu.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -108,9 +117,10 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     MediaItem mediaItem = null;
+
     private void clickOpenSearchOptionBottomSheetFragment(Song song) {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_heart, "Thích"));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_love, "Thích"));
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_download, "Tải xuống"));
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.library_add_24px, "Thêm vào danh sách phát"));
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_next, "Phát tiếp theo"));
@@ -133,7 +143,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         break;
                     case "Phát tiếp theo":
                         int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
-                        MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1 , song);
+                        MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1, song);
                         mediaItem = MediaItem.fromUri(song.getSongURL());
                         MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
                         Toast.makeText(mContext, "Phát tiếp theo clicked", Toast.LENGTH_SHORT).show();
@@ -162,6 +172,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         return 0;
     }
+
     @Override
     public int getItemViewType(int position) {
         Object item = listItems.get(position);
@@ -179,8 +190,11 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private TextView tvSongName, tvArtistName, tvAlbumName, tvOverflowMenu;
         private ImageView imgSong;
 
+        private RelativeLayout container;
+
         public SearchedSongViewHolder(@NonNull View itemView) {
             super(itemView);
+            container = itemView.findViewById(R.id.layout_container);
             tvSongName = itemView.findViewById(R.id.tv_nameSong);
             tvArtistName = itemView.findViewById(R.id.tv_name_artist);
             tvAlbumName = itemView.findViewById(R.id.tv_album_name);
@@ -188,6 +202,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             tvOverflowMenu = itemView.findViewById(R.id.overflow_menu);
         }
     }
+
     public class SearchedArtistViewHolder extends RecyclerView.ViewHolder {
         private TextView tvArtistName;
         private ImageView imgArtist;
@@ -198,6 +213,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             imgArtist = itemView.findViewById(R.id.img_artist);
         }
     }
+
     public class SearchedAlbumViewHolder extends RecyclerView.ViewHolder {
         private TextView tvAlbumName;
         private ImageView imgAlbum;

@@ -43,7 +43,7 @@ public class SearchFilterAdapter extends RecyclerView.Adapter<SearchFilterAdapte
             holder.filterText.setPaintFlags(holder.filterText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         } else {
             // Nếu không phải mục được chọn, đặt màu và gạch chân mặc định
-            holder.filterText.setTextColor(Color.WHITE);
+            holder.filterText.setTextColor(Color.BLACK);
             holder.filterText.setPaintFlags(holder.filterText.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {

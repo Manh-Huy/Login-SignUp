@@ -18,7 +18,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SearchFilterAdapter;
 import com.example.authenticationuseraccount.adapter.SearchSongAdapter;

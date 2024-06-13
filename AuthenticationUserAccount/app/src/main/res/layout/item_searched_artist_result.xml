@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="6dp"
     android:layout_marginTop="10dp"
-    android:layout_marginEnd="10dp">
+    android:layout_marginEnd="10dp"
+    android:background="@drawable/selector_item_local"
+    app:cardCornerRadius="6dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -22,10 +23,10 @@
             android:id="@+id/tv_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Artist"
+            android:layout_marginStart="10dp"
             android:layout_toEndOf="@id/img_artist"
 
-            android:layout_marginStart="10dp"
+            android:text="Artist"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
@@ -33,10 +34,10 @@
             android:id="@+id/tv_artist_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Anh Tu"
-            android:layout_toEndOf="@id/img_artist"
             android:layout_below="@id/tv_artist"
             android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/img_artist"
+            android:text="Anh Tu"
             android:textColor="@color/white"
             android:textSize="16sp" />
 

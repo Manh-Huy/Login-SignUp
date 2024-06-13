@@ -13,13 +13,11 @@ import android.provider.Settings;
 
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.media3.common.MediaItem;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
 
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.adapter.SongAlbumAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
@@ -34,7 +32,6 @@ import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -45,9 +42,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     private UIThread m_vThread;
@@ -84,11 +78,10 @@ public class MainActivity extends AppCompatActivity {
             checkUserPremiumTime(User.getInstance());
             getUserLoveSong(User.getInstance().getUserID());
             getUserListenHistory(User.getInstance().getUserID());
-        }else{
+        } else {
             LogUtils.ApplicationLogE("MainActivity: User Has Not Signed In!");
         }
 
-        askingPermission();
 
         //Notification
         Intent intentFromFCM = getIntent();

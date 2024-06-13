@@ -1,5 +1,7 @@
 package com.example.authenticationuseraccount.fragment;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,12 +10,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.EmailConfirmActivity;
 import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
@@ -33,12 +37,13 @@ public class FragmentCorner extends Fragment {
         return inflater.inflate(R.layout.fragment_corner, container, false);
     }
 
-    private Button btnCreatRoom, btnLeaveRoom, btnJoinRoom;
+    private Button btnCreatRoom, btnLeaveRoom, btnJoinRoom, btnCopyId;
     private FirebaseAuth mAuth;
     private EditText edtUserId;
     private TextView tvUserId;
     private String userID, userName;
     private Context mContext;
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -48,7 +53,7 @@ public class FragmentCorner extends Fragment {
         btnLeaveRoom = view.findViewById(R.id.btn_leave_room);
         btnCreatRoom = view.findViewById(R.id.btn_create_room);
         btnJoinRoom = view.findViewById(R.id.btn_connet_room);
-
+        btnCopyId = view.findViewById(R.id.btn_copy_id);
         mContext = getContext();
         mAuth = FirebaseAuth.getInstance();
 
@@ -102,6 +107,18 @@ public class FragmentCorner extends Fragment {
             }
         });
 
+        btnCopyId.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String textToCopy = tvUserId.getText().toString();
+
+                ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("UserId", textToCopy);
+                clipboard.setPrimaryClip(clip);
+
+                ErrorUtils.showError(mContext,"Copied to clipboard");
+            }
+        });
     }
 
     private void setMediaConrner() {

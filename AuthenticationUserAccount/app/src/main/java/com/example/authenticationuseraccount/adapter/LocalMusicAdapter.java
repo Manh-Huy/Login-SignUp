@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,6 +64,9 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
         holder.tvSongName.setText(song.getTitle());
         holder.tvArtistName.setText(song.getArtistName());
         holder.tvAlbumName.setText(song.getAlbumName());
+        holder.tvSongName.setSelected(true);
+        holder.tvArtistName.setSelected(true);
+        holder.tvAlbumName.setSelected(true);
 
         byte[] image = null;
         try {
@@ -109,7 +113,7 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvSongName, tvArtistName, tvAlbumName, tvOverflowMenu;
         private ImageView imgSong;
-        private RelativeLayout layout;
+        private LinearLayout layout;
 
         public ViewHolder(View itemView) {
             super(itemView);

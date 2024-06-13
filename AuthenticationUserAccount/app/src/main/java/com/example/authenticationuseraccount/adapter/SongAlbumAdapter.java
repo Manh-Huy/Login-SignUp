@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,9 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
         holder.tvSongName.setText(song.getName());
         holder.tvArtistName.setText(song.getArtist());
         holder.tvAlbumName.setText(song.getAlbum());
+        holder.tvSongName.setSelected(true);
+        holder.tvArtistName.setSelected(true);
+        holder.tvAlbumName.setSelected(true);
         Glide.with(mContext)
                 .load(song.getImageURL())
                 .into(holder.imgSong);
@@ -138,7 +142,7 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
     public class SongAlbumViewHolder extends RecyclerView.ViewHolder {
         private TextView tvSongName, tvArtistName, tvAlbumName, tvOverflowMenu;
         private ImageView imgSong;
-        private RelativeLayout layout;
+        private LinearLayout layout;
 
 
         public SongAlbumViewHolder(@NonNull View itemView) {

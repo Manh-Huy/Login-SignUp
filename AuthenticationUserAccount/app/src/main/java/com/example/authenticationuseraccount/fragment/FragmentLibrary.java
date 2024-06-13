@@ -32,6 +32,7 @@ public class FragmentLibrary extends Fragment {
     private Context mContext;
 
     private List<LocalSong> musicList;
+    private LocalMusicAdapter adapter;
 
     @Nullable
     @Override
@@ -47,10 +48,16 @@ public class FragmentLibrary extends Fragment {
 
         FragmentActivity fragmentActivity = (FragmentActivity) getActivity();
 
-        LocalMusicAdapter adapter = new LocalMusicAdapter(mContext,fragmentActivity, musicList);
+         adapter = new LocalMusicAdapter(mContext,fragmentActivity, musicList);
         recyclerView.setAdapter(adapter);
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
     }
 
     @Override

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
 import com.example.authenticationuseraccount.model.ItemSearchOption;
@@ -57,6 +59,15 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
             @Override
             public void onClick(View v) {
                 clickOpenOptionBottomSheetFragment(song);
+            }
+        });
+
+        holder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ErrorUtils.showError(mContext, "Clicked");
+                MediaItemHolder.getInstance().setMediaItem(song);
+                fragmentActivity.finish();
             }
         });
 
@@ -127,9 +138,12 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
     public class SongAlbumViewHolder extends RecyclerView.ViewHolder {
         private TextView tvSongName, tvArtistName, tvAlbumName, tvOverflowMenu;
         private ImageView imgSong;
+        private RelativeLayout layout;
+
 
         public SongAlbumViewHolder(@NonNull View itemView) {
             super(itemView);
+            layout = itemView.findViewById(R.id.layout_container);
             tvSongName = itemView.findViewById(R.id.tv_nameSong);
             tvArtistName = itemView.findViewById(R.id.tv_name_artist);
             tvAlbumName = itemView.findViewById(R.id.tv_album_name);

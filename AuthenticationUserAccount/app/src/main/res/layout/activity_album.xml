@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="#121212"
+    android:background="@drawable/gradient_background"
     tools:context=".activity.AlbumActivity">
 
     <LinearLayout
@@ -20,7 +20,7 @@
             android:id="@+id/playlist_image"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:src="@drawable/img_1"
+            android:src="@drawable/logo"
             android:scaleType="centerCrop"
             android:contentDescription="Playlist Image" />
 
@@ -32,7 +32,7 @@
             android:text="Jazz thư giãn"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:layout_marginTop="16dp" />
 
         <!-- Playlist Subtitle -->
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:text="THK Music"
             android:textSize="14sp"
-            android:textColor="#CCCCCC"
+            android:textColor="#000000"
             android:layout_marginTop="4dp" />
 
         <!-- Playlist Year -->
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:text="2024 • Playlist"
             android:textSize="14sp"
-            android:textColor="#CCCCCC"
+            android:textColor="#000000"
             android:layout_marginTop="4dp" />
 
         <!-- Control Buttons -->
@@ -68,7 +68,7 @@
                 android:src="@drawable/ic_play"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Play"
-                app:tint="#FFFFFF"
+                app:tint="#000000"
                 android:layout_alignParentStart="true" />
 
             <ImageButton
@@ -78,7 +78,7 @@
                 android:src="@drawable/favorite_24px"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Like"
-                app:tint="#FFFFFF"
+                app:tint="#000000"
                 android:layout_toEndOf="@id/play_button"
                 android:layout_marginStart="16dp" />
 
@@ -89,7 +89,7 @@
                 android:src="@drawable/shuffle_24px"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Shuffle"
-                app:tint="#FFFFFF"
+                app:tint="#000000"
                 android:layout_toEndOf="@id/like_button"
                 android:layout_marginStart="16dp" />
 
@@ -100,7 +100,7 @@
                 android:src="@drawable/ic_more"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="More"
-                app:tint="#FFFFFF"
+                app:tint="#000000"
                 android:layout_alignParentEnd="true" />
         </RelativeLayout>
 
@@ -121,7 +121,7 @@
             android:layout_height="wrap_content"
             android:text="52 bài hát"
             android:textSize="14sp"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:layout_marginTop="16dp" />
 
         <androidx.recyclerview.widget.RecyclerView

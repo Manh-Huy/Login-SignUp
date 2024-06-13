@@ -4,9 +4,11 @@
     android:id="@+id/layout_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp"
     android:layout_marginEnd="16dp"
-    >
+
+    android:background="@drawable/gradient_background"
+    android:backgroundTint="@android:color/transparent"
+    app:cardCornerRadius="16dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -18,18 +20,17 @@
             android:id="@+id/card_view_imge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:cardCornerRadius="8dp">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/img_thumbnail"
                 android:layout_width="match_parent"
                 android:layout_height="190dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/chungtacuahientai"
-                />
+                android:src="@drawable/chungtacuahientai" />
 
         </androidx.cardview.widget.CardView>
 

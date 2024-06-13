@@ -3,6 +3,7 @@ package com.example.authenticationuseraccount.activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -31,11 +32,11 @@ public class EmailConfirmActivity extends AppCompatActivity {
         btnConfirmEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_APP_EMAIL);
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:")); // only email apps should handle this
 
                 if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
+                    startActivity(Intent.createChooser(intent, "Choose Email App"));
                 } else {
                     Toast.makeText(EmailConfirmActivity.this, "No email app installed", Toast.LENGTH_SHORT).show();
                 }

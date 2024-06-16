@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
         Date dateFromServer;
 
         try {
-            if ("aN-aN-NaN".equals(expiredDatePremium)) {
+            if ("aN-aN-NaN".equals(expiredDatePremium) || "None".equals(expiredDatePremium) || "none".equals(expiredDatePremium)) {
                 dateFromServer = null;
             } else {
                 dateFromServer = sdf.parse(expiredDatePremium);

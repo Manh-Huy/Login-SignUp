@@ -188,6 +188,8 @@ public class LoginActivity extends AppCompatActivity {
             User.getInstance().setImageURL("");
         }
         User.getInstance().setSignInMethod(signInMethod);
+        User.getInstance().setRole("Normal");
+        User.getInstance().setExpiredDatePremium("None");
         return User.getInstance();
     }
 
@@ -196,11 +198,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 Toast.makeText(LoginActivity.this, "Call Api Add New User Success ", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
             }
-
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-
+                LogUtils.ApplicationLogE("addUser faile " + t.getMessage());
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }
@@ -239,16 +246,16 @@ public class LoginActivity extends AppCompatActivity {
                         if (apiUser.getImageURL() != null) {
                             User.getInstance().setImageURL(apiUser.getImageURL());
                         }
-
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
                 }
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
+                LogUtils.ApplicationLogD("Call getUserById for checkFirstTimeLogin that bai");
             }
         });
     }

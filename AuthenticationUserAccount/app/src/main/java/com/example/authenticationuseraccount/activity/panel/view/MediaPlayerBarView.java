@@ -31,6 +31,8 @@ import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.fragment.FragmentProfile;
+import com.example.authenticationuseraccount.fragment.MyFragmentManager;
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
@@ -324,6 +326,9 @@ public class MediaPlayerBarView {
                     @Override
                     public void onComplete() {
                         LogUtils.ApplicationLogE("Call api love song Complete");
+                        LogUtils.ApplicationLogI("-------------------------------------------------------------");
+                        FragmentProfile fragmentProfile = MyFragmentManager.getInstance().getFragmentProfile();
+                        fragmentProfile.updateUI(user);
                     }
                 });
     }

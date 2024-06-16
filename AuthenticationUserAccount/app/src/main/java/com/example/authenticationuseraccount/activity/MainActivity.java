@@ -1,9 +1,12 @@
 package com.example.authenticationuseraccount.activity;
 
+import static com.example.authenticationuseraccount.common.Constants.PERMISSION_REQUEST_CODE;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
@@ -13,6 +16,8 @@ import android.provider.Settings;
 
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
@@ -74,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (firebaseAuth.getCurrentUser() != null) {
             LogUtils.ApplicationLogI("MainActivity: User Has Signed In!");
-            SocketIoManager.getInstance();
             checkUserPremiumTime(User.getInstance());
             getUserLoveSong(User.getInstance().getUserID());
             getUserListenHistory(User.getInstance().getUserID());
@@ -94,9 +98,13 @@ public class MainActivity extends AppCompatActivity {
     private void askingPermission() {
 
         PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             PermissionManager.requestPermission(this, Manifest.permission.FOREGROUND_SERVICE, 100);
         }
+
+        PermissionManager.requestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, PERMISSION_REQUEST_CODE);
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             PermissionManager.requestPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE, 100);

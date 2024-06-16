@@ -7,4 +7,5 @@ public class Constants {
     public static String NOTIFICATION_SONG_OBJECT = "NOTIFICATION_SONG_OBJECT";
     public static String PREMIUM_USER = "Premium";
     public static String NORMAL_USER = "Normal";
+    public static int PERMISSION_REQUEST_CODE = 100;
 }

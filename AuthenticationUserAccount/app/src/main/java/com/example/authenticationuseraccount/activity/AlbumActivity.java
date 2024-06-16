@@ -77,11 +77,9 @@ public class AlbumActivity extends AppCompatActivity {
             public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
                 switch (itemSearchOption.getText()) {
                     case "Thêm vào danh sách phát":
-                        // Handle "Thích" action
                         Toast.makeText(AlbumActivity.this, "Thêm vào danh sách phát clicked", Toast.LENGTH_SHORT).show();
                         break;
                     case "Phát":
-                        // Handle "Tải xuống" action
                         Toast.makeText(AlbumActivity.this, "Phát clicked", Toast.LENGTH_SHORT).show();
                         break;
                     case "Thích":
@@ -91,7 +89,6 @@ public class AlbumActivity extends AppCompatActivity {
                         Toast.makeText(AlbumActivity.this, "Phát ngẫu nhiên clicked", Toast.LENGTH_SHORT).show();
                         break;
                     default:
-                        // Handle default action
                         Toast.makeText(AlbumActivity.this, "Unknown option clicked", Toast.LENGTH_SHORT).show();
                         break;
                 }

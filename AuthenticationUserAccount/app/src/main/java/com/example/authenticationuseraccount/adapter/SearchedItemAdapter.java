@@ -1,6 +1,9 @@
 package com.example.authenticationuseraccount.adapter;
 
+import static com.example.authenticationuseraccount.common.Constants.PERMISSION_REQUEST_CODE;
+
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.media3.common.MediaItem;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +29,7 @@ import com.example.authenticationuseraccount.model.business.Album;
 import com.example.authenticationuseraccount.model.business.Artist;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.utils.CustomDownloadManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +127,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     MediaItem mediaItem = null;
-
+    FragmentSearchOptionBottomSheet fragmentSearchOptionBottomSheet;
     private void clickOpenSearchOptionBottomSheetFragment(Song song) {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_love, "Thích"));
@@ -130,29 +136,30 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_next, "Phát tiếp theo"));
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_queue, "Thêm vào hàng đợi"));
 
-        FragmentSearchOptionBottomSheet fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
+        fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
             @Override
             public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
                 switch (itemSearchOption.getText()) {
                     case "Thích":
-                        // Handle "Thích" action
                         Toast.makeText(mContext, "Thích clicked", Toast.LENGTH_SHORT).show();
                         break;
                     case "Tải xuống":
-                        // Handle "Tải xuống" action
-                        Toast.makeText(mContext, "Tải xuống clicked", Toast.LENGTH_SHORT).show();
+                        fragmentSearchOptionBottomSheet.dismiss();
+                        HandleDownload(song.getSongURL(),song.getName());
                         break;
                     case "Thêm vào danh sách phát":
                         Toast.makeText(mContext, "Thêm vào danh sách phát clicked", Toast.LENGTH_SHORT).show();
                         break;
                     case "Phát tiếp theo":
+                        fragmentSearchOptionBottomSheet.dismiss();
                         int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
                         MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1, song);
                         mediaItem = MediaItem.fromUri(song.getSongURL());
                         MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
-                        Toast.makeText(mContext, "Phát tiếp theo clicked", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "", Toast.LENGTH_SHORT).show();
                         break;
                     case "Thêm vào hàng đợi":
+                        fragmentSearchOptionBottomSheet.dismiss();
                         MediaItemHolder.getInstance().getListSongs().add(song);
                         mediaItem = MediaItem.fromUri(song.getSongURL());
                         MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
@@ -175,6 +182,17 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             return listItems.size();
         }
         return 0;
+    }
+
+    private void HandleDownload(String fileUrl,String filename) {
+        if (ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(fragmentActivity, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        } else {
+            // Permission already granted, proceed with downloading
+            CustomDownloadManager.getInstance(mContext).downloadFile(fileUrl,filename);
+
+        }
     }
 
     @Override

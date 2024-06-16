@@ -95,9 +95,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging'
 
     //PeerJs x SocketIo
-//    implementation 'io.socket:socket.io-client:1.0.0'
     implementation 'io.socket:socket.io-client:2.0.1'
 
+    //Swipe Refresh
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
 
 }

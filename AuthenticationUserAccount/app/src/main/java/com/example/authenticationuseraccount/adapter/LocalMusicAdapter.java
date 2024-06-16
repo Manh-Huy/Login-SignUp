@@ -45,6 +45,11 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
         this.mFragmentActivity = fragmentActivity;
     }
 
+    public void setData(List<LocalSong> musicList){
+        this.musicList = musicList;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

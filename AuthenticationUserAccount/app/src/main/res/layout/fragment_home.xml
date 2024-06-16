@@ -53,7 +53,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/scoll_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -71,6 +71,7 @@
                     android:id="@+id/viewPager"
                     android:layout_width="match_parent"
                     android:layout_height="128dp"
+                    android:nestedScrollingEnabled="false"
                      />
 
                 <me.relex.circleindicator.CircleIndicator3
@@ -93,6 +94,7 @@
                     android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:nestedScrollingEnabled="false"
                     android:id="@+id/rcv_quick_pick"
                     android:background="@color/mcgpalette0_300"
                     android:layout_width="match_parent"
@@ -112,6 +114,7 @@
                     android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:nestedScrollingEnabled="false"
                     android:id="@+id/rcv_genre"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -130,6 +133,7 @@
                     android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:nestedScrollingEnabled="false"
                     android:id="@+id/rcv_new_release"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -148,6 +152,7 @@
                     android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:nestedScrollingEnabled="false"
                     android:id="@+id/rcv_listen_again"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
@@ -165,6 +170,7 @@
                     android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:nestedScrollingEnabled="false"
                     android:id="@+id/rcv_recommend"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
@@ -182,6 +188,7 @@
                     android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:nestedScrollingEnabled="false"
                     android:id="@+id/rcv_forgotten_favorite"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
@@ -193,7 +200,7 @@
                     android:background="@android:color/transparent" />
             </LinearLayout>
 
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
 
 

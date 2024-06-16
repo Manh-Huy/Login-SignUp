@@ -14,26 +14,31 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.activity.SplashScreenActivity;
 import com.example.authenticationuseraccount.adapter.LocalMusicAdapter;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.LocalSong;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.utils.LocalMusicLoader;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class FragmentLibrary extends Fragment {
+public class FragmentLibrary extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private Context mContext;
 
     private List<LocalSong> musicList;
     private LocalMusicAdapter adapter;
-
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private  FragmentActivity fragmentActivity;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -42,13 +47,15 @@ public class FragmentLibrary extends Fragment {
         mContext = getContext();
 
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-
         musicList = MediaItemHolder.getInstance().getListLocalSong();
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
-        FragmentActivity fragmentActivity = (FragmentActivity) getActivity();
+        fragmentActivity = (FragmentActivity) getActivity();
 
-         adapter = new LocalMusicAdapter(mContext,fragmentActivity, musicList);
+        adapter = new LocalMusicAdapter(mContext,fragmentActivity, musicList);
+        recyclerView.addItemDecoration(new DividerItemDecoration(fragmentActivity,DividerItemDecoration.VERTICAL));
+        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerView.setAdapter(adapter);
 
         return view;
@@ -66,6 +73,13 @@ public class FragmentLibrary extends Fragment {
     }
 
 
+    @Override
+    public void onRefresh() {
+        LogUtils.ApplicationLogI("musicListbe4: " + musicList.size());
+        adapter.setData(LocalMusicLoader.getInstance().loadMusic(fragmentActivity));
+        LogUtils.ApplicationLogI("musicListAfter: " + musicList.size());
+        swipeRefreshLayout.setRefreshing(false);
+    }
 
 
 }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -212,7 +213,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private TextView tvSongName, tvArtistName, tvAlbumName, tvOverflowMenu;
         private ImageView imgSong;
 
-        private LinearLayout container;
+        private ConstraintLayout container;
 
         public SearchedSongViewHolder(@NonNull View itemView) {
             super(itemView);

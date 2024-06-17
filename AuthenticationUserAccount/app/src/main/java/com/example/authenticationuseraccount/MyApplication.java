@@ -23,6 +23,7 @@ public class MyApplication extends Application {
 
     public static final String CHANNEL_ID = "Music Channel";
     public static final String CHANNEL_ID_2 = "Notification Channel";
+    public static final String CHANNEL_ID_3 = "Download Channel";
 
     @Override
     public void onCreate() {
@@ -57,10 +58,12 @@ public class MyApplication extends Application {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
+            //Notification 1
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Music Control Channel", importance);
             channel.setSound(null, null);
 
+            //Notification 2
             int importance2 = NotificationManager.IMPORTANCE_HIGH;
             Uri uri2 = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.rhyderrrr);
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
@@ -69,9 +72,21 @@ public class MyApplication extends Application {
             NotificationChannel channel2 = new NotificationChannel(CHANNEL_ID_2, "Notification From Firebase", importance2);
             channel2.setSound(uri2, audioAttributes);
 
+
+            //Notification 3
+            int importance3 = NotificationManager.IMPORTANCE_MAX;
+            Uri uri3 = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.rhyderrrr);
+            AudioAttributes audioAttributes3 = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build();
+            NotificationChannel channel3 = new NotificationChannel(CHANNEL_ID_3, "Notification From Download", importance3);
+            channel3.setSound(uri3, audioAttributes3);
+
+
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
             notificationManager.createNotificationChannel(channel2);
+            notificationManager.createNotificationChannel(channel3);
 
         }
     }

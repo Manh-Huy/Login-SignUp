@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -172,7 +173,7 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
     public class SongAlbumViewHolder extends RecyclerView.ViewHolder {
         private TextView tvSongName, tvArtistName, tvAlbumName, tvOverflowMenu;
         private ImageView imgSong;
-        private LinearLayout layout;
+        private ConstraintLayout layout;
 
 
         public SongAlbumViewHolder(@NonNull View itemView) {

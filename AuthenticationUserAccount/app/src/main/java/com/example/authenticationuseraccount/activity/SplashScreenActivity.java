@@ -4,6 +4,7 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
@@ -27,6 +30,7 @@ import com.example.authenticationuseraccount.common.PermissionManager;
 import com.example.authenticationuseraccount.model.business.LocalSong;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.utils.CustomDownloadManager;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
 import com.example.authenticationuseraccount.utils.LocalMusicLoader;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -68,6 +72,44 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         askingPermission();
 
+
+    }
+
+    private void askingPermission() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            List<String> permissionsNeeded = new ArrayList<>();
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {
+                permissionsNeeded.add(Manifest.permission.FOREGROUND_SERVICE);
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                    !Environment.isExternalStorageManager()) {
+                permissionsNeeded.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE);
+            }
+
+            if (!permissionsNeeded.isEmpty()) {
+                ActivityCompat.requestPermissions(this, permissionsNeeded.toArray(new String[0]), Constants.PERMISSION_REQUEST_CODE);
+            }else{
+                processWithAppLogic();
+            }
+        }else{
+            processWithAppLogic();
+        }
+    }
+
+    private void processWithAppLogic(){
+        MediaItemHolder.getInstance().setListLocalSong(LocalMusicLoader.getInstance().loadMusic(SplashScreenActivity.this));
         isCallApiGetUser = false;
         isCallApiGetUserLoveSong = false;
         isCallApiGetAllSongInfo = false;
@@ -82,26 +124,40 @@ public class SplashScreenActivity extends AppCompatActivity {
         // Build a GoogleSignInClient with the options specified by gso
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        MediaItemHolder.getInstance().setListLocalSong(LocalMusicLoader.getInstance().loadMusic(SplashScreenActivity.this));
         getNameAllSongInfo();
         checkUserLogin();
     }
 
-    private void askingPermission() {
-
-        PermissionManager.requestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE, 100);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            PermissionManager.requestPermission(this, Manifest.permission.FOREGROUND_SERVICE, 100);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            PermissionManager.requestPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE, 100);
-            if (!Environment.isExternalStorageManager()) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                intent.setData(uri);
-                startActivity(intent);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == Constants.PERMISSION_REQUEST_CODE) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    // Handle the case where the permission was not granted
+                    Toast.makeText(this, "Permission " + permissions[i] + " denied", Toast.LENGTH_SHORT).show();
+                    return;
+                }
             }
+
+            MediaItemHolder.getInstance().setListLocalSong(LocalMusicLoader.getInstance().loadMusic(SplashScreenActivity.this));
+            isCallApiGetUser = false;
+            isCallApiGetUserLoveSong = false;
+            isCallApiGetAllSongInfo = false;
+
+            // Configure google Sign in
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(Constants.DEFAULT_WEB_CLIENT_ID)
+                    .requestEmail()
+                    .build();
+
+            mAuth = FirebaseAuth.getInstance();
+            // Build a GoogleSignInClient with the options specified by gso
+            mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+            getNameAllSongInfo();
+            checkUserLogin();
+            // All permissions are granted, proceed with your logic
         }
     }
 

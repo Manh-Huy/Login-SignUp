@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.media3.common.MediaItem;
 import androidx.recyclerview.widget.RecyclerView;
@@ -118,7 +119,7 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvSongName, tvArtistName, tvAlbumName, tvOverflowMenu;
         private ImageView imgSong;
-        private LinearLayout layout;
+        private ConstraintLayout layout;
 
         public ViewHolder(View itemView) {
             super(itemView);

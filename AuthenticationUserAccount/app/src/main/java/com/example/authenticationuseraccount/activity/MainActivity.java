@@ -33,6 +33,7 @@ import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.MusicService;
 import com.example.authenticationuseraccount.service.UIThread;
 import com.example.authenticationuseraccount.utils.BackEventHandler;
+import com.example.authenticationuseraccount.utils.CustomDownloadManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -330,6 +331,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         LogUtils.ApplicationLogE("MainActivity onDestroy");
+
+        CustomDownloadManager.getInstance(MainActivity.this).unregisterReceiver();
+
         if (m_vThread.getListener() != null) {
             MediaItemHolder.getInstance().getMediaController().removeListener(m_vThread.getListener());
         }

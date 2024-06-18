@@ -75,7 +75,7 @@ public class MyApplication extends Application {
 
             //Notification 3
             int importance3 = NotificationManager.IMPORTANCE_MAX;
-            Uri uri3 = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.rhyderrrr);
+            Uri uri3 = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.trollkid);
             AudioAttributes audioAttributes3 = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();

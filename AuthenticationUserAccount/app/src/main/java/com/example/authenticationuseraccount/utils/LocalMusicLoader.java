@@ -9,13 +9,15 @@ import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.LocalSong;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LocalMusicLoader {
     private static LocalMusicLoader instance;
 
     // Private constructor to prevent instantiation
-    private LocalMusicLoader() { }
+    private LocalMusicLoader() {
+    }
 
     // Public method to provide access to the singleton instance
     public static synchronized LocalMusicLoader getInstance() {
@@ -34,15 +36,21 @@ public class LocalMusicLoader {
         String sortOrder = "_display_name ASC";
         Cursor cursor = activity.getContentResolver().query(uri, CURSOR_PROJECTION, selection, null, sortOrder);
 
+        /*List<String> columeName = Arrays.asList(cursor.getColumnNames());
+
+        for (String columnName : columeName) {
+            LogUtils.ApplicationLogI("Column Name "+ columnName);
+        }
+*/
         if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 int id = Integer.parseInt(getCursorStringByIndex(cursor, "_id"));
                 String artistName = getCursorStringByIndex(cursor, "artist");
                 String albumName = getCursorStringByIndex(cursor, "album");
                 String title = getCursorStringByIndex(cursor, "title");
+                long duration = getCursorLongByIndex(cursor, "duration");
                 String displayName = getCursorStringByIndex(cursor, "_display_name");
                 String data = getCursorStringByIndex(cursor, "_data");
-                long duration = getCursorLongByIndex(cursor, "duration");
 
                 if (artistName == null || artistName.isEmpty())
                     artistName = "<unknown>";
@@ -62,7 +70,10 @@ public class LocalMusicLoader {
                         displayName,
                         songUri));
 
-                LogUtils.ApplicationLogI("Local Music title: " + title + " artist: " + artistName + " songUri: " + songUri + " data: " + data);
+                //download Uri realpath: /storage/emulated/0/Music/Dưới Tòa Sen Vàng - Remix.mp3
+                //Local Music songUri: /storage/emulated/0/Download/ngot.mp3 data: /storage/emulated/0/Download/ngot.mp3
+                LogUtils.ApplicationLogE("Local Music songUri: " + songUri + " data: " + data);
+                LogUtils.ApplicationLogE("Local Music albumname: " + albumName + " displayName: " + displayName + " title: " + title);
             }
             cursor.close(); // Ensure the cursor is closed after use
         }

@@ -12,13 +12,21 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.media3.common.MediaItem;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.authenticationuseraccount.MyApplication;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
@@ -26,6 +34,7 @@ import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -91,24 +100,10 @@ public class CustomDownloadManager {
             if (downloadID == id) {
                 // Download completed
                 LogUtils.ApplicationLogI("onReceive BroadCast complete download");
-
-
-                DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-                if (downloadManager != null) {
-                    DownloadManager.Query query = new DownloadManager.Query();
-                    query.setFilterById(downloadID);
-                    Cursor cursor = downloadManager.query(query);
-                    if (cursor.moveToFirst()) {
-                        int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI);
-                        String downloadedFileUriString = cursor.getString(columnIndex);
-                        Uri downloadedFileUri = Uri.parse(downloadedFileUriString);
-
-                        // Convert file to MyClass object
-                        //Song song = convertFileToMyClass(new File(downloadedFileUri.getPath()));
-                        ErrorUtils.showError(context, "onReceive BroadCast complete download: " + downloadedFileUri);
-                        LogUtils.ApplicationLogI("download Uri: " + downloadedFileUri);
-                    }
-                    cursor.close();
+                try {
+                    getDownloadedFileInfo(context, downloadID);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
 
             }
@@ -116,15 +111,77 @@ public class CustomDownloadManager {
 
     };
 
-    private Song convertFileToMyClass(File file) {
-        Gson gson = new Gson();
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            return gson.fromJson(br, Song.class);
-        } catch (IOException e) {
-            ErrorUtils.showError(context, "Error converting file to MyClass");
-            return null;
+    private void getDownloadedFileInfo(Context context, long downloadID) throws IOException {
+        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Query query = new DownloadManager.Query();
+        query.setFilterById(downloadID);
+        Cursor cursor = downloadManager.query(query);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
+            int status = cursor.getInt(columnIndex);
+
+            if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                // Retrieve details
+                String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                Uri fileUri = Uri.parse(uriString);
+                File file = new File(fileUri.getPath());
+                LogUtils.ApplicationLogI("download Uri realpath: " + fileUri.getPath());
+
+                // Extract metadata
+                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(file.getAbsolutePath());
+                LogUtils.ApplicationLogI("download Uri AbsolutePath: " + fileUri.getPath());
+
+                String title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                String artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+                String album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+                String albumArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
+                String duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                String genre = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
+                String imgUrl = fileUri.getPath();
+                String songUrl = fileUri.getPath();
+                Song song = new Song(artist, album, imgUrl, title, genre, "hfewiluhfs", "0", songUrl);
+                String strTitle = "THK download";
+                String strMessage = title + " has been downloaded";
+
+                retriever.setDataSource(fileUri.getPath());
+                byte[] art = retriever.getEmbeddedPicture();
+                Glide.with(context)
+                        .asBitmap()
+                        .load(art).into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                sendMediaNotification(song, strTitle, strMessage, resource);
+                            }
+
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                            }
+                        });
+
+
+                retriever.release();
+
+
+                // Display or use the metadata
+                LogUtils.ApplicationLogE("Downloaded File Info " + "Title: " + title);
+                LogUtils.ApplicationLogE("Downloaded File Info " + "Artist: " + artist);
+                LogUtils.ApplicationLogE("Downloaded File Info " + "Album: " + album);
+                LogUtils.ApplicationLogE("Downloaded File Info " + "Duration: " + duration);
+                LogUtils.ApplicationLogE("Downloaded File Info " + "AlbumArtist: " + albumArtist);
+                LogUtils.ApplicationLogE("Downloaded File Info " + "Genre: " + genre);
+
+            } else {
+                // Handle download failure
+                int reasonIndex = cursor.getColumnIndex(DownloadManager.COLUMN_REASON);
+                int reason = cursor.getInt(reasonIndex);
+                LogUtils.ApplicationLogE("Downloaded File Info " + "Reason: " + reason);
+            }
+            cursor.close();
         }
     }
+
 
     private void sendMediaNotification(Song song, String strTitle, String strMsg, Bitmap bitmap) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -134,7 +191,7 @@ public class CustomDownloadManager {
         intent.putExtras(bundle);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification notification = new NotificationCompat.Builder(context, MyApplication.CHANNEL_ID_2)
+        Notification notification = new NotificationCompat.Builder(context, MyApplication.CHANNEL_ID_3)
                 .setContentTitle(strTitle)
                 .setContentText(strMsg)
                 .setSmallIcon(R.drawable.logo)

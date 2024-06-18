@@ -198,7 +198,7 @@ public class CustomDownloadManager {
                 .setLargeIcon(bitmap)
                 .setContentIntent(pendingIntent)
                 .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon((Bitmap) null))
-                .setAutoCancel(false)
+                .setAutoCancel(true)
                 .build();
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

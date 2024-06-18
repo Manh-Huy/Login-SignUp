@@ -11,8 +11,8 @@ public class ChillCornerRoomManager {
     private List<String> listUser;
     private boolean isCreated;
     private static ChillCornerRoomManager instance;
-
     private Song currentPlaySong;
+
     private ChillCornerRoomManager() {
         listUser = new ArrayList<>();
         isCreated = false;
@@ -54,11 +54,12 @@ public class ChillCornerRoomManager {
     }
 
     public boolean isCurrentUserHost() {
-        if(roomId == null){
+        if (roomId == null) {
             return false;
         }
         return roomId.equals(currentUserId);
     }
+
     public List<String> getListUser() {
         return listUser;
     }

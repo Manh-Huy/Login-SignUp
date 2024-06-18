@@ -33,7 +33,6 @@ public class SocketIoManager {
 
     private SocketIoManager() {
         gson = new Gson();
-
         ChillCornerRoomManager.getInstance();
 
         try {
@@ -56,8 +55,11 @@ public class SocketIoManager {
                     LogUtils.ApplicationLogI("Connection Error!");
                 }
             });
+
             listenForRoomEvent();
+
             mSocket.connect();
+
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -90,7 +92,9 @@ public class SocketIoManager {
                 //Only host receive this event
                 LogUtils.ApplicationLogI("setRoomId: " + args[0].toString());
                 ChillCornerRoomManager.getInstance().setRoomId(args[0].toString());
+                ChillCornerRoomManager.getInstance().setCurrentUserId(args[0].toString());
                 ChillCornerRoomManager.getInstance().setCreated(true);
+
                 UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -103,12 +107,8 @@ public class SocketIoManager {
         }).on("on-join-room", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                //Add useriD from Server
-                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
-                    ChillCornerRoomManager.getInstance().setCurrentUserId(args[0].toString());
-                    LogUtils.ApplicationLogI("setCurrentUserId: " + args[0].toString());
-                }
-                //Add useriD from Server to list
+
+                //Add userName from Server to list
                 ChillCornerRoomManager.getInstance().getListUser().add(args[0].toString());
                 LogUtils.ApplicationLogI("on-join-room: this user has joined room: " + (String) args[0]);
 
@@ -117,8 +117,8 @@ public class SocketIoManager {
                     UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            UIThread.getInstance().onRoomCreate();
-                            ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), "Room Joined! Let's listen together!");
+                            UIThread.getInstance().onRoomJoined();
+                            //ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), "Room Joined! Let's listen together!");
                         }
                     });
                 }
@@ -132,7 +132,6 @@ public class SocketIoManager {
                     String data = (String) args[0];
                     JSONObject jsonData = new JSONObject(data);
                     Song song = gson.fromJson(jsonData.toString(), Song.class);
-
 
                     LogUtils.ApplicationLogI("on-song-added Deserialise name: " + song.getName() + " artist: " + song.getArtist());
                     ChillCornerRoomManager.getInstance().setCurrentPlaySong(song);
@@ -153,19 +152,35 @@ public class SocketIoManager {
         });
     }
 
-    public void createRoom(String userId) {
-        mSocket.emit("create-room", userId);
-    }
-
-    public void joinRoom(String userHostId, String currentUserID) {
+    public void createRoom(String userId, String username) {
         JSONObject data = new JSONObject();
         try {
-            data.put("roomId", userHostId);
-            data.put("userId", currentUserID);
+            data.put("roomID", userId);
+            data.put("userName", username);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+        mSocket.emit("create-room", data);
+    }
+
+    public void joinRoom(String userHostId, String currentUserID, String userName) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomId", userHostId);
+            data.put("userName", userName);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
         mSocket.emit("join-room", data);
+
+        if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+            ChillCornerRoomManager.getInstance().setCurrentUserId(currentUserID);
+            LogUtils.ApplicationLogI("setCurrentUserId: " + currentUserID);
+        }
+        ChillCornerRoomManager.getInstance().setRoomId(userHostId);
+            LogUtils.ApplicationLogI("setRoomId: " + userHostId);
+
     }
 
     public void onAddSong(String roomId, Song song) {

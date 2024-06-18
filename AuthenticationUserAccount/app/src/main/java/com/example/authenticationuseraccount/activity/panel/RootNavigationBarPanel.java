@@ -24,8 +24,15 @@ public class RootNavigationBarPanel extends BasePanelView {
     private ViewPager2 rootViewPager;
     private ReadableBottomBar rootNavigationBar;
 
+    private FragmentHome fragmentHome;
+    private FragmentCorner fragmentCorner;
+    private FragmentLibrary fragmentLibrary;
+    private FragmentProfile fragmentProfile;
+
+    private Context mContext;
     public RootNavigationBarPanel(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
         super(context, panelLayout);
+        mContext = context;
         getContext().setTheme(R.style.Theme_AuthenticationUserAccount);
         LayoutInflater.from(getContext()).inflate(R.layout.layout_root_navigation_bar, this, true);
     }
@@ -35,6 +42,11 @@ public class RootNavigationBarPanel extends BasePanelView {
         this.setPanelState(COLLAPSED);
         this.setSlideDirection(MultiSlidingUpPanelLayout.SLIDE_VERTICAL);
         this.setPeakHeight(getNavigationBarHeight());
+
+        fragmentHome = new FragmentHome();
+        fragmentCorner = new FragmentCorner();
+        fragmentLibrary = new FragmentLibrary();
+        fragmentProfile = new FragmentProfile();
     }
 
     @Override
@@ -42,11 +54,12 @@ public class RootNavigationBarPanel extends BasePanelView {
         rootViewPager = getMultiSlidingUpPanel().findViewById(R.id.root_view_pager);
         rootNavigationBar = findViewById(R.id.root_navigation_bar);
 
+
         StateFragmentAdapter adapter = new StateFragmentAdapter(getSupportFragmentManager(), getLifecycle());
-        adapter.addFragment(new FragmentHome());
-        adapter.addFragment(new FragmentCorner());
-        adapter.addFragment(new FragmentLibrary());
-        adapter.addFragment(new FragmentProfile());
+        adapter.addFragment(fragmentHome);
+        adapter.addFragment(fragmentCorner);
+        adapter.addFragment(fragmentLibrary);
+        adapter.addFragment(fragmentProfile);
 
         rootViewPager.setAdapter(adapter);
         rootNavigationBar.setupWithViewPager2(rootViewPager);
@@ -81,6 +94,12 @@ public class RootNavigationBarPanel extends BasePanelView {
     public void onRoomCreate() {
         rootViewPager.setCurrentItem(0);
         rootNavigationBar.setupWithViewPager2(rootViewPager);
+        rootViewPager.setCurrentItem(1);
+        rootNavigationBar.setupWithViewPager2(rootViewPager);
+    }
+
+    public void onRoomJoined() {
+        fragmentCorner.onRoomJoined(mContext);
     }
 }
 

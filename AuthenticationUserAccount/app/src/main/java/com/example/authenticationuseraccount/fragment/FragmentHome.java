@@ -87,7 +87,7 @@ public class FragmentHome extends Fragment {
     private List<Genre> mListGenre = new ArrayList<>();
     private List<Song> mListSong = new ArrayList<>();
     private List<Song> listNewReleaseSong;
-    private final int numberSongShowInQuickPick = 10;
+    private final int numberSongShowInQuickPick = 5;
     private List<Song> listSongRecent = new ArrayList<>();
     private List<Song> listSongRecommend = new ArrayList<>();
     private List<Song> listSongQuickPick = new ArrayList<>();

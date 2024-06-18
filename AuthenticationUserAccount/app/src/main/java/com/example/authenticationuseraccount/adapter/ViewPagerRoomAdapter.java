@@ -1,5 +1,7 @@
 package com.example.authenticationuseraccount.adapter;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -10,8 +12,13 @@ import com.example.authenticationuseraccount.fragment.ConversationFragment;
 import com.example.authenticationuseraccount.fragment.ParticipantsFragment;
 
 public class ViewPagerRoomAdapter extends FragmentStatePagerAdapter {
+
+    private ParticipantsFragment participantsFragment;
+    private ConversationFragment conversationFragment;
     public ViewPagerRoomAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
+        participantsFragment = new ParticipantsFragment();
+        conversationFragment = new ConversationFragment();
     }
 
     @NonNull
@@ -19,11 +26,11 @@ public class ViewPagerRoomAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new ParticipantsFragment();
+                return participantsFragment;
             case 1:
-                return new ConversationFragment();
+                return conversationFragment;
             default:
-                return new ParticipantsFragment();
+                return participantsFragment;
         }
     }
 
@@ -45,5 +52,9 @@ public class ViewPagerRoomAdapter extends FragmentStatePagerAdapter {
                 break;
         }
         return title;
+    }
+
+    public void onRoomJoined(Context context){
+        participantsFragment.onRoomJoined(context);
     }
 }

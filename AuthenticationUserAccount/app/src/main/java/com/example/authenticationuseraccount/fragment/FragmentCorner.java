@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,16 +18,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.activity.EmailConfirmActivity;
-import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
-import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 
 public class FragmentCorner extends Fragment {
@@ -39,7 +34,7 @@ public class FragmentCorner extends Fragment {
         return inflater.inflate(R.layout.fragment_corner, container, false);
     }
 
-    private Button btnCreatRoom, btnLeaveRoom, btnJoinRoom, btnCopyId;
+    private Button btnCreatRoom, btnJoinRoom, btnCopyId;
     private FirebaseAuth mAuth;
     private EditText edtUserId;
     private TextView tvUserId;
@@ -48,18 +43,21 @@ public class FragmentCorner extends Fragment {
 
     private FrameLayout frameLayout;
 
+    private FragmentRoom fragmentRoom;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         edtUserId = view.findViewById(R.id.edt_enter_room);
         tvUserId = view.findViewById(R.id.tv_user_id);
-        btnLeaveRoom = view.findViewById(R.id.btn_leave_room);
         btnCreatRoom = view.findViewById(R.id.btn_create_room);
         btnJoinRoom = view.findViewById(R.id.btn_connet_room);
         btnCopyId = view.findViewById(R.id.btn_copy_id);
         frameLayout = view.findViewById(R.id.fragment_container);
         mContext = getContext();
         mAuth = FirebaseAuth.getInstance();
+
+        fragmentRoom = new FragmentRoom();
 
         frameLayout.setVisibility(View.GONE);
 
@@ -73,22 +71,24 @@ public class FragmentCorner extends Fragment {
         btnCreatRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                frameLayout.setVisibility(View.VISIBLE);
-//                if (mAuth.getCurrentUser() != null) {
-//                    if (userSingleTon.getRole().equals(Constants.PREMIUM_USER)) {
-//                        SocketIoManager.getInstance().createRoom(userID);
-//                    } else {
-//                        ErrorUtils.showError(getContext(), "Please Upgrad To Premium To Continue");
-//                    }
-//                } else {
-//                    ErrorUtils.showError(getContext(), "Please Login To Create Room");
-//                }
-                // Replace fragment
-                FragmentRoom fragmentRoom = new FragmentRoom();
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, fragmentRoom);
-                transaction.addToBackStack(null);
-                transaction.commit();
+                if (mAuth.getCurrentUser() != null) {
+                    if (userSingleTon.getRole().equals(Constants.PREMIUM_USER)) {
+                        SocketIoManager.getInstance().createRoom(userID, userName);
+
+                        frameLayout.setVisibility(View.VISIBLE);
+                        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.fragment_container, fragmentRoom);
+                        transaction.addToBackStack(null);
+                        transaction.commit();
+
+                    } else {
+                        ErrorUtils.showError(getContext(), "Please Upgrad To Premium To Continue");
+                    }
+                } else {
+                    ErrorUtils.showError(getContext(), "Please Login To Create Room");
+
+                }
+
             }
         });
 
@@ -100,23 +100,13 @@ public class FragmentCorner extends Fragment {
                     ErrorUtils.showError(mContext, "Room ID cannot be empty");
                 } else {
                     if (mAuth.getCurrentUser() != null) {
-                        SocketIoManager.getInstance().joinRoom(roomId, userID);
+                        SocketIoManager.getInstance().joinRoom(roomId, userID,userSingleTon.getUsername());
                         edtUserId.setText("");
                     } else {
                         ErrorUtils.showError(getContext(), "Please Login To Join Room");
                     }
 
                 }
-            }
-        });
-
-        btnLeaveRoom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Song song = new Song();
-                song.setName("KhaiTran");
-                song.setArtist("TinNguyen");
-                SocketIoManager.getInstance().onAddSong(userID, song);
             }
         });
 
@@ -129,9 +119,19 @@ public class FragmentCorner extends Fragment {
                 ClipData clip = ClipData.newPlainText("UserId", textToCopy);
                 clipboard.setPrimaryClip(clip);
 
-                ErrorUtils.showError(mContext,"Copied to clipboard");
+                ErrorUtils.showError(mContext, "Copied to clipboard");
             }
         });
+    }
+
+    public void onRoomJoined(Context context){
+        frameLayout.setVisibility(View.VISIBLE);
+        // Replace fragment
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragmentRoom);
+        transaction.addToBackStack(null);
+        transaction.commit();
+        fragmentRoom.onRoomJoined(context);
     }
 
     private void setMediaConrner() {

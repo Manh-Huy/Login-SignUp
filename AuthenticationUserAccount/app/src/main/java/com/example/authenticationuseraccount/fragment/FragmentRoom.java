@@ -31,14 +31,11 @@ public class FragmentRoom extends Fragment {
 
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
-    private EditText idInput;
-    private Button copyButton, outRoomButton;
+    private Button outRoomButton;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        idInput = view.findViewById(R.id.id_input);
-        copyButton = view.findViewById(R.id.copy_button);
         outRoomButton = view.findViewById(R.id.out_room_button);
         mTabLayout = view.findViewById(R.id.tab_layout);
         mViewPager = view.findViewById(R.id.view_pager);
@@ -47,19 +44,6 @@ public class FragmentRoom extends Fragment {
         mViewPager.setAdapter(viewPagerAdapter);
 
         mTabLayout.setupWithViewPager(mViewPager);
-
-        copyButton.setOnClickListener(v -> {
-            String textToCopy = idInput.getText().toString();
-            if (!textToCopy.isEmpty()) {
-                ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("Copied Text", textToCopy);
-                clipboard.setPrimaryClip(clip);
-
-                Toast.makeText(getContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Nothing to copy", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         outRoomButton.setOnClickListener(v -> {
             FragmentCorner fragmentCorner = new FragmentCorner();

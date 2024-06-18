@@ -41,6 +41,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 public class CustomDownloadManager {
@@ -111,6 +112,32 @@ public class CustomDownloadManager {
 
     };
 
+    private void sendMediaNotification(Song song, String strTitle, String strMsg, Bitmap bitmap) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setAction(Constants.NOTIFICATION_ACTION_CLICK);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(Constants.NOTIFICATION_SONG_OBJECT, song);
+        intent.putExtras(bundle);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification notification = new NotificationCompat.Builder(context, MyApplication.CHANNEL_ID_3)
+                .setContentTitle(strTitle)
+                .setContentText(strMsg)
+                .setSmallIcon(R.drawable.logo)
+                .setLargeIcon(bitmap)
+                .setContentIntent(pendingIntent)
+                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon((Bitmap) null))
+                .setAutoCancel(true)
+                .build();
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(getNotificationId(), notification);
+    }
+
+    private int getNotificationId() {
+        return (int) new Date().getTime();
+    }
+
     private void getDownloadedFileInfo(Context context, long downloadID) throws IOException {
         DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Query query = new DownloadManager.Query();
@@ -125,13 +152,11 @@ public class CustomDownloadManager {
                 // Retrieve details
                 String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
                 Uri fileUri = Uri.parse(uriString);
-                File file = new File(fileUri.getPath());
                 LogUtils.ApplicationLogI("download Uri realpath: " + fileUri.getPath());
 
-                // Extract metadata
+                // Use a ContentResolver to open the file
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                retriever.setDataSource(file.getAbsolutePath());
-                LogUtils.ApplicationLogI("download Uri AbsolutePath: " + fileUri.getPath());
+                retriever.setDataSource(context, fileUri);
 
                 String title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                 String artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
@@ -160,9 +185,7 @@ public class CustomDownloadManager {
                             }
                         });
 
-
                 retriever.release();
-
 
                 // Display or use the metadata
                 LogUtils.ApplicationLogE("Downloaded File Info " + "Title: " + title);
@@ -180,33 +203,6 @@ public class CustomDownloadManager {
             }
             cursor.close();
         }
-    }
-
-
-    private void sendMediaNotification(Song song, String strTitle, String strMsg, Bitmap bitmap) {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setAction(Constants.NOTIFICATION_ACTION_CLICK);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(Constants.NOTIFICATION_SONG_OBJECT, song);
-        intent.putExtras(bundle);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification notification = new NotificationCompat.Builder(context, MyApplication.CHANNEL_ID_3)
-                .setContentTitle(strTitle)
-                .setContentText(strMsg)
-                .setSmallIcon(R.drawable.logo)
-                .setLargeIcon(bitmap)
-                .setContentIntent(pendingIntent)
-                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon((Bitmap) null))
-                .setAutoCancel(true)
-                .build();
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(getNotificationId(), notification);
-    }
-
-    private int getNotificationId() {
-        return (int) new Date().getTime();
     }
 
 }

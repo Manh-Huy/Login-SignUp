@@ -134,7 +134,7 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
 
     private byte[] getAlbumArt(String path) throws IOException {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(path);
+        retriever.setDataSource(mContext, Uri.parse(path));
         byte[] art = retriever.getEmbeddedPicture();
         retriever.release();
         return art;

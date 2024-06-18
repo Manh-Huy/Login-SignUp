@@ -166,7 +166,7 @@ public class CustomDownloadManager {
                 String genre = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
                 String imgUrl = fileUri.getPath();
                 String songUrl = fileUri.getPath();
-                Song song = new Song(artist, album, imgUrl, title, genre, "hfewiluhfs", "0", songUrl);
+                Song song = new Song(artist, album, imgUrl, title, genre, null, "0", songUrl);
                 String strTitle = "THK download";
                 String strMessage = title + " has been downloaded";
 

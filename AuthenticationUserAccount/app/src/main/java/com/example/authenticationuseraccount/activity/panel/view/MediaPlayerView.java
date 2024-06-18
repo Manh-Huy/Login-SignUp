@@ -216,7 +216,7 @@ public class MediaPlayerView {
         this.materialCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (user == null) {
+                if (FirebaseAuth.getInstance().getCurrentUser() == null) {
                     materialCheckBox.setChecked(false);
                     ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
                 } else {
@@ -308,14 +308,14 @@ public class MediaPlayerView {
     }
 
     private void updateUserHistory() {
-        if (user != null) {
-            ListenHistory listenHistory = getSongHistory(user.getUid(), 1);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
+            ListenHistory listenHistory = getSongHistory(FirebaseAuth.getInstance().getCurrentUser().getUid(), 1);
             LogUtils.ApplicationLogI("Trigger Call Update History!");
             triggerAPICall(listenHistory);
-            MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
         } else {
-            triggerSaveLocal();
             MediaItemHolder.getInstance().setSaveUserHistoryTriggered(true);
+            triggerSaveLocal();
             showUserLocalHistory();
         }
     }
@@ -334,6 +334,10 @@ public class MediaPlayerView {
     private void triggerSaveLocal() {
         LogUtils.ApplicationLogI("Trigger Local Call Update History!");
         ListenHistory listenHistory = getSongHistory("Local", 1);
+        if(listenHistory.getSongID() == null){
+            LogUtils.ApplicationLogI("Local Song! Not Going To Update History");
+            return;
+        }
         DataLocalManager.setListenHistory(listenHistory);
     }
 
@@ -384,7 +388,7 @@ public class MediaPlayerView {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
                     LogUtils.ApplicationLogD("Update User History! " + listenHistory.getSongID());
-                    getUserLoveSong(user.getUid());
+                    getUserLoveSong(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 }, throwable -> {
                     LogUtils.ApplicationLogE("Upload Failed");
                 });
@@ -401,8 +405,7 @@ public class MediaPlayerView {
         Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
         songID = song.getSongID();
         songName = song.getName();
-        LogUtils.ApplicationLogI("song in list: " + song.getName() + " song in media: " + currentSongName);
-        LogUtils.ApplicationLogI("artist in list: " + song.getArtist() + " artist in media: " + currentSongArtist);
+
         LogUtils.ApplicationLogD("Song about to saved: " + songName);
 
         DateTimeFormatter formatter = null;

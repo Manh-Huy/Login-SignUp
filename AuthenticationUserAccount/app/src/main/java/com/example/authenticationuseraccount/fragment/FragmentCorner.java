@@ -9,12 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.EmailConfirmActivity;
@@ -44,6 +46,7 @@ public class FragmentCorner extends Fragment {
     private String userID, userName;
     private Context mContext;
 
+    private FrameLayout frameLayout;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -54,8 +57,11 @@ public class FragmentCorner extends Fragment {
         btnCreatRoom = view.findViewById(R.id.btn_create_room);
         btnJoinRoom = view.findViewById(R.id.btn_connet_room);
         btnCopyId = view.findViewById(R.id.btn_copy_id);
+        frameLayout = view.findViewById(R.id.fragment_container);
         mContext = getContext();
         mAuth = FirebaseAuth.getInstance();
+
+        frameLayout.setVisibility(View.GONE);
 
         User userSingleTon = User.getInstance();
         if (userSingleTon != null) {
@@ -67,15 +73,22 @@ public class FragmentCorner extends Fragment {
         btnCreatRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mAuth.getCurrentUser() != null) {
-                    if (userSingleTon.getRole().equals(Constants.PREMIUM_USER)) {
-                        SocketIoManager.getInstance().createRoom(userID);
-                    } else {
-                        ErrorUtils.showError(getContext(), "Please Upgrad To Premium To Continue");
-                    }
-                } else {
-                    ErrorUtils.showError(getContext(), "Please Login To Create Room");
-                }
+                frameLayout.setVisibility(View.VISIBLE);
+//                if (mAuth.getCurrentUser() != null) {
+//                    if (userSingleTon.getRole().equals(Constants.PREMIUM_USER)) {
+//                        SocketIoManager.getInstance().createRoom(userID);
+//                    } else {
+//                        ErrorUtils.showError(getContext(), "Please Upgrad To Premium To Continue");
+//                    }
+//                } else {
+//                    ErrorUtils.showError(getContext(), "Please Login To Create Room");
+//                }
+                // Replace fragment
+                FragmentRoom fragmentRoom = new FragmentRoom();
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, fragmentRoom);
+                transaction.addToBackStack(null);
+                transaction.commit();
             }
         });
 

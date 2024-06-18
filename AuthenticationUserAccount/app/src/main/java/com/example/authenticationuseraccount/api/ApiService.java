@@ -149,7 +149,11 @@ public interface ApiService {
     @Multipart
     @PATCH("users/{id}")
     Call<String> updateUserProfile(@Path("id") String userID, @Part("username")RequestBody username, @Part MultipartBody.Part url);
+
+    @POST("listenHistory/createMultipleHistory")
+    Completable mergeListenHistoryLocalToAccount(@Body List<ListenHistory> listListenHistory);
 }
+
 
 
 

@@ -323,10 +323,12 @@ public class MediaPlayerView {
     private void showUserLocalHistory() { // hàm này chỉ có tác dụng log ra để xem lưu local listen history thôi
         LogUtils.ApplicationLogI("Show History!");
         List<ListenHistory> listenHistories = DataLocalManager.getListenHistory();
+
         for (ListenHistory history : listenHistories) {
             String logMessage = "SongID: " + history.getSongID() +
                     ", Count: " + history.getCount() +
-                    ", IsLove: " + history.isLove();
+                    ", IsLove: " + history.isLove() +
+                    ", Date: " + history.getLastListen();
             LogUtils.ApplicationLogI(logMessage);
         }
     }

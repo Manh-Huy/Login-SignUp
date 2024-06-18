@@ -3,6 +3,7 @@ package com.example.authenticationuseraccount.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -19,6 +20,7 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -34,6 +36,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -246,9 +252,20 @@ public class LoginActivity extends AppCompatActivity {
                         if (apiUser.getImageURL() != null) {
                             User.getInstance().setImageURL(apiUser.getImageURL());
                         }
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+
+                        List<ListenHistory> listenHistories = DataLocalManager.getListenHistory();
+
+                        if (!listenHistories.isEmpty()) {
+                            for (ListenHistory listenHistory : listenHistories) {
+                                listenHistory.setUserID(id);
+                            }
+                            mergeListenHistoryLocalToAccount(listenHistories);
+                        }
+                        else {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
                 }
             }
@@ -260,5 +277,20 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("CheckResult")
+    private void mergeListenHistoryLocalToAccount(List<ListenHistory> listenHistory) {
 
+        ApiService.apiService.mergeListenHistoryLocalToAccount(listenHistory)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("mergeListenHistoryLocalToAccount thanh cong!");
+                    DataLocalManager.deleteListenHistory();
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("mergeListenHistoryLocalToAccount that bai");
+                });
+    }
 }

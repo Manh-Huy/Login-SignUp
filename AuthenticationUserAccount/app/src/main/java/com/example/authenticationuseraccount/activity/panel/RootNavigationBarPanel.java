@@ -12,7 +12,10 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.StateFragmentAdapter;
-import com.example.authenticationuseraccount.fragment.MyFragmentManager;
+import com.example.authenticationuseraccount.fragment.FragmentCorner;
+import com.example.authenticationuseraccount.fragment.FragmentHome;
+import com.example.authenticationuseraccount.fragment.FragmentLibrary;
+import com.example.authenticationuseraccount.fragment.FragmentProfile;
 import com.realgear.multislidinguppanel.BasePanelView;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 import com.realgear.readable_bottom_bar.ReadableBottomBar;
@@ -40,14 +43,14 @@ public class RootNavigationBarPanel extends BasePanelView {
         rootNavigationBar = findViewById(R.id.root_navigation_bar);
 
         StateFragmentAdapter adapter = new StateFragmentAdapter(getSupportFragmentManager(), getLifecycle());
-        MyFragmentManager fragmentManager = MyFragmentManager.getInstance();
-        adapter.addFragment(fragmentManager.getFragmentHome());
-        adapter.addFragment(fragmentManager.getFragmentCorner());
-        adapter.addFragment(fragmentManager.getFragmentLibrary());
-        adapter.addFragment(fragmentManager.getFragmentProfile());
+        adapter.addFragment(new FragmentHome());
+        adapter.addFragment(new FragmentCorner());
+        adapter.addFragment(new FragmentLibrary());
+        adapter.addFragment(new FragmentProfile());
 
         rootViewPager.setAdapter(adapter);
         rootNavigationBar.setupWithViewPager2(rootViewPager);
+
     }
 
     @Override

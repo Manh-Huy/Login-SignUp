@@ -25,12 +25,9 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
-import com.example.authenticationuseraccount.fragment.FragmentProfile;
-import com.example.authenticationuseraccount.fragment.MyFragmentManager;
 import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
@@ -450,35 +447,7 @@ public class MediaPlayerView {
                     public void onComplete() {
                         LogUtils.ApplicationLogE("Call api love song Complete");
                         LogUtils.ApplicationLogE("Count: " + MediaItemHolder.getInstance().getListLoveSong().size());
-                        getUserListenHistory(user.getUid());
-                    }
-                });
-    }
-    private void getUserListenHistory(String userID) {
-        ApiService.apiService.getUserListenHistory(userID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Song>>() {
-                    @Override
-                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-                    }
 
-                    @Override
-                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
-                        MediaItemHolder.getInstance().setListRecentSong(songs);
-                    }
-
-                    @Override
-                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                        LogUtils.ApplicationLogE("Call api listen user history error");
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        LogUtils.ApplicationLogE("Call api listen history complete");
-                        LogUtils.ApplicationLogI("-------------------------------------------------------------");
-                        FragmentProfile fragmentProfile = MyFragmentManager.getInstance().getFragmentProfile();
-                        fragmentProfile.updateUI(user);
                     }
                 });
     }

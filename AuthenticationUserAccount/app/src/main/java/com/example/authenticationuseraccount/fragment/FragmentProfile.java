@@ -27,7 +27,6 @@ import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
 import com.example.authenticationuseraccount.activity.PremiumActivity;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
-import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -37,7 +36,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.installations.Utils;
 
 public class FragmentProfile extends Fragment {
     private RelativeLayout layoutLogout;
@@ -151,8 +149,7 @@ public class FragmentProfile extends Fragment {
         });
     }
 
-    public void updateUI(FirebaseUser user) {
-        LogUtils.ApplicationLogE("Goi dc ui");
+    private void updateUI(FirebaseUser user) {
         if (user == null) {
             layoutLogin.setVisibility(View.GONE);
             layoutLogout.setVisibility(View.VISIBLE);

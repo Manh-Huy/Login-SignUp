@@ -1,14 +1,13 @@
 package com.example.authenticationuseraccount.fragment;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,36 +23,31 @@ import com.google.android.material.tabs.TabLayout;
 
 public class FragmentRoom extends Fragment {
 
+    private View view;
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
-    private EditText idInput;
-    private Button copyButton, outRoomButton;
+    private Button outRoomButton;
     private ViewPagerRoomAdapter viewPagerAdapter;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_room, container, false);
-    }
+        // Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.fragment_room, container, false);
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        // Initialize the views
-        idInput = view.findViewById(R.id.id_input);
+        // Initialize views
         outRoomButton = view.findViewById(R.id.out_room_button);
         mTabLayout = view.findViewById(R.id.tab_layout);
         mViewPager = view.findViewById(R.id.view_pager);
 
         // Initialize the ViewPager adapter
-        viewPagerAdapter = new ViewPagerRoomAdapter(getChildFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        viewPagerAdapter = new ViewPagerRoomAdapter(getChildFragmentManager());
+        viewPagerAdapter.addFragment(new ParticipantsFragment(), "Participants");
+        viewPagerAdapter.addFragment(new ConversationFragment(), "Conversation");
         mViewPager.setAdapter(viewPagerAdapter);
 
         // Setup the TabLayout with the ViewPager
         mTabLayout.setupWithViewPager(mViewPager);
-
-
 
         // Set click listener for out room button
         outRoomButton.setOnClickListener(v -> {
@@ -63,14 +57,19 @@ public class FragmentRoom extends Fragment {
             transaction.addToBackStack(null);
             transaction.commit();
         });
+
+        return view;
     }
 
+
     public void onRoomJoined(Context context) {
-        if (viewPagerAdapter != null) {
-            viewPagerAdapter.onRoomJoined(context);
-        } else {
-            // Handle the case where the adapter is not initialized
-            Toast.makeText(context, "Adapter not initialized", Toast.LENGTH_SHORT).show();
-        }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (viewPagerAdapter != null) {
+                viewPagerAdapter.onRoomJoined(context);
+            } else {
+                // Handle the case where the adapter is not initialized
+                Toast.makeText(context, "Adapter not initialized", Toast.LENGTH_SHORT).show();
+            }
+        }, 2000); // 2000 milliseconds delay (2 seconds)
     }
 }

@@ -29,7 +29,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
 
     public void setData(List<String> userNames) {
         this.userNames = userNames != null ? userNames : new ArrayList<>();
-        LogUtils.ApplicationLogE("userNames: " + this.userNames.size());
+        LogUtils.ApplicationLogE("ParticipantAdapter" + "userNames size: " + this.userNames.size());
         notifyDataSetChanged();
     }
 
@@ -43,6 +43,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String username = userNames.get(position);
+        LogUtils.ApplicationLogE("ParticipantAdapter " + "Binding user at position: " + position + " - " + username);
         holder.tvUserName.setText(username);
         holder.btnKick.setOnClickListener(v -> {
             ErrorUtils.showError(mContext, "User " + username + " kicked");
@@ -51,6 +52,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
 
     @Override
     public int getItemCount() {
+        LogUtils.ApplicationLogE("ParticipantAdapter "+ "getItemCount: " + userNames.size());
         return userNames.size();
     }
 

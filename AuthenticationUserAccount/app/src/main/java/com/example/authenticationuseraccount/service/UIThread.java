@@ -267,7 +267,6 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
 
     public void onRoomJoined(){
         LogUtils.ApplicationLogD("onRoomJoined");
-        //UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRoomCreate();
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomJoined();
     }
 }

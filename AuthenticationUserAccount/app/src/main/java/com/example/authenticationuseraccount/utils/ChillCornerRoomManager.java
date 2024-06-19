@@ -7,11 +7,22 @@ import java.util.List;
 
 public class ChillCornerRoomManager {
     private String roomId;
+
+    public List<Song> getListSongs() {
+        return listSongs;
+    }
+
+    public void setListSongs(List<Song> listSongs) {
+        this.listSongs = listSongs;
+    }
+
     private String currentUserId;
     private List<String> listUser;
     private boolean isCreated;
     private static ChillCornerRoomManager instance;
-    private Song currentPlaySong;
+    private int currentPlaySongIndex;
+
+    private List<Song> listSongs;
 
     private ChillCornerRoomManager() {
         listUser = new ArrayList<>();
@@ -68,11 +79,11 @@ public class ChillCornerRoomManager {
         this.listUser = listUser;
     }
 
-    public Song getCurrentPlaySong() {
-        return currentPlaySong;
+    public int getCurrentPlaySongIndex() {
+        return currentPlaySongIndex;
     }
 
-    public void setCurrentPlaySong(Song currentPlaySong) {
-        this.currentPlaySong = currentPlaySong;
+    public void setCurrentPlaySongIndex(int currentPlaySong) {
+        this.currentPlaySongIndex = currentPlaySong;
     }
 }

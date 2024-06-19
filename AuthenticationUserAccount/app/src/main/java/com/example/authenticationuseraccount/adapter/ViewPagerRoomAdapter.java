@@ -47,7 +47,4 @@ public class ViewPagerRoomAdapter extends FragmentPagerAdapter {
         arraytitle.add(title);
     }
 
-    public void onRoomJoined(Context context) {
-        //participantsFragment.onRoomJoined(context);
-    }
 }

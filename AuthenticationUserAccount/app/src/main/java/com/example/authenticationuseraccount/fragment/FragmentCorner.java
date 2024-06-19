@@ -73,13 +73,14 @@ public class FragmentCorner extends Fragment {
             public void onClick(View v) {
                 if (mAuth.getCurrentUser() != null) {
                     if (userSingleTon.getRole().equals(Constants.PREMIUM_USER)) {
-                        SocketIoManager.getInstance().createRoom(userID, userName);
 
                         frameLayout.setVisibility(View.VISIBLE);
                         FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
                         transaction.replace(R.id.fragment_container, fragmentRoom);
                         transaction.addToBackStack(null);
                         transaction.commit();
+
+                        SocketIoManager.getInstance().createRoom(userID, userName);
 
                     } else {
                         ErrorUtils.showError(getContext(), "Please Upgrad To Premium To Continue");
@@ -101,7 +102,7 @@ public class FragmentCorner extends Fragment {
                 } else {
                     if (mAuth.getCurrentUser() != null) {
                         SocketIoManager.getInstance().joinRoom(roomId, userID,userSingleTon.getUsername());
-                        edtUserId.setText("");
+                        //edtUserId.setText("");
                     } else {
                         ErrorUtils.showError(getContext(), "Please Login To Join Room");
                     }

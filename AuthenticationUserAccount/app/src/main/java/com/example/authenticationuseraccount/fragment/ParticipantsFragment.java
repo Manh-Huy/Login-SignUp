@@ -45,8 +45,6 @@ public class ParticipantsFragment extends Fragment {
 
         recyclerViewParticipant = view.findViewById(R.id.rcv_participant);
         recyclerViewParticipant.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        recyclerViewParticipant.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-
         participantAdapter = new ParticipantAdapter(getContext(), ChillCornerRoomManager.getInstance().getListUser());
         List<String> userList = ChillCornerRoomManager.getInstance().getListUser();
         participantAdapter.setData(userList);
@@ -73,18 +71,11 @@ public class ParticipantsFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-    }
-
     public void onRoomJoined(Context context) {
         List<String> userList = ChillCornerRoomManager.getInstance().getListUser();
         participantAdapter.setData(userList);
-        ErrorUtils.showError(context, "Room joined");
         if (userList != null && !userList.isEmpty()) {
-            LogUtils.ApplicationLogE("First user: " + userList.get(0));
+            LogUtils.ApplicationLogE("users: " + userList.size());
         } else {
             LogUtils.ApplicationLogE("User list is empty or null");
         }

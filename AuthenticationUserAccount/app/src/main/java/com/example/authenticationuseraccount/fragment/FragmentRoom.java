@@ -28,6 +28,8 @@ public class FragmentRoom extends Fragment {
     private ViewPager mViewPager;
     private Button outRoomButton;
     private ViewPagerRoomAdapter viewPagerAdapter;
+    private ParticipantsFragment participantsFragment;
+    private ConversationFragment conversationFragment;
 
     @Nullable
     @Override
@@ -41,9 +43,11 @@ public class FragmentRoom extends Fragment {
         mViewPager = view.findViewById(R.id.view_pager);
 
         // Initialize the ViewPager adapter
+        participantsFragment = new ParticipantsFragment();
+        conversationFragment = new ConversationFragment();
         viewPagerAdapter = new ViewPagerRoomAdapter(getChildFragmentManager());
-        viewPagerAdapter.addFragment(new ParticipantsFragment(), "Participants");
-        viewPagerAdapter.addFragment(new ConversationFragment(), "Conversation");
+        viewPagerAdapter.addFragment(participantsFragment, "Participants");
+        viewPagerAdapter.addFragment(conversationFragment, "Conversation");
         mViewPager.setAdapter(viewPagerAdapter);
 
         // Setup the TabLayout with the ViewPager
@@ -63,13 +67,14 @@ public class FragmentRoom extends Fragment {
 
 
     public void onRoomJoined(Context context) {
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (viewPagerAdapter != null) {
-                viewPagerAdapter.onRoomJoined(context);
-            } else {
-                // Handle the case where the adapter is not initialized
-                Toast.makeText(context, "Adapter not initialized", Toast.LENGTH_SHORT).show();
-            }
-        }, 2000); // 2000 milliseconds delay (2 seconds)
+        if (viewPagerAdapter != null) {
+            participantsFragment.onRoomJoined(context);
+        } else {
+            // Handle the case where the adapter is not initialized
+            Toast.makeText(context, "Adapter not initialized", Toast.LENGTH_SHORT).show();
+        }
+        /*new Handler(Looper.getMainLooper()).postDelayed(() -> {
+
+        }, 2000); // 2000 milliseconds delay (2 seconds)*/
     }
 }

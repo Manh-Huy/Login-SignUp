@@ -137,11 +137,12 @@ public class EditProfileActivity extends AppCompatActivity {
                     Toast.makeText(EditProfileActivity.this, "có ùi", Toast.LENGTH_SHORT).show();
                 }
 
-                if (tvUsername.getText() == user.getDisplayName()) {
+                if (tvUsername.getText().toString().equals(user.getDisplayName())) {
                     usernameChange = null;
                 }
                 else {
                     usernameChange = tvUsername.getText().toString();
+                    Toast.makeText(EditProfileActivity.this, "ten: " + usernameChange, Toast.LENGTH_SHORT).show();
                     UpdateUsernameInFirebase(usernameChange);
                 }
 
@@ -229,12 +230,20 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void updateUserProfile(String userID, String username, String mimeTypeFile, File image) {
-        String strUsername = username.trim();
+        if (username == null && image == null) {
+            Toast.makeText(this, "No changes to update", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        RequestBody requestBodyUsername = RequestBody.create(MediaType.parse("multipart/form-data"), strUsername);
-        RequestBody requestBodyAva = RequestBody.create(MediaType.parse(mimeTypeFile), image);
+        RequestBody requestBodyUsername = username != null ?
+                RequestBody.create(MediaType.parse("multipart/form-data"), username.trim()) :
+                null;
 
-        MultipartBody.Part multipartBodyAvt = MultipartBody.Part.createFormData("imageURL", image.getName(), requestBodyAva);
+        MultipartBody.Part multipartBodyAvt = null;
+        if (image != null && mimeTypeFile != null) {
+            RequestBody requestBodyAva = RequestBody.create(MediaType.parse(mimeTypeFile), image);
+            multipartBodyAvt = MultipartBody.Part.createFormData("imageURL", image.getName(), requestBodyAva);
+        }
 
         ApiService.apiService.updateUserProfile(userID, requestBodyUsername, multipartBodyAvt).enqueue(new Callback<String>() {
             @Override
@@ -243,7 +252,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 imageURLChange = response.body();
                 LogUtils.ApplicationLogI("ImgUrl: " + imageURLChange);
                 if (mFile != null) {
-                    //UpdateAvatarUserInFirebase(imageURLChange);
+                    UpdateAvatarUserInFirebase(imageURLChange);
                 }
             }
 
@@ -255,9 +264,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 LogUtils.ApplicationLogE(t.getStackTrace().toString());
             }
         });
-
-
     }
+
 
     private void UpdateUsernameInFirebase(String username) {
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()

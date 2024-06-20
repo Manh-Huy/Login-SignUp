@@ -1,12 +1,16 @@
 package com.example.authenticationuseraccount.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -39,6 +43,23 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.ViewHolder
                     .load(banner.getImageURL())
                     .into(holder.imgBanner);
         }
+
+        holder.cardViewBanner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = banner.getLink();
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    url = "http://" + url;
+                }
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                Intent chooser = Intent.createChooser(intent, "Open with");
+                try {
+                    mContext.startActivity(chooser);
+                } catch (Exception e) {
+                    Toast.makeText(mContext, "Cannot open link", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -48,10 +69,11 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.ViewHolder
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView imgBanner;
+        private CardView cardViewBanner;
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             imgBanner = itemView.findViewById(R.id.banner);
-
+            cardViewBanner = itemView.findViewById(R.id.cardView);
         }
     }
 }

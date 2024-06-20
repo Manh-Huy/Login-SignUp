@@ -85,7 +85,7 @@ public class ConversationFragment extends Fragment {
         String roomID = ChillCornerRoomManager.getInstance().getRoomId();
         String username = User.getInstance().getUsername();
         String userImgUrl = User.getInstance().getImageURL();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
         String messsageTimeStamp = dateFormat.format(new Date());
         Message message = new Message(username, userImgUrl, strMessage, messsageTimeStamp);
         SocketIoManager.getInstance().sendMessage(roomID, message);

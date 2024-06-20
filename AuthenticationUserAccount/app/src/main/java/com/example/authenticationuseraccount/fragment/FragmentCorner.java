@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
+import com.example.authenticationuseraccount.model.Message;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
@@ -135,6 +136,10 @@ public class FragmentCorner extends Fragment {
         fragmentRoom.onRoomJoined(context);
     }
 
+    public void onMessageReceived(Context mContext, Message message) {
+        fragmentRoom.onMessageReceived(mContext, message);
+    }
+
     private void setMediaConrner() {
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -158,5 +163,6 @@ public class FragmentCorner extends Fragment {
             }
         });
     }
+
 
 }

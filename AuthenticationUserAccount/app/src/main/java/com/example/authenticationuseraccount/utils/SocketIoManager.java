@@ -1,11 +1,8 @@
 package com.example.authenticationuseraccount.utils;
 
-import android.util.Log;
-
-import androidx.media3.common.MediaItem;
-
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.Message;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.UIThread;
@@ -57,6 +54,7 @@ public class SocketIoManager {
             });
 
             listenForRoomEvent();
+            listenForChatEvent();
 
             mSocket.connect();
 
@@ -64,8 +62,52 @@ public class SocketIoManager {
             e.printStackTrace();
         }
     }
+    public void sendMessage(String roomId,Message message){
+        String messageJson = gson.toJson(message);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomId);
+            data.put("message", messageJson);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("sendMessage: " + data.toString());
+        mSocket.emit("user-message", data);
+    }
 
-    public void listenForRoomEvent() {
+    private void listenForChatEvent() {
+        mSocket.on("on-user-message", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = message
+                onMessageReceived(args);
+            }
+        });
+    }
+
+    private void onMessageReceived(Object[] args) {
+        try {
+            LogUtils.ApplicationLogI("on-user-message " + (String) args[0]);
+            String data = (String) args[0];
+            JSONObject jsonData = new JSONObject(data);
+            Message message = gson.fromJson(jsonData.toString(), Message.class);
+
+            //LogUtils.ApplicationLogI("on-user-message Deserialise name: " + message.getUserName() + " imgUrl: " + message.getImgUrl() + " message: " +message.getMessage() + " time: " + message.getMesssageTimeStamp());
+
+            UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    UIThread.getInstance().onMessageReceived(message);
+                }
+            });
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void listenForRoomEvent() {
         mSocket.on("on-create-room", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
@@ -258,7 +300,7 @@ public class SocketIoManager {
         String songJson = gson.toJson(song);
         JSONObject data = new JSONObject();
         try {
-            data.put("room", roomId);
+            data.put("roomID", roomId);
             data.put("song", songJson);
         } catch (JSONException e) {
             throw new RuntimeException(e);

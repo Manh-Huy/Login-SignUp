@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.fragment;
 
+import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -18,10 +19,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.MessageAdapter;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.Message;
+import com.example.authenticationuseraccount.model.business.User;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ConversationFragment extends Fragment {
 
@@ -30,6 +38,7 @@ public class ConversationFragment extends Fragment {
     private RecyclerView rcvMessage;
     private MessageAdapter messageAdapter;
     private List<Message> mListMessage;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -47,7 +56,7 @@ public class ConversationFragment extends Fragment {
         rcvMessage.setLayoutManager(linearLayoutManager);
 
         mListMessage = new ArrayList<>();
-        messageAdapter = new MessageAdapter();
+        messageAdapter = new MessageAdapter(getContext());
         messageAdapter.setData(mListMessage);
 
         rcvMessage.setAdapter(messageAdapter);
@@ -66,14 +75,20 @@ public class ConversationFragment extends Fragment {
             }
         });
     }
+
     private void sendMessage() {
         String strMessage = edtMessage.getText().toString().trim();
         if (TextUtils.isEmpty(strMessage)) {
             return;
         }
-        mListMessage.add(new Message(strMessage));
-        messageAdapter.notifyDataSetChanged();
-        rcvMessage.scrollToPosition(mListMessage.size() - 1);
+
+        String roomID = ChillCornerRoomManager.getInstance().getRoomId();
+        String username = User.getInstance().getUsername();
+        String userImgUrl = User.getInstance().getImageURL();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.getDefault());
+        String messsageTimeStamp = dateFormat.format(new Date());
+        Message message = new Message(username, userImgUrl, strMessage, messsageTimeStamp);
+        SocketIoManager.getInstance().sendMessage(roomID, message);
 
         edtMessage.setText("");
     }
@@ -88,7 +103,7 @@ public class ConversationFragment extends Fragment {
                 activityRootView.getWindowVisibleDisplayFrame(r);
 
                 int heightDiff = activityRootView.getRootView().getHeight() - r.height();
-                if (heightDiff > 0.25*activityRootView.getRootView().getHeight()) {
+                if (heightDiff > 0.25 * activityRootView.getRootView().getHeight()) {
                     // key board display
                     if (mListMessage.size() > 0) {
                         rcvMessage.scrollToPosition(mListMessage.size() - 1);
@@ -97,5 +112,12 @@ public class ConversationFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public void onMessageReceived(Context context, Message message) {
+        LogUtils.ApplicationLogI("onMessageReceived: "+ message.getMessage());
+        mListMessage.add(message);
+        messageAdapter.notifyDataSetChanged();
+        rcvMessage.scrollToPosition(mListMessage.size() - 1);
     }
 }

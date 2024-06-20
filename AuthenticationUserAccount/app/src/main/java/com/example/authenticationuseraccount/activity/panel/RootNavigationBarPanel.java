@@ -16,6 +16,7 @@ import com.example.authenticationuseraccount.fragment.FragmentCorner;
 import com.example.authenticationuseraccount.fragment.FragmentHome;
 import com.example.authenticationuseraccount.fragment.FragmentLibrary;
 import com.example.authenticationuseraccount.fragment.FragmentProfile;
+import com.example.authenticationuseraccount.model.Message;
 import com.realgear.multislidinguppanel.BasePanelView;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 import com.realgear.readable_bottom_bar.ReadableBottomBar;
@@ -100,6 +101,10 @@ public class RootNavigationBarPanel extends BasePanelView {
 
     public void onRoomJoined() {
         fragmentCorner.onRoomJoined(mContext);
+    }
+
+    public void onMessageReceived(Message message) {
+        fragmentCorner.onMessageReceived(mContext, message);
     }
 }
 

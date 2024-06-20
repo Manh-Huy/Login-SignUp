@@ -2,8 +2,6 @@ package com.example.authenticationuseraccount.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +11,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.ViewPagerRoomAdapter;
+import com.example.authenticationuseraccount.model.Message;
 import com.google.android.material.tabs.TabLayout;
 
 public class FragmentRoom extends Fragment {
@@ -73,8 +71,14 @@ public class FragmentRoom extends Fragment {
             // Handle the case where the adapter is not initialized
             Toast.makeText(context, "Adapter not initialized", Toast.LENGTH_SHORT).show();
         }
-        /*new Handler(Looper.getMainLooper()).postDelayed(() -> {
+    }
 
-        }, 2000); // 2000 milliseconds delay (2 seconds)*/
+    public void onMessageReceived(Context context, Message message){
+        if (viewPagerAdapter != null) {
+            conversationFragment.onMessageReceived(context, message);
+        } else {
+            // Handle the case where the adapter is not initialized
+            Toast.makeText(context, "Adapter not initialized", Toast.LENGTH_SHORT).show();
+        }
     }
 }

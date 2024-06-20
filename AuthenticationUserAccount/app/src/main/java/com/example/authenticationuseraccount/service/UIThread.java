@@ -7,7 +7,6 @@ import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
-import androidx.media3.common.Metadata;
 import androidx.media3.common.Player;
 import androidx.media3.common.Timeline;
 import androidx.media3.session.MediaController;
@@ -16,10 +15,9 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.panel.RootMediaPlayerPanel;
 import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
-import com.example.authenticationuseraccount.activity.panel.view.MediaPlayerView;
-import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
+import com.example.authenticationuseraccount.model.Message;
 import com.example.authenticationuseraccount.theme.AsyncPaletteBuilder;
 import com.example.authenticationuseraccount.theme.interfaces.PaletteStateListener;
 import com.realgear.multislidinguppanel.MultiSlidingPanelAdapter;
@@ -269,5 +267,9 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         LogUtils.ApplicationLogD("onRoomJoined");
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRoomCreate();
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomJoined();
+    }
+
+    public void onMessageReceived(Message message) {
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onMessageReceived(message);
     }
 }

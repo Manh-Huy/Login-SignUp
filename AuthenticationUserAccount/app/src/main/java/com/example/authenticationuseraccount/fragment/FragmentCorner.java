@@ -79,7 +79,7 @@ public class FragmentCorner extends Fragment {
                         transaction.replace(R.id.fragment_container, fragmentRoom);
                         transaction.addToBackStack(null);
                         transaction.commit();
-
+                        ChillCornerRoomManager.getInstance().setRoomId(userID);
                         SocketIoManager.getInstance().createRoom(userID, userName);
 
                     } else {

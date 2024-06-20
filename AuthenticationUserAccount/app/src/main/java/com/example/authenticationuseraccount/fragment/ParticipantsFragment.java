@@ -4,6 +4,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,13 +74,18 @@ public class ParticipantsFragment extends Fragment {
     }
 
     public void onRoomJoined(Context context) {
-        List<String> userList = ChillCornerRoomManager.getInstance().getListUser();
-        participantAdapter.setData(userList);
-        if (userList != null && !userList.isEmpty()) {
-            LogUtils.ApplicationLogE("users: " + userList.size());
-        } else {
-            LogUtils.ApplicationLogE("User list is empty or null");
-        }
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                List<String> userList = ChillCornerRoomManager.getInstance().getListUser();
+                if (userList != null && !userList.isEmpty()) {
+                    participantAdapter.setData(userList);
+                    LogUtils.ApplicationLogE("users: " + userList.size());
+                } else {
+                    LogUtils.ApplicationLogE("User list is empty or null");
+                }
+            }
+        }, 1000); // 2000 milliseconds = 2 seconds
     }
 
 }

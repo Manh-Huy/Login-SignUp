@@ -190,7 +190,6 @@ public class SocketIoManager {
 
             LogUtils.ApplicationLogI("onResponseRoomInfo Deserialise roomID: " + roomManager.getRoomId() + " NumUsers: " + roomManager.getListUser().size());
 
-
             JSONObject data2 = new JSONObject();
             try {
                 data2.put("roomID", roomManager.getRoomId());
@@ -198,7 +197,6 @@ public class SocketIoManager {
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
-
             mSocket.emit("user-join-room", data2);
 
 
@@ -222,6 +220,7 @@ public class SocketIoManager {
     }
 
     private void onUserJoinRoomBroadCast(Object[] args){
+
         LogUtils.ApplicationLogI("onUserJoinRoomBroadCast: user " + args[0].toString() +" has joined room: " + ChillCornerRoomManager.getInstance().getRoomId());
         UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
             @Override

@@ -6,22 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChillCornerRoomManager {
-    private String roomId;
-
-    public List<Song> getListSongs() {
-        return listSongs;
-    }
-
-    public void setListSongs(List<Song> listSongs) {
-        this.listSongs = listSongs;
-    }
-
-    private String currentUserId;
-    private List<String> listUser;
-    private boolean isCreated;
     private static ChillCornerRoomManager instance;
-    private int currentPlaySongIndex;
 
+    private String roomId;
+    private String currentUserId;
+    private boolean isCreated;
+    private int currentPlaySongIndex;
+    private List<String> listUser;
     private List<Song> listSongs;
 
     private ChillCornerRoomManager() {
@@ -52,8 +43,8 @@ public class ChillCornerRoomManager {
         return isCreated;
     }
 
-    public void setCreated(boolean created) {
-        isCreated = created;
+    public void setCreated(boolean isCreated) {
+        this.isCreated = isCreated;
     }
 
     public String getCurrentUserId() {
@@ -65,10 +56,7 @@ public class ChillCornerRoomManager {
     }
 
     public boolean isCurrentUserHost() {
-        if (roomId == null) {
-            return false;
-        }
-        return roomId.equals(currentUserId);
+        return roomId != null && roomId.equals(currentUserId);
     }
 
     public List<String> getListUser() {
@@ -79,11 +67,19 @@ public class ChillCornerRoomManager {
         this.listUser = listUser;
     }
 
+    public List<Song> getListSongs() {
+        return listSongs;
+    }
+
+    public void setListSongs(List<Song> listSongs) {
+        this.listSongs = listSongs;
+    }
+
     public int getCurrentPlaySongIndex() {
         return currentPlaySongIndex;
     }
 
-    public void setCurrentPlaySongIndex(int currentPlaySong) {
-        this.currentPlaySongIndex = currentPlaySong;
+    public void setCurrentPlaySongIndex(int currentPlaySongIndex) {
+        this.currentPlaySongIndex = currentPlaySongIndex;
     }
 }

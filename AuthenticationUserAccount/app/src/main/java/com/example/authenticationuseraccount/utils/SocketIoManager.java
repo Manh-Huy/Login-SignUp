@@ -4,6 +4,7 @@ import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.Message;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.UIThread;
 import com.google.gson.Gson;
@@ -44,6 +45,9 @@ public class SocketIoManager {
             }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
+                    if(ChillCornerRoomManager.getInstance().getRoomId() != null){
+                        SocketIoManager.getInstance().disconnectFromRoom();
+                    }
                     LogUtils.ApplicationLogI("Disconnected from server");
                 }
             }).on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
@@ -62,6 +66,13 @@ public class SocketIoManager {
             e.printStackTrace();
         }
     }
+
+    public void disconnectFromRoom(){
+        LogUtils.ApplicationLogI("disconnectFromRoom: " + User.getInstance().getUsername());
+        mSocket.emit("user-out-room",User.getInstance().getUsername());
+        ChillCornerRoomManager.release();
+    }
+
     public void sendMessage(String roomId,Message message){
         String messageJson = gson.toJson(message);
         JSONObject data = new JSONObject();

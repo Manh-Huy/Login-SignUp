@@ -74,7 +74,7 @@ public class FragmentHome extends Fragment {
     private CircleIndicator3 circleIndicator;
     private BannerAdapter bannerAdapter;
     private RecyclerView rcvQuickPick, rcvListenAgain, rcvRecommend, rcvNewRelease, rcvGenre, rcvForgottenFavorite;
-    private ImageView searchImageView, imgMenuIcon;
+    private ImageView searchImageView;
     private TextView tvListenAgain, tvRecommend, tvForgottenFavorite;
     private Disposable mDisposable;
     private ThumbnailSongSmallAdapter mThumbnailSongSmallAdapter_QuickPick;
@@ -102,7 +102,6 @@ public class FragmentHome extends Fragment {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-        imgMenuIcon = view.findViewById(R.id.menuIcon);
         viewPager = view.findViewById(R.id.viewPager);
         circleIndicator = view.findViewById(R.id.circleIndicator);
         searchImageView = view.findViewById(R.id.searchIcon);
@@ -202,14 +201,6 @@ public class FragmentHome extends Fragment {
             showGenreInRecyclerView();
         }
 
-        imgMenuIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Intent intent = new Intent(getContext(), PremiumActivity.class);
-                //getContext().startActivity(intent);
-            }
-        });
-
         return view;
     }
 
@@ -244,6 +235,10 @@ public class FragmentHome extends Fragment {
     public void onResume() {
         super.onResume();
         mThumbnailSongSmallAdapter_QuickPick.notifyDataSetChanged();
+        mThumbnailSongNewAdapter_NewRelease.notifyDataSetChanged();
+        mThumbnailSongAdapter_ListenAgain.notifyDataSetChanged();
+        mThumbnailSongAdapter_Recommend.notifyDataSetChanged();
+        mThumbnailSongSmallAdapter_ForgottenFavorite.notifyDataSetChanged();
     }
 
     private void ShowUIForLocal() {

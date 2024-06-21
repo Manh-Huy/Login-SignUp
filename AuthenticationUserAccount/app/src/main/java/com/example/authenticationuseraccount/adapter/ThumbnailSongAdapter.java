@@ -23,7 +23,7 @@ public class ThumbnailSongAdapter extends RecyclerView.Adapter<ThumbnailSongAdap
     private List<Song> mSongs;
     private Context mContext;
 
-    public ThumbnailSongAdapter(Context mContext,List<Song> mSongs, IClickSongRecyclerViewListener listener) {
+    public ThumbnailSongAdapter(Context mContext, List<Song> mSongs, IClickSongRecyclerViewListener listener) {
         this.mSongs = mSongs;
         this.mContext = mContext;
         this.iClickSongRecyclerViewListener = listener;
@@ -48,6 +48,8 @@ public class ThumbnailSongAdapter extends RecyclerView.Adapter<ThumbnailSongAdap
 
         holder.tvSongTitle.setText(song.getName());
         holder.tvArtist.setText(song.getArtist());
+        holder.tvSongTitle.setSelected(true);
+        holder.tvArtist.setSelected(true);
 
         Glide.with(mContext)
                 .load(song.getImageURL())

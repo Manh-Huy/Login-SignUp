@@ -75,12 +75,19 @@ public class FragmentRoom extends Fragment {
 
 
     public void onRoomJoined(Context context, String roomId) {
-        if (viewPagerAdapter != null) {
-            participantsFragment.onRoomJoined(context, roomId);
-        } else {
-            // Handle the case where the adapter is not initialized
-            Toast.makeText(context, "Adapter not initialized", Toast.LENGTH_SHORT).show();
-        }
+        LogUtils.ApplicationLogI("FragmentRoom | onRoomJoined");
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (viewPagerAdapter != null) {
+                    participantsFragment.onRoomJoined(context, roomId);
+                } else {
+                    // Handle the case where the adapter is not initialized
+                    Toast.makeText(context, "Adapter not initialized", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, 500); // 2000 milliseconds = 2 seconds
+
     }
 
     public void onMessageReceived(Context context, Message message) {

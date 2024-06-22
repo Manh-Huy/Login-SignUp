@@ -24,7 +24,6 @@ public class SocketIoManager {
         return mSocket;
     }
 
-
     private Socket mSocket;
     private static SocketIoManager instance;
     private Gson gson;
@@ -101,8 +100,15 @@ public class SocketIoManager {
             public void call(Object... args) {
                 onSongAdded(args);
             }
+        }).on("on-user-disconnect", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = socketID
+                onUserLeaveRoom(args);
+            }
         });
     }
+
 
     private void listenForChatEvent() {
         mSocket.on("on-user-message", new Emitter.Listener() {
@@ -318,6 +324,30 @@ public class SocketIoManager {
         });
     }
 
+    private void onUserLeaveRoom(Object[] args) {
+        //args = socketID
+
+        LogUtils.ApplicationLogI("SocketIOManger | on-user-disconnect : user " + args[0].toString() + " has leave room: " + ChillCornerRoomManager.getInstance().getRoomId());
+        String userSocketId = (String) args[0];
+        String username = "";
+        for (SocketUser user : ChillCornerRoomManager.getInstance().getListUser()) {
+            if (user.getSocketID().equals(userSocketId)) {
+                username = user.getUserName();
+                ChillCornerRoomManager.getInstance().getListUser().remove(user);
+                break;
+            }
+        }
+        String finalUsername = username;
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                UIThread.getInstance().onRoomJoined(ChillCornerRoomManager.getInstance().getRoomId());
+                ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), finalUsername + " Has Left The Party! Boooo!");
+            }
+        });
+    }
+
+
     private void onSongAdded(Object[] args) {
         try {
             LogUtils.ApplicationLogI("on-song-added " + (String) args[0]);
@@ -373,10 +403,13 @@ public class SocketIoManager {
                     UIThread.getInstance().onOutRoom();
                 }
             });
-            mSocket.off();
             mSocket.disconnect();
+            mSocket.off();
             mSocket.close();
         }
+    }
+    public static synchronized void release(){
+        instance = null;
     }
 
 }

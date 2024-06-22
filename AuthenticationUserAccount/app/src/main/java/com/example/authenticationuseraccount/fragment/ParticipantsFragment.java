@@ -66,20 +66,20 @@ public class ParticipantsFragment extends Fragment {
     }
 
 
-    public void onRoomJoined(Context context, String roomId) {
+    public void onRoomJoined(Context context, String roomID) {
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
                 List<SocketUser> userList = ChillCornerRoomManager.getInstance().getListUser();
                 if (userList != null && !userList.isEmpty()) {
                     participantAdapter.setData(userList);
-                    idInput.setText(roomId);
-                    LogUtils.ApplicationLogE("users: " + userList.size());
+                    idInput.setText(roomID);
+                    LogUtils.ApplicationLogE("users: " + userList.size() + " roomId: " + roomID);
                 } else {
                     LogUtils.ApplicationLogE("User list is empty or null");
                 }
             }
-        }, 500); // 2000 milliseconds = 2 seconds
+        }, 300); // 2000 milliseconds = 2 seconds
     }
 
     public void onRoomCreate(Context context, String roomID) {

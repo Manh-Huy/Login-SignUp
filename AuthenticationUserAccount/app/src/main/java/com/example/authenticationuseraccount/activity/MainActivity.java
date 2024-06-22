@@ -347,6 +347,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (SocketIoManager.getInstance() != null) {
             SocketIoManager.getInstance().disconnect();
+            SocketIoManager.release();
         }
 
         Intent intent = new Intent(MainActivity.this, MusicService.class);

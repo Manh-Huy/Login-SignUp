@@ -4,12 +4,14 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,10 +22,11 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.Message;
 import com.example.authenticationuseraccount.model.business.User;
-import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
+import com.github.ybq.android.spinkit.style.Wave;
 import com.google.firebase.auth.FirebaseAuth;
 
 
@@ -32,23 +35,10 @@ public class FragmentCorner extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_corner, container, false);
-    }
-
-    private Button btnCreatRoom, btnJoinRoom, btnCopyId;
-    private FirebaseAuth mAuth;
-    private EditText edtUserId;
-    private TextView tvUserId;
-    private String userID, userName;
-    private Context mContext;
-
-    private FrameLayout frameLayout;
-
-    private FragmentRoom fragmentRoom;
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        View view = inflater.inflate(R.layout.fragment_corner, container, false);
+        mProgressBar = view.findViewById(R.id.corner_progress_bar);
+        mProgressBar.setIndeterminateDrawable(new Wave());
+        mProgressBar.setVisibility(View.INVISIBLE);
         edtUserId = view.findViewById(R.id.edt_enter_room);
         tvUserId = view.findViewById(R.id.tv_user_id);
         btnCreatRoom = view.findViewById(R.id.btn_create_room);
@@ -74,15 +64,27 @@ public class FragmentCorner extends Fragment {
             public void onClick(View v) {
                 if (mAuth.getCurrentUser() != null) {
                     if (userSingleTon.getRole().equals(Constants.PREMIUM_USER)) {
-
-                        frameLayout.setVisibility(View.VISIBLE);
-                        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.fragment_container, fragmentRoom);
-                        transaction.addToBackStack(null);
-                        transaction.commit();
-                        ChillCornerRoomManager.getInstance().setRoomId(userID);
-                        SocketIoManager.getInstance().createRoom(userID, userName);
-
+                        mProgressBar.setVisibility(View.VISIBLE);
+                        Handler handler = new Handler();
+                        Runnable checkConnectionRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                if (SocketIoManager.getInstance().getmSocket().id() == null) {
+                                    LogUtils.ApplicationLogI("Waiting for connection!");
+                                    handler.postDelayed(this, 100); // Check again after 100 milliseconds
+                                } else {
+                                    // Hide the ProgressBar and create the room on the UI thread
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mProgressBar.setVisibility(View.INVISIBLE);
+                                            SocketIoManager.getInstance().createRoom(userName);
+                                        }
+                                    });
+                                }
+                            }
+                        };
+                        handler.post(checkConnectionRunnable);
                     } else {
                         ErrorUtils.showError(getContext(), "Please Upgrad To Premium To Continue");
                     }
@@ -102,7 +104,31 @@ public class FragmentCorner extends Fragment {
                     ErrorUtils.showError(mContext, "Room ID cannot be empty");
                 } else {
                     if (mAuth.getCurrentUser() != null) {
-                        SocketIoManager.getInstance().joinRoom(roomId, userID,userSingleTon.getUsername());
+
+                        mProgressBar.setVisibility(View.VISIBLE);
+                        Handler handler = new Handler();
+                        Runnable checkConnectionRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                if (SocketIoManager.getInstance().getmSocket().id() == null) {
+                                    LogUtils.ApplicationLogI("Waiting for connection!");
+                                    handler.postDelayed(this, 100); // Check again after 100 milliseconds
+                                } else {
+                                    // Hide the ProgressBar and create the room on the UI thread
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mProgressBar.setVisibility(View.INVISIBLE);
+                                            SocketIoManager.getInstance().joinRoom(roomId,userName);
+                                        }
+                                    });
+                                }
+                            }
+                        };
+                        handler.post(checkConnectionRunnable);
+
+
+                        //SocketIoManager.getInstance().joinRoom(roomId, userID, userSingleTon.getUsername());
                         //edtUserId.setText("");
                     } else {
                         ErrorUtils.showError(getContext(), "Please Login To Join Room");
@@ -124,45 +150,43 @@ public class FragmentCorner extends Fragment {
                 ErrorUtils.showError(mContext, "Copied to clipboard");
             }
         });
+
+        return view;
     }
 
-    public void onRoomJoined(Context context){
+    private Button btnCreatRoom, btnJoinRoom, btnCopyId;
+    private FirebaseAuth mAuth;
+    private EditText edtUserId;
+    private TextView tvUserId;
+    private String userID, userName;
+    private Context mContext;
+
+    private FrameLayout frameLayout;
+
+    private FragmentRoom fragmentRoom;
+    private ProgressBar mProgressBar;
+
+    public void onRoomJoined(Context context, String roomId) {
         frameLayout.setVisibility(View.VISIBLE);
         // Replace fragment
         FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragmentRoom);
         transaction.addToBackStack(null);
         transaction.commit();
-        fragmentRoom.onRoomJoined(context);
+        fragmentRoom.onRoomJoined(context, roomId);
     }
 
     public void onMessageReceived(Context mContext, Message message) {
         fragmentRoom.onMessageReceived(mContext, message);
     }
 
-    private void setMediaConrner() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                /*MainActivity mainActivity = (MainActivity) getActivity();
-                mainActivity.getM_vThread().onRoomCreate();*/
-                /*Song song = new Song();
-                song.setAlbum("Đánh Đổi");
-                song.setArtist("Obito");
-                song.setCreatedAt("2024-06-08");
-                song.setGenre("Rap");
-                song.setImageURL("https://storage.googleapis.com/nodejsapp-89f00.appspot.com/images/%C4%90%E1%BA%A7u%20%C4%90%C6%B0%E1%BB%9Dng%20X%C3%B3%20Ch%E1%BB%A3_thumbnail.jpg?GoogleAccessId=firebase-adminsdk-pmygm%40nodejsapp-89f00.iam.gserviceaccount.com&Expires=32503680000&Signature=LbyxSXV4AtiTXp8baLGkG4Z8NZA5I9jMhYsH8Leqdi6A4V7eCzWHB8p9LaiA7wwO%2F4IQTJaYGb85Go2ITyPB15vBKBqHzmQmT77cT3D46fYZ%2BWlyttDWfJhjjX9PdjZF93hsGGrEKVorypotuTXJ1Oc3AV46bUEQGUvs5HPTsYhiWK60CJ2bdss0WD1dxYe1vAFpb3Szu3DLQXB%2BT8MN9ZlB%2Bh8ko9lF76JxiJycNjlLGD5V0AAlXoJgpgrUf5CZjKi14gYF2yEDJRlKdz6ZnifKZsz74LC0ZNJt3VbjGE6grj8em%2FTF5jbzwnzTMJI8lYXxkkfE75atdCUezL%2BakA%3D%3D");
-                song.setName("Đầu Đường Xó Chợ");
-                song.setSongID("1_Z8hghccx7DZV4pWc0FEzoM8nn6g6T26");
-                song.setSongURL("https://drive.google.com/uc?id=1_Z8hghccx7DZV4pWc0FEzoM8nn6g6T26&export=download");
-                song.setViews("3249283");
-                MediaItemHolder.getInstance().getListSongs().clear();
-                MediaItemHolder.getInstance().getListSongs().add(song);
-                MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
-                MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);*/
-            }
-        });
+    public void onRoomCreate(Context context, String roomID) {
+        LogUtils.ApplicationLogI("FragmentCorner | onRoomCreate");
+        frameLayout.setVisibility(View.VISIBLE);
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragmentRoom);
+        transaction.addToBackStack(null);
+        transaction.commit();
+        fragmentRoom.onRoomCreate(context, roomID);
     }
-
-
 }

@@ -257,19 +257,23 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateLoveSongFromBarView(isLove);
     }
 
-    public void onRoomCreate(){
-        LogUtils.ApplicationLogD("onRoomCreate");
+    public void onRoomCreate(String roomID){
+        LogUtils.ApplicationLogD("UIThread | onRoomCreate: " + roomID);
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRoomCreate();
-        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomCreate();
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomCreate(roomID);
     }
 
-    public void onRoomJoined(){
-        LogUtils.ApplicationLogD("onRoomJoined");
+    public void onRoomJoined(String roomId){
+        LogUtils.ApplicationLogD("UIThread | onRoomJoined");
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRoomCreate();
-        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomJoined();
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomJoined(roomId);
     }
 
     public void onMessageReceived(Message message) {
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onMessageReceived(message);
+    }
+
+    public void onOutRoom() {
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onOutRoom();
     }
 }

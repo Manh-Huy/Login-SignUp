@@ -13,23 +13,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
+import com.example.authenticationuseraccount.model.SocketUser;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.ViewHolder> {
 
-    private List<String> userNames;
+    private List<SocketUser> userNames;
     private Context mContext;
 
-    public ParticipantAdapter(Context context, List<String> userNames) {
+    public ParticipantAdapter(Context context, List<SocketUser> userNames) {
         this.mContext = context;
         this.userNames = userNames != null ? userNames : new ArrayList<>();
     }
 
-    public void setData(List<String> userNames) {
+    public void setData(List<SocketUser> userNames) {
         this.userNames = userNames != null ? userNames : new ArrayList<>();
-        LogUtils.ApplicationLogE("ParticipantAdapter" + "userNames size: " + this.userNames.size());
         notifyDataSetChanged();
     }
 
@@ -42,17 +43,21 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String username = userNames.get(position);
+        String username = userNames.get(position).getUserName();
         LogUtils.ApplicationLogE("ParticipantAdapter " + "Binding user at position: " + position + " - " + username);
         holder.tvUserName.setText(username);
-        holder.btnKick.setOnClickListener(v -> {
-            ErrorUtils.showError(mContext, "User " + username + " kicked");
-        });
+        if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+            holder.btnKick.setOnClickListener(v -> {
+                ErrorUtils.showError(mContext, "User " + username + " kicked");
+            });
+        }else{
+            holder.btnKick.setVisibility(View.INVISIBLE);
+        }
+
     }
 
     @Override
     public int getItemCount() {
-        LogUtils.ApplicationLogE("ParticipantAdapter "+ "getItemCount: " + userNames.size());
         return userNames.size();
     }
 

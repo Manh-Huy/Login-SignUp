@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.utils;
 
+import com.example.authenticationuseraccount.model.SocketUser;
 import com.example.authenticationuseraccount.model.business.Song;
 
 import java.util.ArrayList;
@@ -12,12 +13,14 @@ public class ChillCornerRoomManager {
     private String currentUserId;
     private boolean isCreated;
     private int currentPlaySongIndex;
-    private List<String> listUser;
+    private List<SocketUser> listUser;
     private List<Song> listSongs;
 
     private ChillCornerRoomManager() {
         listUser = new ArrayList<>();
         isCreated = false;
+        currentPlaySongIndex = -1;
+        currentUserId = null;
     }
 
     public static synchronized ChillCornerRoomManager getInstance() {
@@ -59,11 +62,11 @@ public class ChillCornerRoomManager {
         return roomId != null && roomId.equals(currentUserId);
     }
 
-    public List<String> getListUser() {
+    public List<SocketUser> getListUser() {
         return listUser;
     }
 
-    public void setListUser(List<String> listUser) {
+    public void setListUser(List<SocketUser> listUser) {
         this.listUser = listUser;
     }
 

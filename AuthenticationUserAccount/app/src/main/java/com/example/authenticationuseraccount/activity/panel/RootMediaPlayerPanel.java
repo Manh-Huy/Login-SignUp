@@ -215,4 +215,10 @@ public class RootMediaPlayerPanel extends BasePanelView {
         this.setSlideDirection(MultiSlidingUpPanelLayout.SLIDE_VERTICAL);
         this.setPeakHeight(getNavigationBarHeight() + 102);
     }
+
+    public void onOutRoom() {
+        this.setPanelState(MultiSlidingUpPanelLayout.HIDDEN);
+        this.setSlideDirection(MultiSlidingUpPanelLayout.SLIDE_VERTICAL);
+        this.setPeakHeight(getNavigationBarHeight() + 102);
+    }
 }

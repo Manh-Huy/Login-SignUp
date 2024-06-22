@@ -92,15 +92,17 @@ public class RootNavigationBarPanel extends BasePanelView {
         return 0;
     }
 
-    public void onRoomCreate() {
+    public void onRoomCreate(String roomID) {
         rootViewPager.setCurrentItem(0);
         rootNavigationBar.setupWithViewPager2(rootViewPager);
         rootViewPager.setCurrentItem(1);
         rootNavigationBar.setupWithViewPager2(rootViewPager);
+
+        fragmentCorner.onRoomCreate(mContext,roomID);
     }
 
-    public void onRoomJoined() {
-        fragmentCorner.onRoomJoined(mContext);
+    public void onRoomJoined(String roomId) {
+        fragmentCorner.onRoomJoined(mContext, roomId);
     }
 
     public void onMessageReceived(Message message) {

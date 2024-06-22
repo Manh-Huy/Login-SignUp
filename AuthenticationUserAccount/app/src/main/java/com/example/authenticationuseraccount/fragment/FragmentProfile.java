@@ -183,4 +183,5 @@ public class FragmentProfile extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         updateUI(FirebaseAuth.getInstance().getCurrentUser());
     }
+
 }

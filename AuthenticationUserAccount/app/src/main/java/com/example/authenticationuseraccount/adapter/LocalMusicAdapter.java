@@ -29,6 +29,8 @@ import com.example.authenticationuseraccount.model.ItemSearchOption;
 import com.example.authenticationuseraccount.model.business.LocalSong;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -97,7 +99,13 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
             @Override
             public void onClick(View v) {
                 ErrorUtils.showError(mContext, "Clicked");
-                MediaItemHolder.getInstance().setMediaItem(songLocalTest);
+
+                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                    MediaItemHolder.getInstance().setMediaItem(songLocalTest);
+                } else {
+                    ErrorUtils.showError(mContext, "Can not Play Local Song!");
+                }
+
             }
         });
 
@@ -154,25 +162,18 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
             public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
                 switch (itemSearchOption.getText()) {
                     case Constants.ACTION_PLAY_NEXT:
-                        if (MediaItemHolder.getInstance().getListSongs().isEmpty()) {
-                            MediaItemHolder.getInstance().getListSongs().add(song);
-                            mediaItem = MediaItem.fromUri(song.getSongURL());
-                            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+                        if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                            playNext(song);
                         } else {
-                            int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
-                            MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1, song);
-                            mediaItem = MediaItem.fromUri(song.getSongURL());
-                            MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
+                            ErrorUtils.showError(mContext, "Can not Play Local Song!");
                         }
-                        fragmentSearchOptionBottomSheet.dismiss();
-                        Toast.makeText(mContext, "Song Added To Top : " + song.getName(), Toast.LENGTH_SHORT).show();
                         break;
                     case Constants.ACTION_ADD_TO_QUEUE:
-                        MediaItemHolder.getInstance().getListSongs().add(song);
-                        mediaItem = MediaItem.fromUri(song.getSongURL());
-                        MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
-                        fragmentSearchOptionBottomSheet.dismiss();
-                        Toast.makeText(mContext, "Song Added : " + song.getName(), Toast.LENGTH_SHORT).show();
+                        if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                            addToQueue(song);
+                        } else {
+                            ErrorUtils.showError(mContext, "Can not Play Local Song!");
+                        }
                         break;
                     default:
                         // Handle default action
@@ -183,6 +184,29 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
             }
         });
         fragmentSearchOptionBottomSheet.show(mFragmentActivity.getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
+    }
+
+    private void addToQueue(Song song) {
+        MediaItemHolder.getInstance().getListSongs().add(song);
+        mediaItem = MediaItem.fromUri(song.getSongURL());
+        MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+        fragmentSearchOptionBottomSheet.dismiss();
+        Toast.makeText(mContext, "Song Added : " + song.getName(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void playNext(Song song) {
+        if (MediaItemHolder.getInstance().getListSongs().isEmpty()) {
+            MediaItemHolder.getInstance().getListSongs().add(song);
+            mediaItem = MediaItem.fromUri(song.getSongURL());
+            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+        } else {
+            int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+            MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1, song);
+            mediaItem = MediaItem.fromUri(song.getSongURL());
+            MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
+        }
+        fragmentSearchOptionBottomSheet.dismiss();
+        Toast.makeText(mContext, "Song Added To Top : " + song.getName(), Toast.LENGTH_SHORT).show();
     }
 }
 

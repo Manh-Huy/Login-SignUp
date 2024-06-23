@@ -246,6 +246,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/premiumCard">
 
                 <LinearLayout
+                    android:id="@+id/layout_download"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"

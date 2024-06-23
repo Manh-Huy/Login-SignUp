@@ -18,6 +18,7 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SongAlbumAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.Genre;
@@ -25,6 +26,8 @@ import com.example.authenticationuseraccount.model.IClickSearchOptionItemListene
 import com.example.authenticationuseraccount.model.ItemSearchOption;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +90,9 @@ public class AlbumActivity extends AppCompatActivity {
         });
 
     }
+
     FragmentSearchOptionBottomSheet fragmentSearchOptionBottomSheet;
+
     private void clickOpenOptionBottomSheet() {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_playlist, Constants.ACTION_ADD_TO_PLAYLIST));
@@ -95,7 +100,7 @@ public class AlbumActivity extends AppCompatActivity {
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_heart, Constants.ACTION_LOVE));
         itemSearchOptionList.add(new ItemSearchOption(leveldown.kyle.icon_packs.R.drawable.shuffle_24px, Constants.ACTION_ADD_RANDOM_PLAYLIST));
 
-         fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
+        fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
             @Override
             public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
                 switch (itemSearchOption.getText()) {
@@ -122,21 +127,55 @@ public class AlbumActivity extends AppCompatActivity {
     }
 
     private void setPlayList(List<Song> listSong) {
-        MediaItemHolder.getInstance().setListAlbumMediaItem(listSong);
-        Toast.makeText(AlbumActivity.this, "Playlist Added", Toast.LENGTH_SHORT).show();
-        finish();
+        if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+            MediaItemHolder.getInstance().setListAlbumMediaItem(listSong);
+            Toast.makeText(AlbumActivity.this, "Playlist Added", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            //Host Room
+            if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                //SocketIoManager.getInstance().onAddSong(userID, song);
+            } else {
+                //Guest Room
+                ErrorUtils.showError(AlbumActivity.this, "Only Host Can Change The Playlist!");
+            }
+        }
     }
 
     private void setPlayListRandom(List<Song> listSong) {
-        MediaItemHolder.getInstance().setListAlbumMediaItemRandom(listSong);
-        Toast.makeText(AlbumActivity.this, "Random Playlist Added", Toast.LENGTH_SHORT).show();
-        finish();
+        if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+            MediaItemHolder.getInstance().setListAlbumMediaItemRandom(listSong);
+            Toast.makeText(AlbumActivity.this, "Random Playlist Added", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            //Host Room
+            if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                //SocketIoManager.getInstance().onAddSong(userID, song);
+            } else {
+                //Guest Room
+                ErrorUtils.showError(AlbumActivity.this, "Only Host Can Change The Playlist!");
+            }
+        }
     }
 
-    private void addPlayListToQueue(List<Song>listSong){
-        MediaItemHolder.getInstance().addListMediaItem(listSong);
-        Toast.makeText(AlbumActivity.this, "Playlist Added To Queue", Toast.LENGTH_SHORT).show();
-        finish();
+    private void addPlayListToQueue(List<Song> listSong) {
+        if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+            MediaItemHolder.getInstance().addListMediaItem(listSong);
+            Toast.makeText(AlbumActivity.this, "Playlist Added To Queue", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            //Host Room
+            if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                //SocketIoManager.getInstance().onAddSong(userID, song);
+            } else {
+                //Guest Room
+                ErrorUtils.showError(AlbumActivity.this, "Only Host Can Change The Playlist!");
+            }
+        }
+
     }
 
     private void getListSongByGenre(String nameGenre) {

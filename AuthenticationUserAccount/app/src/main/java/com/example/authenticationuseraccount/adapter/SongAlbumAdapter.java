@@ -162,11 +162,9 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
                 ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
             }
         }
-
     }
 
     private void playNext(Song song) {
-
         if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
             if (MediaItemHolder.getInstance().getListSongs().isEmpty()) {
                 MediaItemHolder.getInstance().getListSongs().add(song);
@@ -191,7 +189,6 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
                 ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
             }
         }
-
     }
 
     private void HandleDownload(String fileUrl, String filename) {

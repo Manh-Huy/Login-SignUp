@@ -15,6 +15,7 @@ import com.example.authenticationuseraccount.adapter.StateFragmentAdapter;
 import com.example.authenticationuseraccount.fragment.FragmentCorner;
 import com.example.authenticationuseraccount.fragment.FragmentHome;
 import com.example.authenticationuseraccount.fragment.FragmentLibrary;
+import com.example.authenticationuseraccount.fragment.FragmentPlaylist;
 import com.example.authenticationuseraccount.fragment.FragmentProfile;
 import com.example.authenticationuseraccount.model.Message;
 import com.realgear.multislidinguppanel.BasePanelView;
@@ -30,7 +31,9 @@ public class RootNavigationBarPanel extends BasePanelView {
     private FragmentLibrary fragmentLibrary;
     private FragmentProfile fragmentProfile;
 
+    private FragmentPlaylist fragmentPlaylist;
     private Context mContext;
+
     public RootNavigationBarPanel(@NonNull Context context, MultiSlidingUpPanelLayout panelLayout) {
         super(context, panelLayout);
         mContext = context;
@@ -48,6 +51,7 @@ public class RootNavigationBarPanel extends BasePanelView {
         fragmentCorner = new FragmentCorner();
         fragmentLibrary = new FragmentLibrary();
         fragmentProfile = new FragmentProfile();
+        fragmentPlaylist = new FragmentPlaylist();
     }
 
     @Override
@@ -58,6 +62,7 @@ public class RootNavigationBarPanel extends BasePanelView {
 
         StateFragmentAdapter adapter = new StateFragmentAdapter(getSupportFragmentManager(), getLifecycle());
         adapter.addFragment(fragmentHome);
+        adapter.addFragment(fragmentPlaylist);
         adapter.addFragment(fragmentCorner);
         adapter.addFragment(fragmentLibrary);
         adapter.addFragment(fragmentProfile);
@@ -72,7 +77,7 @@ public class RootNavigationBarPanel extends BasePanelView {
 
     }
 
-    public void changeFragment(int index){
+    public void changeFragment(int index) {
         rootViewPager.setCurrentItem(index);
         rootNavigationBar.setupWithViewPager2(rootViewPager);
     }
@@ -93,12 +98,12 @@ public class RootNavigationBarPanel extends BasePanelView {
     }
 
     public void onRoomCreate(String roomID) {
-        rootViewPager.setCurrentItem(0);
-        rootNavigationBar.setupWithViewPager2(rootViewPager);
         rootViewPager.setCurrentItem(1);
         rootNavigationBar.setupWithViewPager2(rootViewPager);
+        rootViewPager.setCurrentItem(2);
+        rootNavigationBar.setupWithViewPager2(rootViewPager);
 
-        fragmentCorner.onRoomCreate(mContext,roomID);
+        fragmentCorner.onRoomCreate(mContext, roomID);
     }
 
     public void onRoomJoined(String roomId) {

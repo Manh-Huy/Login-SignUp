@@ -4,9 +4,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.TaskStackBuilder;
 import androidx.media3.common.AudioAttributes;
-import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
@@ -14,7 +12,6 @@ import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaSessionService;
 
 import com.example.authenticationuseraccount.activity.MainActivity;
-import com.example.authenticationuseraccount.activity.MediaPlayerActivity;
 import com.example.authenticationuseraccount.common.LogUtils;
 
 @UnstableApi

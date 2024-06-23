@@ -34,7 +34,6 @@ import java.util.List;
 
 public class FragmentLibrary extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private Context mContext;
-
     private List<LocalSong> musicList;
     private LocalMusicAdapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;

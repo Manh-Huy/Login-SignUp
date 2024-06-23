@@ -590,7 +590,7 @@ public class FragmentHome extends Fragment {
                 SocketIoManager.getInstance().onAddSong(userID, song);
             }else{
                 //Guest Room
-                ErrorUtils.showError(getContext(),"Please Upgrade To Premium To Control Room Media!");
+                ErrorUtils.showError(getContext(),"Only Host Can Change The Playlist!");
             }
         }
 

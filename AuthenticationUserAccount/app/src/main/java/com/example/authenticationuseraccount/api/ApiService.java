@@ -7,6 +7,7 @@ import com.example.authenticationuseraccount.model.SearchHistory;
 import com.example.authenticationuseraccount.model.SearchResult;
 import com.example.authenticationuseraccount.model.business.Album;
 import com.example.authenticationuseraccount.model.business.Artist;
+import com.example.authenticationuseraccount.model.business.Playlist;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
@@ -152,6 +153,9 @@ public interface ApiService {
 
     @POST("listenHistory/createMultipleHistory")
     Completable mergeListenHistoryLocalToAccount(@Body List<ListenHistory> listListenHistory);
+
+    @GET("playlists/getPlaylistByUserID/{id}")
+    Observable<List<Playlist>> getPLayListByID(@Path("id") String userID);
 }
 
 

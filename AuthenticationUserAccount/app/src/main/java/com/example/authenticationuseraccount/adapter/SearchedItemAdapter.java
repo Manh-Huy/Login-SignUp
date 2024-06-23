@@ -23,11 +23,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.fragment.FragmentPlaylistOptionBottomSheet;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
 import com.example.authenticationuseraccount.model.ItemSearchOption;
 import com.example.authenticationuseraccount.model.business.Album;
 import com.example.authenticationuseraccount.model.business.Artist;
+import com.example.authenticationuseraccount.model.business.Playlist;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.CustomDownloadManager;
@@ -129,6 +131,8 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     MediaItem mediaItem = null;
     FragmentSearchOptionBottomSheet fragmentSearchOptionBottomSheet;
+
+    FragmentPlaylistOptionBottomSheet fragmentPlaylistOptionBottomSheet;
     private void clickOpenSearchOptionBottomSheetFragment(Song song) {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_love, "Thích"));
@@ -149,7 +153,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         HandleDownload(song.getSongURL(),song.getName());
                         break;
                     case "Thêm vào danh sách phát":
-                        Toast.makeText(mContext, "Thêm vào danh sách phát clicked", Toast.LENGTH_SHORT).show();
+                        clickOpenPlaylistOptionBottomSheetFragment();
                         break;
                     case "Phát tiếp theo":
                         fragmentSearchOptionBottomSheet.dismiss();
@@ -175,6 +179,13 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             }
         });
         fragmentSearchOptionBottomSheet.show(fragmentActivity.getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
+    }
+
+    private void clickOpenPlaylistOptionBottomSheetFragment() {
+        List<Playlist> playlistList = new ArrayList<>();
+
+        fragmentPlaylistOptionBottomSheet = new FragmentPlaylistOptionBottomSheet(playlistList);
+        fragmentPlaylistOptionBottomSheet.show(fragmentActivity.getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
     }
 
     @Override

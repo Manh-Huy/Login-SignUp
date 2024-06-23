@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
@@ -32,6 +33,7 @@ import com.example.authenticationuseraccount.service.MediaItemHolder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.ViewHolder> {
 
@@ -46,7 +48,7 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
         this.mFragmentActivity = fragmentActivity;
     }
 
-    public void setData(List<LocalSong> musicList){
+    public void setData(List<LocalSong> musicList) {
         this.musicList = musicList;
         notifyDataSetChanged();
     }
@@ -139,22 +141,19 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
         retriever.release();
         return art;
     }
+
     FragmentSearchOptionBottomSheet fragmentSearchOptionBottomSheet;
+
     private void clickOpenOptionBottomSheetFragment(Song song) {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_queue, "Thêm vào hàng đợi"));
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_next, "Phát tiếp theo"));
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.library_add_24px, "Thêm vào danh sách phát"));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_queue, Constants.ACTION_ADD_TO_QUEUE));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_next, Constants.ACTION_PLAY_NEXT));
 
-         fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
+        fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
             @Override
             public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
                 switch (itemSearchOption.getText()) {
-                    case "Thêm vào danh sách phát":
-                        fragmentSearchOptionBottomSheet.dismiss();
-                        Toast.makeText(mContext, "Thêm vào danh sách phát clicked", Toast.LENGTH_SHORT).show();
-                        break;
-                    case "Phát tiếp theo":
+                    case Constants.ACTION_PLAY_NEXT:
                         if (MediaItemHolder.getInstance().getListSongs().isEmpty()) {
                             MediaItemHolder.getInstance().getListSongs().add(song);
                             mediaItem = MediaItem.fromUri(song.getSongURL());
@@ -166,14 +165,14 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
                             MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
                         }
                         fragmentSearchOptionBottomSheet.dismiss();
-                        Toast.makeText(mContext, "Phát tiếp theo clicked", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "Song Added To Top : " + song.getName(), Toast.LENGTH_SHORT).show();
                         break;
-                    case "Thêm vào hàng đợi":
+                    case Constants.ACTION_ADD_TO_QUEUE:
                         MediaItemHolder.getInstance().getListSongs().add(song);
                         mediaItem = MediaItem.fromUri(song.getSongURL());
                         MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
                         fragmentSearchOptionBottomSheet.dismiss();
-                        Toast.makeText(mContext, "Thêm vào hàng đợi clicked: " + MediaItemHolder.getInstance().getListSongs().size(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, "Song Added : " + song.getName(), Toast.LENGTH_SHORT).show();
                         break;
                     default:
                         // Handle default action

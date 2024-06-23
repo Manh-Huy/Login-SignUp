@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
+import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
@@ -88,33 +89,33 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
 
     private void clickOpenOptionBottomSheetFragment(Song song) {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_heart, "Thích"));
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_next, "Phát tiếp theo"));
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_queue, "Thêm vào hàng đợi"));
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_download, "Tải xuống"));
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.library_add_24px, "Thêm vào danh sách phát"));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.baseline_favorite_border_24, Constants.ACTION_LOVE));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_download, Constants.ACTION_DOWNLOAD));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.library_add_24px, Constants.ACTION_ADD_TO_PLAYLIST));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_next, Constants.ACTION_PLAY_NEXT));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_queue, Constants.ACTION_ADD_TO_QUEUE));
 
         fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
             @Override
             public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
                 switch (itemSearchOption.getText()) {
-                    case "Thích":
+                    case Constants.ACTION_LOVE:
                         fragmentSearchOptionBottomSheet.dismiss();
                         Toast.makeText(mContext, "Thích clicked", Toast.LENGTH_SHORT).show();
                         break;
-                    case "Tải xuống":
+                    case Constants.ACTION_DOWNLOAD:
                         HandleDownload(song.getSongURL(), song.getName());
                         fragmentSearchOptionBottomSheet.dismiss();
                         break;
-                    case "Thêm vào danh sách phát":
+                    case Constants.ACTION_ADD_TO_PLAYLIST:
                         fragmentSearchOptionBottomSheet.dismiss();
                         Toast.makeText(mContext, "Thêm vào danh sách phát clicked", Toast.LENGTH_SHORT).show();
                         break;
-                    case "Phát tiếp theo":
+                    case Constants.ACTION_PLAY_NEXT:
                         playNext(song);
                         fragmentSearchOptionBottomSheet.dismiss();
                         break;
-                    case "Thêm vào hàng đợi":
+                    case Constants.ACTION_ADD_TO_QUEUE:
                         addToQueue(song);
                         fragmentSearchOptionBottomSheet.dismiss();
                         break;

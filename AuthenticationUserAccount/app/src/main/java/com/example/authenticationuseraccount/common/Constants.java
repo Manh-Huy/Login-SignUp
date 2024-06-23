@@ -12,5 +12,6 @@ public class Constants {
     public static final String ACTION_ADD_TO_PLAYLIST = "Add To Playlist";
     public static final String ACTION_ADD_TO_QUEUE = "Add To Queue";
     public static final String ACTION_DOWNLOAD = "Download";
+    public static final String ACTION_ADD_RANDOM_PLAYLIST = "Play Random";
     public static int PERMISSION_REQUEST_CODE = 100;
 }

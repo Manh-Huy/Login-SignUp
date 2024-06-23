@@ -87,6 +87,7 @@ public class MediaPlayerView {
         this.m_vTextView_CurrentDuration = this.mControlsContainer.findViewById(R.id.text_view_song_current_duration);
         this.m_vTextView_MaxDuration = this.mControlsContainer.findViewById(R.id.text_view_song_max_duration);
         this.m_vBtn_Repeat = findViewById(R.id.btn_repeat);
+        this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
         this.m_vBtn_Prev = findViewById(R.id.btn_skip_previous);
         this.m_vBtn_PlayPause = findViewById(R.id.btn_play_pause);
         this.m_vBtn_Next = findViewById(R.id.btn_skip_next);
@@ -106,6 +107,7 @@ public class MediaPlayerView {
         }
         mMediaController = controller;
         setOnListener();
+        mMediaController.setRepeatMode(MediaItemHolder.REPEAT_TYPE_ALL);
     }
 
     public void onPanelStateChanged(int panelSate) {
@@ -166,7 +168,7 @@ public class MediaPlayerView {
             switch (m_vRepeatType) {
                 case MediaItemHolder.REPEAT_TYPE_NONE:
                     this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
-                    this.m_vBtn_Repeat.setAlpha(0.5F);
+                    this.m_vBtn_Repeat.setAlpha(0.25F);
                     break;
 
                 case MediaItemHolder.REPEAT_TYPE_ONE:
@@ -250,6 +252,7 @@ public class MediaPlayerView {
     }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap, boolean isLoveSong) {
+        this.m_vBtn_Shuffle.setIconResource(mMediaController.getShuffleModeEnabled() ? leveldown.kyle.icon_packs.R.drawable.ic_shuffle_on_24px : R.drawable.ic_shuffle_off);
         this.materialCheckBox.setChecked(isLoveSong);
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
@@ -336,7 +339,7 @@ public class MediaPlayerView {
     private void triggerSaveLocal() {
         LogUtils.ApplicationLogI("Trigger Local Call Update History!");
         ListenHistory listenHistory = getSongHistory("Local", 1);
-        if(listenHistory.getSongID() == null){
+        if (listenHistory.getSongID() == null) {
             LogUtils.ApplicationLogI("Local Song! Not Going To Update History");
             return;
         }

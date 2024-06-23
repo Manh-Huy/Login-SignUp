@@ -6,6 +6,7 @@ import androidx.media3.common.Player;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.MediaSession;
 
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.LocalSong;
 import com.example.authenticationuseraccount.model.business.Song;
 
@@ -13,6 +14,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MediaItemHolder {
     public static final int REPEAT_TYPE_NONE = Player.REPEAT_MODE_OFF;
@@ -166,6 +168,37 @@ public class MediaItemHolder {
         this.listSongs.add(song);
         MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
         MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+    }
+
+    public void addListMediaItem(List<Song> songs) {
+        for (Song song : songs) {
+            this.listSongs.add(song);
+            MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+        }
+    }
+
+    public void setListAlbumMediaItem(List<Song> songs) {
+        this.listSongs.clear();
+        MediaItemHolder.getInstance().getMediaController().clearMediaItems();
+        int i = 0;
+        for (Song song : songs) {
+            this.listSongs.add(song);
+            MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+        }
+
+    }
+
+    public void setListAlbumMediaItemRandom(List<Song> songs) {
+        this.listSongs.clear();
+        MediaItemHolder.getInstance().getMediaController().clearMediaItems();
+        for (Song song : songs) {
+            this.listSongs.add(song);
+            MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+        }
+        MediaItemHolder.getInstance().getMediaController().setShuffleModeEnabled(true);
     }
 
 }

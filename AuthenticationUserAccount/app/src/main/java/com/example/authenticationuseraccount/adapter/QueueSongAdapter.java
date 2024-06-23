@@ -21,6 +21,8 @@ import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.github.ybq.android.spinkit.style.ChasingDots;
 import com.github.ybq.android.spinkit.style.Wave;
 
@@ -89,9 +91,23 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
         holder.layoutItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                iClickSongRecyclerViewListener.onClickItemSong(song);
-                MediaItemHolder.getInstance().getMediaController().seekToDefaultPosition(position);
-                notifyDataSetChanged();
+
+                //No Room
+                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                    iClickSongRecyclerViewListener.onClickItemSong(song);
+                    MediaItemHolder.getInstance().getMediaController().seekToDefaultPosition(position);
+                    notifyDataSetChanged();
+                } else {
+                    //Host Room
+                    if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                        String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                        //SocketIoManager.getInstance().onAddSong(userID, song);
+                    } else {
+                        //Guest Room
+                        ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                    }
+                }
+                
             }
         });
 

@@ -81,6 +81,14 @@ public class SocketIoManager {
                 onSongSet(args);
             }
         });
+
+        mSocket.on("on-add-song-play-next", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = song
+                onSongAddedPlayNext(args);
+            }
+        });
     }
 
     public void setSong(String roomId, Song song) {
@@ -148,6 +156,39 @@ public class SocketIoManager {
                 MediaItemHolder.getInstance().addMediaItemToQueue(song);
                 LogUtils.ApplicationLogI("SocketIOManager | on-song-added : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
                 ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), song.getName() + " Has Been Added To Queue!");
+            }
+        });
+    }
+
+    public void addSongPlayNext(String roomId, Song song){
+        String songJson = gson.toJson(song);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomId);
+            data.put("song", songJson);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | add-song-play-next: " + data.toString());
+        mSocket.emit("add-song-play-next", data);
+    }
+
+    private void onSongAddedPlayNext(Object[] args) {
+        LogUtils.ApplicationLogI("SocketIOManager | on-add-song-play-next: " + (String) args[0]);
+        String data = (String) args[0];
+        JSONObject jsonData = null;
+        try {
+            jsonData = new JSONObject(data);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        Song song = gson.fromJson(jsonData.toString(), Song.class);
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().playMediaItemNext(song);
+                LogUtils.ApplicationLogI("SocketIOManager | on-add-song-play-next : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
+                ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), song.getName() + " Has Been Added To Top Of Queue!");
             }
         });
     }

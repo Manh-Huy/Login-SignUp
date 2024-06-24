@@ -36,6 +36,7 @@ import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.CustomDownloadManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,12 +103,12 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     public void onClick(View v) {
                         if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
                             MediaItemHolder.getInstance().setMediaItem(song);
-                            fragmentActivity.finish();
+
                         } else {
                             //Host Room
                             if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                                 String userID = ChillCornerRoomManager.getInstance().getRoomId();
-                                //SocketIoManager.getInstance().onAddSong(userID, song);
+                                SocketIoManager.getInstance().setSong(userID, song);
                             } else {
                                 //Guest Room
                                 ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
@@ -193,13 +194,13 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
             MediaItemHolder.getInstance().addMediaItemToQueue(song);
             fragmentSearchOptionBottomSheet.dismiss();
-            fragmentActivity.finish();
             Toast.makeText(mContext, song.getName() + " Added to queue", Toast.LENGTH_SHORT).show();
         } else {
             //Host Room
             if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                 String userID = ChillCornerRoomManager.getInstance().getRoomId();
-                //SocketIoManager.getInstance().onAddSong(userID, song);
+                SocketIoManager.getInstance().addSong(userID, song);
+                fragmentSearchOptionBottomSheet.dismiss();
             } else {
                 //Guest Room
                 ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
@@ -212,13 +213,12 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
             MediaItemHolder.getInstance().playMediaItemNext(song);
             fragmentSearchOptionBottomSheet.dismiss();
-            fragmentActivity.finish();
             Toast.makeText(mContext, song.getName() + " will play next", Toast.LENGTH_SHORT).show();
         } else {
             //Host Room
             if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                 String userID = ChillCornerRoomManager.getInstance().getRoomId();
-                //SocketIoManager.getInstance().onAddSong(userID, song);
+                SocketIoManager.getInstance().addSongPlayNext(userID, song);
             } else {
                 //Guest Room
                 ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");

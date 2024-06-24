@@ -162,7 +162,7 @@ public class AlbumActivity extends AppCompatActivity {
 
     private void addPlayListToQueue(List<Song> listSong) {
         if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
-            MediaItemHolder.getInstance().addListMediaItem(listSong);
+            MediaItemHolder.getInstance().addListAlbumMediaItem(listSong);
             Toast.makeText(AlbumActivity.this, "Playlist Added To Queue", Toast.LENGTH_SHORT).show();
             finish();
         } else {

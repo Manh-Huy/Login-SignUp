@@ -189,7 +189,7 @@ public class MediaItemHolder {
         }
     }
 
-    public void addListMediaItem(List<Song> songs) {
+    public void addListAlbumMediaItem(List<Song> songs) {
         for (Song song : songs) {
             this.listSongs.add(song);
             MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());

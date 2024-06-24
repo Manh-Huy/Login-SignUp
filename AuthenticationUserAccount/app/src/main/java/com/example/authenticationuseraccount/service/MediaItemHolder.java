@@ -200,13 +200,11 @@ public class MediaItemHolder {
     public void setListAlbumMediaItem(List<Song> songs) {
         this.listSongs.clear();
         instance.getMediaController().clearMediaItems();
-        int i = 0;
         for (Song song : songs) {
             this.listSongs.add(song);
             MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
             instance.getMediaController().addMediaItem(mediaItem);
         }
-
     }
 
     public void setListAlbumMediaItemRandom(List<Song> songs) {

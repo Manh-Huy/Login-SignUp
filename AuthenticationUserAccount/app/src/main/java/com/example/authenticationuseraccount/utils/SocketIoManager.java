@@ -9,10 +9,14 @@ import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.UIThread;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -89,7 +93,125 @@ public class SocketIoManager {
                 onSongAddedPlayNext(args);
             }
         });
+
+        mSocket.on("on-playlist-added", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                // args = List<Song>;
+                onAddPlaylistToQueue(args);
+            }
+        });
+
+        mSocket.on("on-playlist-set", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                // args = List<Song>;
+                onSetPlaylist(args);
+            }
+        });
+
+        mSocket.on("on-playlist-random-set", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                // args = List<Song>;
+                onSetPlaylistRandom(args);
+            }
+        });
     }
+
+    public void addPlaylistToQueue(String roomId, List<Song> listSong) {
+        String songJson = gson.toJson(listSong);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomId);
+            data.put("songs", songJson);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | add-playlist: " + data.toString());
+        mSocket.emit("add-playlist", data);
+    }
+
+    public void onAddPlaylistToQueue(Object[] args) {
+        LogUtils.ApplicationLogI("SocketIOManager | on-playlist-added: " + (String) args[0]);
+        String data = (String) args[0];
+        List<Song> songList = convertJsonToSongList(data);
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().addListAlbumMediaItem(songList);
+                LogUtils.ApplicationLogI("SocketIOManager | on-playlist-added : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
+                ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), songList.size() + " Songs Has Been Added To Queue!");
+            }
+        });
+    }
+
+    public void setPlaylist(String roomId, List<Song> listSong) {
+        String songJson = gson.toJson(listSong);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomId);
+            data.put("songs", songJson);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | set-playlist: " + data.toString());
+        mSocket.emit("set-playlist", data);
+    }
+
+    public void onSetPlaylist(Object[] args) {
+        LogUtils.ApplicationLogI("SocketIOManager | on-playlist-set : " + (String) args[0]);
+        String data = (String) args[0];
+        List<Song> songList = convertJsonToSongList(data);
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().setListAlbumMediaItem(songList);
+                LogUtils.ApplicationLogI("SocketIOManager | on-playlist-set : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
+                ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), songList.size() + " Songs Has Been Set To Queue!");
+            }
+        });
+    }
+
+    public void setPlaylistRandom(String roomId, List<Song> listSong) {
+        String songJson = gson.toJson(listSong);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomId);
+            data.put("songs", new JSONArray(songJson));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | set-playlist-random: " + data.toString());
+        mSocket.emit("set-playlist-random", data);
+    }
+
+    public void onSetPlaylistRandom(Object[] args) {
+        LogUtils.ApplicationLogI("SocketIOManager | on-playlist-set : " + (JSONArray) args[0]);
+
+        JSONArray jsonArray = (JSONArray) args[0];
+        List<Song> shuffledSongs = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject songJson = null;
+            try {
+                songJson = jsonArray.getJSONObject(i);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            Song song = gson.fromJson(songJson.toString(), Song.class);
+            shuffledSongs.add(song);
+        }
+
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().setListAlbumMediaItem(shuffledSongs);
+                LogUtils.ApplicationLogI("SocketIOManager | on-playlist-random-set : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
+                ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), shuffledSongs.size() + " Songs Has Been Randomized And Set To Queue!");
+            }
+        });
+    }
+
 
     public void setSong(String roomId, Song song) {
         String songJson = gson.toJson(song);
@@ -127,7 +249,7 @@ public class SocketIoManager {
         }
     }
 
-    public void addSong(String roomId, Song song){
+    public void addSong(String roomId, Song song) {
         String songJson = gson.toJson(song);
         JSONObject data = new JSONObject();
         try {
@@ -160,7 +282,7 @@ public class SocketIoManager {
         });
     }
 
-    public void addSongPlayNext(String roomId, Song song){
+    public void addSongPlayNext(String roomId, Song song) {
         String songJson = gson.toJson(song);
         JSONObject data = new JSONObject();
         try {
@@ -192,7 +314,6 @@ public class SocketIoManager {
             }
         });
     }
-
 
     private void listenForRoomEvent() {
         mSocket.on("on-create-room", new Emitter.Listener() {
@@ -495,6 +616,32 @@ public class SocketIoManager {
 
     public static synchronized void release() {
         instance = null;
+    }
+
+    public static List<Song> convertJsonToSongList(String jsonData) {
+        List<Song> songList = new ArrayList<>();
+        Gson gson = new Gson();
+
+        try {
+            // Convert the string data to a JSONArray
+            JSONArray jsonArray = new JSONArray(jsonData);
+
+            // Iterate over the JSONArray
+            for (int i = 0; i < jsonArray.length(); i++) {
+                // Get each JSONObject
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                // Convert JSONObject to Song object using Gson
+                Song song = gson.fromJson(jsonObject.toString(), Song.class);
+
+                // Add Song object to the songList
+                songList.add(song);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return songList;
     }
 
 }

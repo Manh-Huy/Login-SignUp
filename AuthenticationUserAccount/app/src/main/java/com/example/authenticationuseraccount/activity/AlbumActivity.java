@@ -135,7 +135,7 @@ public class AlbumActivity extends AppCompatActivity {
             //Host Room
             if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                 String userID = ChillCornerRoomManager.getInstance().getRoomId();
-                //SocketIoManager.getInstance().onAddSong(userID, song);
+                SocketIoManager.getInstance().setPlaylist(userID, listSong);
             } else {
                 //Guest Room
                 ErrorUtils.showError(AlbumActivity.this, "Only Host Can Change The Playlist!");
@@ -152,7 +152,7 @@ public class AlbumActivity extends AppCompatActivity {
             //Host Room
             if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                 String userID = ChillCornerRoomManager.getInstance().getRoomId();
-                //SocketIoManager.getInstance().onAddSong(userID, song);
+                SocketIoManager.getInstance().setPlaylistRandom(userID, listSong);
             } else {
                 //Guest Room
                 ErrorUtils.showError(AlbumActivity.this, "Only Host Can Change The Playlist!");
@@ -169,7 +169,7 @@ public class AlbumActivity extends AppCompatActivity {
             //Host Room
             if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                 String userID = ChillCornerRoomManager.getInstance().getRoomId();
-                //SocketIoManager.getInstance().onAddSong(userID, song);
+                SocketIoManager.getInstance().addPlaylistToQueue(userID, listSong);
             } else {
                 //Guest Room
                 ErrorUtils.showError(AlbumActivity.this, "Only Host Can Change The Playlist!");

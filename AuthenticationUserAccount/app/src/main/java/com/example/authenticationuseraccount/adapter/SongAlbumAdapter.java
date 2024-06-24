@@ -154,8 +154,8 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
         } else {
             //Host Room
             if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
-                String userID = ChillCornerRoomManager.getInstance().getRoomId();
-                //SocketIoManager.getInstance().onAddSong(userID, song);
+                String roomID = ChillCornerRoomManager.getInstance().getRoomId();
+                SocketIoManager.getInstance().addSong(roomID, song);
                 fragmentActivity.finish();
             } else {
                 //Guest Room

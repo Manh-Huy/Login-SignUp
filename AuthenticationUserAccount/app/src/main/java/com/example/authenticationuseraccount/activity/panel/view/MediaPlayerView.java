@@ -274,7 +274,6 @@ public class MediaPlayerView {
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        LogUtils.ApplicationLogE("onResourceReady");
                         mProgressBar.setVisibility(View.GONE);
                         mImageViewThumbNail.setVisibility(View.VISIBLE);
                         return false;

@@ -56,6 +56,7 @@ public class SocketIoManager {
 
             listenForRoomEvent();
             listenForChatEvent();
+            listenForMusicEvent();
 
             mSocket.connect();
 
@@ -63,6 +64,94 @@ public class SocketIoManager {
             e.printStackTrace();
         }
     }
+
+    private void listenForMusicEvent() {
+        mSocket.on("on-song-added", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = song
+                onSongAdded(args);
+            }
+        });
+
+        mSocket.on("on-song-set", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = song
+                onSongSet(args);
+            }
+        });
+    }
+
+    public void setSong(String roomId, Song song) {
+        String songJson = gson.toJson(song);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomId);
+            data.put("song", songJson);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | set-song: " + data.toString());
+        mSocket.emit("set-song", data);
+    }
+
+    private void onSongSet(Object[] args) {
+        try {
+            LogUtils.ApplicationLogI("SocketIOManager | on-song-set: " + (String) args[0]);
+            String data = (String) args[0];
+            JSONObject jsonData = new JSONObject(data);
+            Song song = gson.fromJson(jsonData.toString(), Song.class);
+
+            UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    MediaItemHolder.getInstance().setMediaItem(song);
+                    ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
+                    ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), song.getName() + " Has Been Set!");
+                    LogUtils.ApplicationLogI("SocketIOManager | on-song-set current index: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
+                }
+            });
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addSong(String roomId, Song song){
+        String songJson = gson.toJson(song);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomId);
+            data.put("song", songJson);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | add-song: " + data.toString());
+        mSocket.emit("add-song", data);
+    }
+
+    private void onSongAdded(Object[] args) {
+        LogUtils.ApplicationLogI("SocketIOManager | on-song-added: " + (String) args[0]);
+        String data = (String) args[0];
+        JSONObject jsonData = null;
+        try {
+            jsonData = new JSONObject(data);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        Song song = gson.fromJson(jsonData.toString(), Song.class);
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().addMediaItemToQueue(song);
+                LogUtils.ApplicationLogI("SocketIOManager | on-song-added : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
+                ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), song.getName() + " Has Been Added To Queue!");
+            }
+        });
+    }
+
 
     private void listenForRoomEvent() {
         mSocket.on("on-create-room", new Emitter.Listener() {
@@ -95,11 +184,6 @@ public class SocketIoManager {
                 //args = userName
                 onUserJoinRoomBroadCast(args);
             }
-        }).on("on-song-added", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                onSongAdded(args);
-            }
         }).on("on-user-disconnect", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
@@ -108,7 +192,6 @@ public class SocketIoManager {
             }
         });
     }
-
 
     private void listenForChatEvent() {
         mSocket.on("on-user-message", new Emitter.Listener() {
@@ -295,12 +378,9 @@ public class SocketIoManager {
             LogUtils.ApplicationLogI("SocketIOManager | on-response-room-info Deserialise roomID: " + roomManager.getRoomId() + " NumUsers: " + roomManager.getListUser().size());
 
             JSONObject data2 = new JSONObject();
-            try {
-                data2.put("roomID", roomManager.getRoomId());
-                data2.put("userName", roomManager.getListUser().get(roomManager.getListUser().size() - 1).getUserName());
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
+            data2.put("roomID", roomManager.getRoomId());
+            data2.put("userName", roomManager.getListUser().get(roomManager.getListUser().size() - 1).getUserName());
+
 
             LogUtils.ApplicationLogI("SocketIOManager | user-join-room: " + data2.toString());
             mSocket.emit("user-join-room", data2);
@@ -347,43 +427,6 @@ public class SocketIoManager {
         });
     }
 
-
-    private void onSongAdded(Object[] args) {
-        try {
-            LogUtils.ApplicationLogI("on-song-added " + (String) args[0]);
-            String data = (String) args[0];
-            JSONObject jsonData = new JSONObject(data);
-            Song song = gson.fromJson(jsonData.toString(), Song.class);
-
-            LogUtils.ApplicationLogI("on-song-added Deserialise name: " + song.getName() + " artist: " + song.getArtist());
-            //ChillCornerRoomManager.getInstance().setCurrentPlaySong(song);
-
-            UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    MediaItemHolder.getInstance().setMediaItem(song);
-                }
-            });
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void onAddSong(String roomId, Song song) {
-        String songJson = gson.toJson(song);
-        JSONObject data = new JSONObject();
-        try {
-            data.put("roomID", roomId);
-            data.put("song", songJson);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-        //LogUtils.ApplicationLogI("on-add-song: " + data.toString());
-        mSocket.emit("on-add-song", data);
-    }
-
     public static SocketIoManager getInstance() {
         if (instance == null) {
             synchronized (SocketIoManager.class) {
@@ -408,7 +451,8 @@ public class SocketIoManager {
             mSocket.close();
         }
     }
-    public static synchronized void release(){
+
+    public static synchronized void release() {
         instance = null;
     }
 

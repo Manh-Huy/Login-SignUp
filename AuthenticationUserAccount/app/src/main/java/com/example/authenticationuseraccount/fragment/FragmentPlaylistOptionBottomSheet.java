@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,7 +33,7 @@ public class FragmentPlaylistOptionBottomSheet extends BottomSheetDialogFragment
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         BottomSheetDialog bottomSheetDialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
 
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.layout_search_option_bottom_sheet, null);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.layout_playlist_option_bottom_sheet, null);
         bottomSheetDialog.setContentView(view);
 
         RecyclerView rcvSearchOption =view.findViewById(R.id.rcv_search_option);
@@ -44,6 +46,19 @@ public class FragmentPlaylistOptionBottomSheet extends BottomSheetDialogFragment
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         rcvSearchOption.addItemDecoration(itemDecoration);
+
+        Button btnAddToPlaylist = view.findViewById(R.id.btn_add_to_playlist);
+        btnAddToPlaylist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Playlist selectedPlaylist = itemPlaylistOptionAdapter.getSelectedPlaylist();
+                if (selectedPlaylist == null) {
+                    Toast.makeText(getContext(), "No items selected", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Selected item: " + selectedPlaylist.getPlaylistName(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         return bottomSheetDialog;
     }

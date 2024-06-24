@@ -16,6 +16,7 @@ import java.util.List;
 
 public class ItemPlaylistOptionAdapter extends RecyclerView.Adapter<ItemPlaylistOptionAdapter.ItemPlaylistOptionViewHolder> {
     private List<Playlist> mListItems;
+    private int selectedPosition = -1;
 
     public ItemPlaylistOptionAdapter(List<Playlist> mListItems) {
         this.mListItems = mListItems;
@@ -35,9 +36,17 @@ public class ItemPlaylistOptionAdapter extends RecyclerView.Adapter<ItemPlaylist
             return;
         }
         holder.cbPlaylist.setText(playlist.getPlaylistName());
-        holder.layoutItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        holder.cbPlaylist.setOnCheckedChangeListener(null);
+        holder.cbPlaylist.setChecked(position == selectedPosition);
+
+        holder.cbPlaylist.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                selectedPosition = holder.getAdapterPosition();
+                notifyDataSetChanged();
+            } else {
+                if (selectedPosition == holder.getAdapterPosition()) {
+                    selectedPosition = -1;
+                }
             }
         });
     }
@@ -48,6 +57,13 @@ public class ItemPlaylistOptionAdapter extends RecyclerView.Adapter<ItemPlaylist
             return mListItems.size();
         }
         return 0;
+    }
+
+    public Playlist getSelectedPlaylist() {
+        if (selectedPosition != -1) {
+            return mListItems.get(selectedPosition);
+        }
+        return null;
     }
 
     public class ItemPlaylistOptionViewHolder extends RecyclerView.ViewHolder {

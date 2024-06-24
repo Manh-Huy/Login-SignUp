@@ -47,11 +47,13 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private Context mContext;
     private FragmentActivity fragmentActivity;
     private List<Object> listItems;
+    private List<Playlist> listPlaylist;
 
-    public SearchedItemAdapter(Context context, FragmentActivity fragmentActivity, List<Object> song) {
-        this.mContext = context;
+    public SearchedItemAdapter(Context mContext, FragmentActivity fragmentActivity, List<Object> listItems, List<Playlist> listPlaylist) {
+        this.mContext = mContext;
         this.fragmentActivity = fragmentActivity;
-        this.listItems = song;
+        this.listItems = listItems;
+        this.listPlaylist = listPlaylist;
     }
 
     @NonNull
@@ -236,9 +238,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private void clickOpenPlaylistOptionBottomSheetFragment() {
-        List<Playlist> playlistList = new ArrayList<>();
-
-        fragmentPlaylistOptionBottomSheet = new FragmentPlaylistOptionBottomSheet(playlistList);
+        fragmentPlaylistOptionBottomSheet = new FragmentPlaylistOptionBottomSheet(listPlaylist);
         fragmentPlaylistOptionBottomSheet.show(fragmentActivity.getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
     }
 

@@ -156,6 +156,14 @@ public interface ApiService {
 
     @GET("playlists/getPlaylistByUserID/{id}")
     Observable<List<Playlist>> getPLayListByID(@Path("id") String userID);
+
+    @POST("playlists")
+    Completable addPlaylist(@Body Playlist playlist);
+
+    @FormUrlEncoded
+    @PATCH("playlists/addSongToPlaylist")
+    Completable addSongToPlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName, @Field("songID") String songID);
+
 }
 
 

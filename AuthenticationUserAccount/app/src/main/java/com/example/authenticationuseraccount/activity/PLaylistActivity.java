@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import java.util.List;
 public class PLaylistActivity extends AppCompatActivity {
     private TextView playlistTitle, songCount;
     private ImageButton btnMore;
+    private ImageView imgDeletePlaylist;
     private RecyclerView songRecyclerView;
     private SongAlbumAdapter songAlbumAdapter;
 
@@ -40,6 +42,7 @@ public class PLaylistActivity extends AppCompatActivity {
         songRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         btnMore = findViewById(R.id.more_button);
+        imgDeletePlaylist = findViewById(R.id.img_delete_playlist);
 
         Intent intent = getIntent();
         Playlist playlist = (Playlist) intent.getSerializableExtra("playlist");
@@ -61,6 +64,15 @@ public class PLaylistActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 clickOpenOptionBottomSheet();
+            }
+        });
+
+        imgDeletePlaylist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (playlist != null) {
+
+                }
             }
         });
 

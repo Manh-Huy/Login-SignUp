@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,17 +16,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.ItemPlaylistOptionAdapter;
+import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.Playlist;
+import com.example.authenticationuseraccount.model.business.Song;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class FragmentPlaylistOptionBottomSheet extends BottomSheetDialogFragment {
     private List<Playlist> mListItems;
+    private String userID;
+    private Song selectedSong;
 
-    public FragmentPlaylistOptionBottomSheet(List<Playlist> mListItems) {
+    public FragmentPlaylistOptionBottomSheet(List<Playlist> mListItems, String userID, Song selectedSong) {
         this.mListItems = mListItems;
+        this.userID = userID;
+        this.selectedSong = selectedSong;
     }
 
     @NonNull
@@ -55,11 +66,25 @@ public class FragmentPlaylistOptionBottomSheet extends BottomSheetDialogFragment
                 if (selectedPlaylist == null) {
                     Toast.makeText(getContext(), "No items selected", Toast.LENGTH_SHORT).show();
                 } else {
+                    addSongToPlaylist(userID, selectedPlaylist.getPlaylistName(), selectedSong.getSongID());
                     Toast.makeText(getContext(), "Selected item: " + selectedPlaylist.getPlaylistName(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
         return bottomSheetDialog;
+    }
+
+    @SuppressLint("CheckResult")
+    private void addSongToPlaylist(String userID, String playlistName, String songID) {
+        ApiService.apiService.addSongToPlaylist(userID, playlistName, songID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Call API Add Song to Playlist Successfully");
+                    dismiss();
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Call API Add Song to Playlist Failed");
+                });
     }
 }

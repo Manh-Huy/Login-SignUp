@@ -115,10 +115,9 @@ public class SearchActivity extends AppCompatActivity {
 
         // Lây thông tin playlist
 
-//        if (user != null){
-//            getPlaylistUserByID(user.getUid());
-//
-//        }
+        if (user != null) {
+            getPlaylistUserByID(user.getUid());
+        }
 
         progressBar.setVisibility(View.GONE);
         overlayLayout.setVisibility(View.GONE);
@@ -354,7 +353,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private void showSearchResult(List<Object> list) {
         FragmentActivity fragmentActivity = SearchActivity.this;
-        searchedItemSongAdapter = new SearchedItemAdapter(getApplicationContext(), fragmentActivity, list, testPlaylist());
+        searchedItemSongAdapter = new SearchedItemAdapter(getApplicationContext(), fragmentActivity, list, listUserPlaylist);
         searchRecyclerView.setAdapter(searchedItemSongAdapter);
     }
     private void filterList(String text) {
@@ -478,29 +477,5 @@ public class SearchActivity extends AppCompatActivity {
             mDisposable.dispose();
         }
         super.onDestroy();
-    }
-
-    private List<Playlist> testPlaylist() {
-        // Tạo đối tượng Song
-        Song song1 = new Song("Artist1", "Album1", "http://example.com/image1.jpg", "Song1", "Pop", "ID1", "1000", "http://example.com/song1.mp3");
-        Song song2 = new Song("Artist2", "Album2", "http://example.com/image2.jpg", "Song2", "Rock", "ID2", "2000", "http://example.com/song2.mp3");
-        Song song3 = new Song("Artist3", "Album3", "http://example.com/image3.jpg", "Song3", "Jazz", "ID3", "3000", "http://example.com/song3.mp3");
-        Song song4 = new Song("Artist4", "Album4", "http://example.com/image4.jpg", "Song4", "Hip-Hop", "ID4", "4000", "http://example.com/song4.mp3");
-        Song song5 = new Song("Artist5", "Album5", "http://example.com/image5.jpg", "Song5", "Classical", "ID5", "5000", "http://example.com/song5.mp3");
-        Song song6 = new Song("Artist6", "Album6", "http://example.com/image6.jpg", "Song6", "Country", "ID6", "6000", "http://example.com/song6.mp3");
-        Song song7 = new Song("Artist7", "Album7", "http://example.com/image7.jpg", "Song7", "Blues", "ID7", "7000", "http://example.com/song7.mp3");
-        Song song8 = new Song("Artist8", "Album8", "http://example.com/image8.jpg", "Song8", "Electronic", "ID8", "8000", "http://example.com/song8.mp3");
-        Song song9 = new Song("Artist9", "Album9", "http://example.com/image9.jpg", "Song9", "R&B", "ID9", "9000", "http://example.com/song9.mp3");
-        Song song10 = new Song("Artist10", "Album10", "http://example.com/image10.jpg", "Song10", "Reggae", "ID10", "10000", "http://example.com/song10.mp3");
-
-        // Tạo đối tượng Playlist
-        Playlist playlist1 = new Playlist(new ArrayList<>(Arrays.asList(song1, song2)), "Playlist1", "User1", "Username1");
-        Playlist playlist2 = new Playlist(new ArrayList<>(Arrays.asList(song3, song4)), "Playlist2", "User2", "Username2");
-        Playlist playlist3 = new Playlist(new ArrayList<>(Arrays.asList(song5, song6)), "Playlist3", "User3", "Username3");
-        Playlist playlist4 = new Playlist(new ArrayList<>(Arrays.asList(song7, song8)), "Playlist4", "User4", "Username4");
-        Playlist playlist5 = new Playlist(new ArrayList<>(Arrays.asList(song9, song10)), "Playlist5", "User5", "Username5");
-
-        // Trả về danh sách Playlist
-        return new ArrayList<>(Arrays.asList(playlist1, playlist2, playlist3, playlist4, playlist5));
     }
 }

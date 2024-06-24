@@ -59,6 +59,9 @@
             android:name=".activity.LoginSignUpActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.PLaylistActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.SplashScreenActivity"
             android:exported="true">
             <intent-filter>

@@ -37,6 +37,8 @@ import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.CustomDownloadManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -171,7 +173,13 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         HandleDownload(song.getSongURL(), song.getName());
                         break;
                     case Constants.ACTION_ADD_TO_PLAYLIST:
-                        clickOpenPlaylistOptionBottomSheetFragment();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user == null) {
+                            Toast.makeText(mContext, "Please login to add song to playlist", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            clickOpenPlaylistOptionBottomSheetFragment(user.getUid(), song);
+                        }
                         break;
                     case Constants.ACTION_PLAY_NEXT:
                         playNext(song);
@@ -226,8 +234,8 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    private void clickOpenPlaylistOptionBottomSheetFragment() {
-        fragmentPlaylistOptionBottomSheet = new FragmentPlaylistOptionBottomSheet(listPlaylist);
+    private void clickOpenPlaylistOptionBottomSheetFragment(String userID, Song song) {
+        fragmentPlaylistOptionBottomSheet = new FragmentPlaylistOptionBottomSheet(listPlaylist,userID, song);
         fragmentPlaylistOptionBottomSheet.show(fragmentActivity.getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
     }
 

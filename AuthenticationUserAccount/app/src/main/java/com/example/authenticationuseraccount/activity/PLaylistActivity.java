@@ -34,7 +34,7 @@ public class PLaylistActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_album);
+        setContentView(R.layout.activity_playlist);
 
         songCount = findViewById(R.id.song_count);
         playlistTitle = findViewById(R.id.playlist_title);

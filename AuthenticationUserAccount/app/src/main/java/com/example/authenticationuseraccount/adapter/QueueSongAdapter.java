@@ -101,7 +101,7 @@ public class QueueSongAdapter extends RecyclerView.Adapter<QueueSongAdapter.Thum
                     //Host Room
                     if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                         String userID = ChillCornerRoomManager.getInstance().getRoomId();
-                        //SocketIoManager.getInstance().onAddSong(userID, song);
+                        SocketIoManager.getInstance().setSongQueueIndex(userID, position);
                     } else {
                         //Guest Room
                         ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");

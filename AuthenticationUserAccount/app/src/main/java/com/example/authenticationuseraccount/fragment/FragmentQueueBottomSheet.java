@@ -24,6 +24,7 @@ import com.example.authenticationuseraccount.adapter.ThumbnailSongSmallAdapter;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.model.IClickSongRecyclerViewListener;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -36,6 +37,8 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment implemen
 
     private Context mContext;
 
+    private QueueSongAdapter songSmallAdapter;
+
     public FragmentQueueBottomSheet(MediaMetadata currentMedia, List<Song> mListItems) {
         this.currentMedia = currentMedia;
         this.mListItems = mListItems;
@@ -47,6 +50,12 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment implemen
 
     public void setListItems(List<Song> mediaItems) {
         this.mListItems = mediaItems;
+    }
+
+    public void notifyChanges() {
+        songSmallAdapter.notifyDataSetChanged();
+        //songSmallAdapter = new QueueSongAdapter(getContext(), mListItems, this);
+        onClickItemSong(MediaItemHolder.getInstance().getListSongs().get(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex()));
     }
 
     public void setCurrentMediaItem(MediaMetadata mediaItem) {
@@ -80,7 +89,7 @@ public class FragmentQueueBottomSheet extends BottomSheetDialogFragment implemen
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rcvData.setLayoutManager(linearLayoutManager);
 
-        QueueSongAdapter songSmallAdapter = new QueueSongAdapter(getContext(), mListItems, this);
+        songSmallAdapter = new QueueSongAdapter(getContext(), mListItems, this);
         rcvData.setAdapter(songSmallAdapter);
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL);

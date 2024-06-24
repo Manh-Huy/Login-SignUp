@@ -117,6 +117,42 @@ public class SocketIoManager {
                 onSetPlaylistRandom(args);
             }
         });
+
+        mSocket.on("on-set-song-queue-index", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = int;
+                onSetSongQueueIndex(args);
+            }
+        });
+    }
+
+    public void setSongQueueIndex(String roomID, int index) {
+        String indexJson = gson.toJson(index);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomID);
+            data.put("index", indexJson);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | set-song-queue-index: " + data.toString());
+        mSocket.emit("set-song-queue-index", data);
+    }
+
+    private void onSetSongQueueIndex(Object[] args) {
+        LogUtils.ApplicationLogI("SocketIOManager | on-set-song-queue-index: " + (String) args[0]);
+        String indexString = (String) args[0];
+        int index = Integer.parseInt(indexString);
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(index);
+                MediaItemHolder.getInstance().getMediaController().seekToDefaultPosition(index);
+                UIThread.getInstance().updateQueue();
+                ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), "Song At Position " + index + " In Queue Has Been Set!");
+            }
+        });
     }
 
     public void addPlaylistToQueue(String roomId, List<Song> listSong) {
@@ -140,6 +176,8 @@ public class SocketIoManager {
             @Override
             public void run() {
                 MediaItemHolder.getInstance().addListAlbumMediaItem(songList);
+                ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
+                ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
                 LogUtils.ApplicationLogI("SocketIOManager | on-playlist-added : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
                 ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), songList.size() + " Songs Has Been Added To Queue!");
             }
@@ -167,6 +205,8 @@ public class SocketIoManager {
             @Override
             public void run() {
                 MediaItemHolder.getInstance().setListAlbumMediaItem(songList);
+                ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
+                ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
                 LogUtils.ApplicationLogI("SocketIOManager | on-playlist-set : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
                 ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), songList.size() + " Songs Has Been Set To Queue!");
             }
@@ -206,12 +246,13 @@ public class SocketIoManager {
             @Override
             public void run() {
                 MediaItemHolder.getInstance().setListAlbumMediaItem(shuffledSongs);
+                ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
+                ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
                 LogUtils.ApplicationLogI("SocketIOManager | on-playlist-random-set : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
                 ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), shuffledSongs.size() + " Songs Has Been Randomized And Set To Queue!");
             }
         });
     }
-
 
     public void setSong(String roomId, Song song) {
         String songJson = gson.toJson(song);
@@ -237,6 +278,7 @@ public class SocketIoManager {
                 @Override
                 public void run() {
                     MediaItemHolder.getInstance().setMediaItem(song);
+                    ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
                     ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
                     ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), song.getName() + " Has Been Set!");
                     LogUtils.ApplicationLogI("SocketIOManager | on-song-set current index: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
@@ -276,6 +318,8 @@ public class SocketIoManager {
             @Override
             public void run() {
                 MediaItemHolder.getInstance().addMediaItemToQueue(song);
+                ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
+                ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
                 LogUtils.ApplicationLogI("SocketIOManager | on-song-added : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
                 ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), song.getName() + " Has Been Added To Queue!");
             }
@@ -309,6 +353,8 @@ public class SocketIoManager {
             @Override
             public void run() {
                 MediaItemHolder.getInstance().playMediaItemNext(song);
+                ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
+                ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
                 LogUtils.ApplicationLogI("SocketIOManager | on-add-song-play-next : " + MediaItemHolder.getInstance().getMediaController().getMediaItemCount());
                 ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), song.getName() + " Has Been Added To Top Of Queue!");
             }
@@ -481,6 +527,10 @@ public class SocketIoManager {
 
         SocketUser socketUser = new SocketUser(userID, userName);
         ChillCornerRoomManager.getInstance().getListUser().add(socketUser);
+        if (MediaItemHolder.getInstance().getListSongs() != null && !MediaItemHolder.getInstance().getListSongs().isEmpty()) {
+            ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
+            ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
+        }
         String roomInfoJson = gson.toJson(ChillCornerRoomManager.getInstance());
 
         //data = roomId + ChillCornerRoomManager( List<SocketUser>, List<Song>, CurrentIndex )
@@ -602,16 +652,23 @@ public class SocketIoManager {
 
     public void disconnect() {
         if (mSocket != null) {
-            UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    UIThread.getInstance().onOutRoom();
-                }
-            });
             mSocket.disconnect();
             mSocket.off();
             mSocket.close();
         }
+    }
+
+    public void outRoom() {
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                UIThread.getInstance().onOutRoom();
+                mSocket.disconnect();
+                mSocket.off();
+                mSocket.close();
+            }
+        });
+
     }
 
     public static synchronized void release() {

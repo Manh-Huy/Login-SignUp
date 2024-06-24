@@ -66,7 +66,7 @@ public class FragmentRoom extends Fragment {
             transaction.commit();
 
             //Disconnect Room
-            SocketIoManager.getInstance().disconnect();
+            SocketIoManager.getInstance().outRoom();
             ChillCornerRoomManager.release();
         });
 

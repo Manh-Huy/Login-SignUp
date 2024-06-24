@@ -15,6 +15,7 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.panel.RootMediaPlayerPanel;
 import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
 import com.example.authenticationuseraccount.model.Message;
@@ -60,7 +61,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         return this.mListener;
     }
 
-    public static  UIThread getInstance() {
+    public static UIThread getInstance() {
         return instance;
     }
 
@@ -249,21 +250,32 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         UIThread.this.mFragmentQueueBottomSheet.show(m_vMainActivity.getSupportFragmentManager(), mFragmentQueueBottomSheet.getTag());
     }
 
-    public void onUpdateLoveSong(boolean isLove){
+    public void updateQueue() {
+        UIThread.this.mFragmentQueueBottomSheet.setCurrentMediaItem(MediaItemHolder.getInstance().getMediaController().getMediaMetadata());
+        UIThread.this.mFragmentQueueBottomSheet.setListItems(MediaItemHolder.getInstance().getListSongs());
+        if (UIThread.this.mFragmentQueueBottomSheet.isAdded()) {
+            UIThread.this.mFragmentQueueBottomSheet.notifyChanges();
+        } else {
+            UIThread.this.mFragmentQueueBottomSheet.show(m_vMainActivity.getSupportFragmentManager(), mFragmentQueueBottomSheet.getTag());
+        }
+    }
+
+
+    public void onUpdateLoveSong(boolean isLove) {
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateLoveSong(isLove);
     }
 
-    public void onUpdateLoveSongFromBarView(boolean isLove){
+    public void onUpdateLoveSongFromBarView(boolean isLove) {
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onUpdateLoveSongFromBarView(isLove);
     }
 
-    public void onRoomCreate(String roomID){
+    public void onRoomCreate(String roomID) {
         LogUtils.ApplicationLogD("UIThread | onRoomCreate: " + roomID);
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRoomCreate();
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomCreate(roomID);
     }
 
-    public void onRoomJoined(String roomId){
+    public void onRoomJoined(String roomId) {
         LogUtils.ApplicationLogD("UIThread | onRoomJoined");
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRoomCreate();
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onRoomJoined(roomId);

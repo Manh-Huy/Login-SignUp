@@ -191,9 +191,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private void addToQueue(Song song) {
         if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
-            MediaItemHolder.getInstance().getListSongs().add(song);
-            mediaItem = MediaItem.fromUri(song.getSongURL());
-            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+            MediaItemHolder.getInstance().addMediaItemToQueue(song);
             fragmentSearchOptionBottomSheet.dismiss();
             fragmentActivity.finish();
             Toast.makeText(mContext, song.getName() + " Added to queue", Toast.LENGTH_SHORT).show();
@@ -212,16 +210,7 @@ public class SearchedItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private void playNext(Song song) {
         if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
-            if (MediaItemHolder.getInstance().getListSongs().isEmpty()) {
-                MediaItemHolder.getInstance().getListSongs().add(song);
-                mediaItem = MediaItem.fromUri(song.getSongURL());
-                MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
-            } else {
-                int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
-                MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1, song);
-                mediaItem = MediaItem.fromUri(song.getSongURL());
-                MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
-            }
+            MediaItemHolder.getInstance().playMediaItemNext(song);
             fragmentSearchOptionBottomSheet.dismiss();
             fragmentActivity.finish();
             Toast.makeText(mContext, song.getName() + " will play next", Toast.LENGTH_SHORT).show();

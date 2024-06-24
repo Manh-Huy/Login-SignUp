@@ -187,24 +187,13 @@ public class LocalMusicAdapter extends RecyclerView.Adapter<LocalMusicAdapter.Vi
     }
 
     private void addToQueue(Song song) {
-        MediaItemHolder.getInstance().getListSongs().add(song);
-        mediaItem = MediaItem.fromUri(song.getSongURL());
-        MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+        MediaItemHolder.getInstance().addMediaItemToQueue(song);
         fragmentSearchOptionBottomSheet.dismiss();
         Toast.makeText(mContext, "Song Added : " + song.getName(), Toast.LENGTH_SHORT).show();
     }
 
     private void playNext(Song song) {
-        if (MediaItemHolder.getInstance().getListSongs().isEmpty()) {
-            MediaItemHolder.getInstance().getListSongs().add(song);
-            mediaItem = MediaItem.fromUri(song.getSongURL());
-            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
-        } else {
-            int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
-            MediaItemHolder.getInstance().getListSongs().add(currentSongIndex + 1, song);
-            mediaItem = MediaItem.fromUri(song.getSongURL());
-            MediaItemHolder.getInstance().getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
-        }
+        MediaItemHolder.getInstance().playMediaItemNext(song);
         fragmentSearchOptionBottomSheet.dismiss();
         Toast.makeText(mContext, "Song Added To Top : " + song.getName(), Toast.LENGTH_SHORT).show();
     }

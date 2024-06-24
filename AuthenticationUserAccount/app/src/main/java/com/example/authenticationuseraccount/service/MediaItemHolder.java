@@ -167,38 +167,57 @@ public class MediaItemHolder {
         this.listSongs.clear();
         this.listSongs.add(song);
         MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
-        MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+        instance.getMediaController().setMediaItem(mediaItem);
+    }
+
+    public void addMediaItemToQueue(Song song) {
+        instance.getListSongs().add(song);
+        MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+        instance.getMediaController().addMediaItem(mediaItem);
+    }
+
+    public void playMediaItemNext(Song song) {
+        if (instance.getListSongs().isEmpty()) {
+            instance.getListSongs().add(song);
+            MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+            instance.getMediaController().addMediaItem(mediaItem);
+        } else {
+            int currentSongIndex = instance.getMediaController().getCurrentMediaItemIndex();
+            instance.getListSongs().add(currentSongIndex + 1, song);
+            MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
+            instance.getMediaController().addMediaItem(currentSongIndex + 1, mediaItem);
+        }
     }
 
     public void addListMediaItem(List<Song> songs) {
         for (Song song : songs) {
             this.listSongs.add(song);
             MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
-            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+            instance.getMediaController().addMediaItem(mediaItem);
         }
     }
 
     public void setListAlbumMediaItem(List<Song> songs) {
         this.listSongs.clear();
-        MediaItemHolder.getInstance().getMediaController().clearMediaItems();
+        instance.getMediaController().clearMediaItems();
         int i = 0;
         for (Song song : songs) {
             this.listSongs.add(song);
             MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
-            MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
+            instance.getMediaController().addMediaItem(mediaItem);
         }
 
     }
 
     public void setListAlbumMediaItemRandom(List<Song> songs) {
         this.listSongs.clear();
-        MediaItemHolder.getInstance().getMediaController().clearMediaItems();
+        instance.getMediaController().clearMediaItems();
         for (Song song : songs) {
             this.listSongs.add(song);
             MediaItem mediaItem = MediaItem.fromUri(song.getSongURL());
             MediaItemHolder.getInstance().getMediaController().addMediaItem(mediaItem);
         }
-        MediaItemHolder.getInstance().getMediaController().setShuffleModeEnabled(true);
+        instance.getMediaController().setShuffleModeEnabled(true);
     }
 
 }

@@ -587,7 +587,7 @@ public class FragmentHome extends Fragment {
             //Host Room
             if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
                 String userID = ChillCornerRoomManager.getInstance().getRoomId();
-                SocketIoManager.getInstance().onAddSong(userID, song);
+                SocketIoManager.getInstance().setSong(userID, song);
             }else{
                 //Guest Room
                 ErrorUtils.showError(getContext(),"Only Host Can Change The Playlist!");

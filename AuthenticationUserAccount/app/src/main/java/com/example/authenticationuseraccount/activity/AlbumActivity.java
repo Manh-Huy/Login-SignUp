@@ -11,9 +11,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SongAlbumAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
@@ -52,6 +54,7 @@ public class AlbumActivity extends AppCompatActivity {
     private List<Playlist> listUserPlaylist = new ArrayList<>();
 
 
+    private ImageView imgPlaylist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class AlbumActivity extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
+        imgPlaylist = findViewById(R.id.playlist_image);
         songCount = findViewById(R.id.song_count);
         playlistTitle = findViewById(R.id.playlist_title);
         songRecyclerView = findViewById(R.id.rcv_song_list);
@@ -76,6 +80,7 @@ public class AlbumActivity extends AppCompatActivity {
         if (genre != null) {
             playlistTitle.setText(genre.getName().toUpperCase());
             getListSongByGenre(genre.getName());
+            Glide.with(AlbumActivity.this).load(genre.getImageURL()).into(imgPlaylist);
         }
 
         btnPlay.setOnClickListener(new View.OnClickListener() {

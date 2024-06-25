@@ -2,6 +2,7 @@ package com.example.authenticationuseraccount.fragment;
 
 import static android.view.View.GONE;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,6 +42,7 @@ import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.homepagemodel.Banner;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.service.UIThread;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,6 +50,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -582,7 +586,13 @@ public class FragmentHome extends Fragment {
     private void onClickGoToMP3Player(Song song) {
         //No Room
         if(ChillCornerRoomManager.getInstance().getCurrentUserId() == null){
+            //Set Music
             MediaItemHolder.getInstance().setMediaItem(song);
+
+            //Update Recent + Trigger Api
+            ListenHistory listenHistory = getSongHistory(FirebaseAuth.getInstance().getCurrentUser().getUid(), 0,song);
+            triggerAPICall(listenHistory);
+
         }else{
             //Host Room
             if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
@@ -594,6 +604,65 @@ public class FragmentHome extends Fragment {
             }
         }
 
+    }
+    @SuppressLint("CheckResult")
+    private void triggerAPICall(ListenHistory listenHistory) {
+
+        ApiService.apiService.addUserListenHistory(listenHistory)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Update User Recent! " + listenHistory.getSongID());
+                    getUserListenHistory(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Upload User Recent Failed!");
+                });
+    }
+
+    private void getUserListenHistory(String userID) {
+        ApiService.apiService.getUserListenHistory(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        LogUtils.ApplicationLogI("FragmentHome | getUserListenHistory | api size: " + songs.size());
+                        MediaItemHolder.getInstance().setListRecentSong(songs);
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api user history error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.ApplicationLogE("Call api listen history complete");
+                        LogUtils.ApplicationLogI("FragmentHome | getUserListenHistory | onComplete | api size: " + MediaItemHolder.getInstance().getListRecentSong().size());
+                        UIThread.getInstance().onUpdateHistory(MediaItemHolder.getInstance().getListRecentSong().size());
+
+                        /*UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                            }
+                        });*/
+                    }
+                });
+    }
+
+
+    private ListenHistory getSongHistory(String uid, int count,Song songFromItem) {
+        String songID = songFromItem.getSongID();
+        String songName = songFromItem.getName();
+        LogUtils.ApplicationLogD("Song about to add to recent: " + songName);
+        DateTimeFormatter formatter = null;
+        String formattedDate = "yyyy-MM-dd";
+        return new ListenHistory(uid, songID, count, false, formattedDate);
     }
 
     @UnstableApi

@@ -12,6 +12,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.StateFragmentAdapter;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentCorner;
 import com.example.authenticationuseraccount.fragment.FragmentHome;
 import com.example.authenticationuseraccount.fragment.FragmentLibrary;
@@ -112,6 +113,11 @@ public class RootNavigationBarPanel extends BasePanelView {
 
     public void onMessageReceived(Message message) {
         fragmentCorner.onMessageReceived(mContext, message);
+    }
+
+    public void onUpdateHistory(int size) {
+        LogUtils.ApplicationLogI("RootNavigationBarPanel | onUpdateHistory");
+        fragmentProfile.onUpdateHistory(size);
     }
 }
 

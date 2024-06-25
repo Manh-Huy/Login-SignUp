@@ -27,6 +27,7 @@ import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
 import com.example.authenticationuseraccount.activity.PremiumActivity;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
@@ -232,4 +233,8 @@ public class FragmentProfile extends Fragment {
         updateUI(FirebaseAuth.getInstance().getCurrentUser());
     }
 
+    public void onUpdateHistory(int size) {
+        LogUtils.ApplicationLogI("Fragment Profile | onUpdateHistory | size: " + size);
+        tvNumHistory.setText(size + " songs");
+    }
 }

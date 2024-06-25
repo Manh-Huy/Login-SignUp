@@ -288,4 +288,9 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     public void onOutRoom() {
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onOutRoom();
     }
+
+    public void onUpdateHistory(int size){
+        LogUtils.ApplicationLogI("UIThread | onUpdateHistory");
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onUpdateHistory(size);
+    }
 }

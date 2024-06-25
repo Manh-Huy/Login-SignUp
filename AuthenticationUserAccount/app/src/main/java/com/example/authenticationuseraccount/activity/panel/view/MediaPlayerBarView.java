@@ -139,7 +139,7 @@ public class MediaPlayerBarView {
             mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
 
         }
-        LogUtils.ApplicationLogE("MediaPlayerBarView onUpdateMetadata");
+        //LogUtils.ApplicationLogE("MediaPlayerBarView onUpdateMetadata");
         this.mTextView_SongTitle.setText(mediaMetadata.title);
         this.mTextView_SongArtist.setText(mediaMetadata.artist);
         this.mTextView_SongArtist.setSelected(true);

@@ -91,20 +91,9 @@ public class RootMediaPlayerPanel extends BasePanelView {
         onSetupSeekBar();
     }
 
-    public void onUpdateUI(MediaMetadata currentMetaData) {
-        LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
-        mParentView.setVisibility(VISIBLE);
-        byte[] art = currentMetaData.artworkData;
-        Bitmap bitmap = null;
-        bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
-
-        this.mMediaPlayerBarView.onUpdateMetadata(currentMetaData, bitmap, isLoveSong());
-        this.mMediaPlayerView.onUpdateMetadata(currentMetaData, bitmap, isLoveSong());
-
-    }
 
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap) {
-        LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
+        //LogUtils.ApplicationLogE("RootMedia: onUpdateMetadata");
         mParentView.setVisibility(VISIBLE);
 
         this.mMediaPlayerBarView.onUpdateMetadata(mediaMetadata, bitmap, isLoveSong());
@@ -117,8 +106,8 @@ public class RootMediaPlayerPanel extends BasePanelView {
         String songID = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getSongID();
         String nameID = MediaItemHolder.getInstance().getListSongs().get(currentIndex).getName();
 
-        LogUtils.ApplicationLogI("song iD: " + songID);
-        LogUtils.ApplicationLogI("song name: " + nameID);
+        //LogUtils.ApplicationLogI("song iD: " + songID);
+        //LogUtils.ApplicationLogI("song name: " + nameID);
 
         List<Song> listSongLove = MediaItemHolder.getInstance().getListLoveSong();
 

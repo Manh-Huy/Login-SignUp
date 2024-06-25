@@ -171,6 +171,10 @@ public interface ApiService {
     @FormUrlEncoded
     @DELETE("playlists")
     Completable deletePlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName);
+
+    @FormUrlEncoded
+    @PATCH("playlists/addSongToPlaylist")
+    Completable deleteSongToPlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName, @Field("songID") String songID);
 }
 
 

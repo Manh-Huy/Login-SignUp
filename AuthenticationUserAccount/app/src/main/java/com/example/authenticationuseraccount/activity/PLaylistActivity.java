@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
-import com.example.authenticationuseraccount.adapter.SongAlbumAdapter;
+import com.example.authenticationuseraccount.adapter.SongPlaylistAdapter;
 import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
@@ -42,8 +42,9 @@ public class PLaylistActivity extends AppCompatActivity {
     private ImageButton btnMore;
     private ImageView imgDeletePlaylist;
     private RecyclerView songRecyclerView;
-    private SongAlbumAdapter songAlbumAdapter;
+    private SongPlaylistAdapter songAlbumAdapter;
     private List<Song> playListSong;
+    private Playlist playlist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class PLaylistActivity extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         Intent intent = getIntent();
-        Playlist playlist = (Playlist) intent.getSerializableExtra("playlist");
+        playlist = (Playlist) intent.getSerializableExtra("playlist");
 
         if (playlist != null) {
             String playlistName = playlist.getPlaylistName();
@@ -148,7 +149,7 @@ public class PLaylistActivity extends AppCompatActivity {
                         LogUtils.ApplicationLogE("Call api getSpecificPlaylist successfully");
                         FragmentActivity fragmentActivity = PLaylistActivity.this;
                         List<Playlist> playlistList = new ArrayList<>();
-                        songAlbumAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, playListSong, playlistList);
+                        songAlbumAdapter = new SongPlaylistAdapter(getApplicationContext(), fragmentActivity, playListSong, playlist);
                         songRecyclerView.setAdapter(songAlbumAdapter);
                     }
                 });

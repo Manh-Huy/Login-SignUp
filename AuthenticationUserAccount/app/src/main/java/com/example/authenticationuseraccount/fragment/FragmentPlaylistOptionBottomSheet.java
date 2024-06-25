@@ -67,7 +67,7 @@ public class FragmentPlaylistOptionBottomSheet extends BottomSheetDialogFragment
                     Toast.makeText(getContext(), "No items selected", Toast.LENGTH_SHORT).show();
                 } else {
                     addSongToPlaylist(userID, selectedPlaylist.getPlaylistName(), selectedSong.getSongID());
-                    Toast.makeText(getContext(), "Selected item: " + selectedPlaylist.getPlaylistName(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Added Song to playlist", Toast.LENGTH_SHORT).show();
                 }
             }
         });

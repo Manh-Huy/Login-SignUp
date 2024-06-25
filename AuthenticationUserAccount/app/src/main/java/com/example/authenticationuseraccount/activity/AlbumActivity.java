@@ -24,31 +24,41 @@ import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottom
 import com.example.authenticationuseraccount.model.Genre;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
 import com.example.authenticationuseraccount.model.ItemSearchOption;
+import com.example.authenticationuseraccount.model.business.Playlist;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class AlbumActivity extends AppCompatActivity {
+    FirebaseUser user;
     private Disposable mDisposable;
     private TextView playlistTitle, songCount;
     private ImageButton btnMore, btnPlay, btnLove, btnRandom;
     private RecyclerView songRecyclerView;
     private SongAlbumAdapter songAlbumAdapter;
     private List<Song> listSong;
+    private List<Playlist> listUserPlaylist = new ArrayList<>();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         songCount = findViewById(R.id.song_count);
         playlistTitle = findViewById(R.id.playlist_title);
@@ -200,11 +210,38 @@ public class AlbumActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
+                        getPlaylistUserByID(user.getUid());
+                    }
+                });
+    }
+
+    private void getPlaylistUserByID(String userID) {
+        ApiService.apiService.getPLayListByID(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Playlist>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull List<Playlist> playlists) {
+                        listUserPlaylist.addAll(playlists);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api get playlist error");
+                    }
+
+                    @Override
+                    public void onComplete() {
                         String count = listSong.size() + " bài hát";
                         songCount.setText(count);
 
                         FragmentActivity fragmentActivity = AlbumActivity.this;
-                        songAlbumAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong);
+                        songAlbumAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong, listUserPlaylist);
                         songRecyclerView.setAdapter(songAlbumAdapter);
                     }
                 });

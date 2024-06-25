@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -82,7 +83,8 @@ public class PLaylistActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (playlist != null) {
-
+                    deletePlaylist(user.getUid(), playlist.getPlaylistName());
+                    Toast.makeText(PLaylistActivity.this, "Deleted playlist!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -145,11 +147,24 @@ public class PLaylistActivity extends AppCompatActivity {
                     public void onComplete() {
                         LogUtils.ApplicationLogE("Call api getSpecificPlaylist successfully");
                         FragmentActivity fragmentActivity = PLaylistActivity.this;
-                        songAlbumAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, playListSong);
+                        List<Playlist> playlistList = new ArrayList<>();
+                        songAlbumAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, playListSong, playlistList);
                         songRecyclerView.setAdapter(songAlbumAdapter);
                     }
                 });
 
+    }
+
+    @SuppressLint("CheckResult")
+    private void deletePlaylist(String userID, String playlistName) {
+        ApiService.apiService.deletePlaylist(userID, playlistName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Call API delete Playlist Successfully");
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Call API delete Playlist Failed");
+                });
     }
     @Override
     public void onDestroy() {

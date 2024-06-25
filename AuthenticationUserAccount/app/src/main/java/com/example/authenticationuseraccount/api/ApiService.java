@@ -33,6 +33,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -166,6 +167,10 @@ public interface ApiService {
 
     @GET("playlists/getSpecificPlaylist")
     Observable<List<Song>> getSpecificPlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName);
+
+    @FormUrlEncoded
+    @DELETE("playlists")
+    Completable deletePlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName);
 }
 
 

@@ -18,11 +18,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SongAlbumAdapter;
+import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
 import com.example.authenticationuseraccount.model.ItemSearchOption;
+import com.example.authenticationuseraccount.model.business.Playlist;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
@@ -34,7 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class FavAndHisSongActivity extends AppCompatActivity {
     FragmentActivity fragmentActivity;
@@ -47,6 +54,10 @@ public class FavAndHisSongActivity extends AppCompatActivity {
     private RecyclerView songRecyclerView;
     private SongAlbumAdapter songAdapter;
     private List<Song> listSong;
+    private List<Playlist> listUserPlaylist = new ArrayList<>();
+
+    String typeShow;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,23 +77,10 @@ public class FavAndHisSongActivity extends AppCompatActivity {
         fragmentActivity = FavAndHisSongActivity.this;
 
         showUserProfile();
+        getPlaylistUserByID(user.getUid());
 
         Intent intent = getIntent();
-        String typeShow = (String) intent.getSerializableExtra("type_show");
-
-        if (Objects.equals(typeShow, "Fav")) {
-            tvSongTitle.setText("YOUR FAVORITE");
-            listSong = MediaItemHolder.getInstance().getListLoveSong();
-            updateUI();
-            songAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong);
-            songRecyclerView.setAdapter(songAdapter);
-        } else if (Objects.equals(typeShow, "His")) {
-            tvSongTitle.setText("YOUR HISTORY");
-            listSong = MediaItemHolder.getInstance().getListRecentSong();
-            updateUI();
-            songAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong);
-            songRecyclerView.setAdapter(songAdapter);
-        }
+        typeShow = (String) intent.getSerializableExtra("type_show");
 
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -213,6 +211,45 @@ public class FavAndHisSongActivity extends AppCompatActivity {
                 ErrorUtils.showError(FavAndHisSongActivity.this, "Only Host Can Change The Playlist!");
             }
         }
+    }
+
+    private void getPlaylistUserByID(String userID) {
+        ApiService.apiService.getPLayListByID(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Playlist>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull List<Playlist> playlists) {
+                        listUserPlaylist.addAll(playlists);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api get playlist error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        if (Objects.equals(typeShow, "Fav")) {
+                            tvSongTitle.setText("YOUR FAVORITE");
+                            listSong = MediaItemHolder.getInstance().getListLoveSong();
+                            updateUI();
+                            songAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong, listUserPlaylist);
+                            songRecyclerView.setAdapter(songAdapter);
+                        } else if (Objects.equals(typeShow, "His")) {
+                            tvSongTitle.setText("YOUR HISTORY");
+                            listSong = MediaItemHolder.getInstance().getListRecentSong();
+                            updateUI();
+                            songAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong, listUserPlaylist);
+                            songRecyclerView.setAdapter(songAdapter);
+                        }
+                    }
+                });
     }
 
     @Override

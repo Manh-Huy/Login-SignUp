@@ -26,14 +26,19 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.AlbumActivity;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
+import com.example.authenticationuseraccount.fragment.FragmentAddPlaylistBottomSheet;
+import com.example.authenticationuseraccount.fragment.FragmentPlaylistOptionBottomSheet;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
 import com.example.authenticationuseraccount.model.ItemSearchOption;
+import com.example.authenticationuseraccount.model.business.Playlist;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.CustomDownloadManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +49,13 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
     private FragmentActivity fragmentActivity;
     private List<Song> listSongs;
     MediaItem mediaItem = null;
+    private List<Playlist> listPlaylist;
 
-    public SongAlbumAdapter(Context mContext, FragmentActivity fragmentActivity, List<Song> listSongs) {
+    public SongAlbumAdapter(Context mContext, FragmentActivity fragmentActivity, List<Song> listSongs, List<Playlist> listPlaylist) {
         this.mContext = mContext;
         this.fragmentActivity = fragmentActivity;
         this.listSongs = listSongs;
+        this.listPlaylist = listPlaylist;
     }
 
     @NonNull
@@ -125,8 +132,14 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
                         fragmentSearchOptionBottomSheet.dismiss();
                         break;
                     case Constants.ACTION_ADD_TO_PLAYLIST:
-                        fragmentSearchOptionBottomSheet.dismiss();
-                        Toast.makeText(mContext, "Thêm vào danh sách phát clicked", Toast.LENGTH_SHORT).show();
+                        //fragmentSearchOptionBottomSheet.dismiss();
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user == null) {
+                            Toast.makeText(mContext, "Please login to add song to playlist", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            clickOpenPlaylistOptionBottomSheetFragment(user.getUid(), song);
+                        }
                         break;
                     case Constants.ACTION_PLAY_NEXT:
                         playNext(song);
@@ -143,6 +156,11 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
             }
         });
         fragmentSearchOptionBottomSheet.show(fragmentActivity.getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
+    }
+
+    private void clickOpenPlaylistOptionBottomSheetFragment(String userID, Song song) {
+        FragmentPlaylistOptionBottomSheet fragmentPlaylistOptionBottomSheet = new FragmentPlaylistOptionBottomSheet(listPlaylist,userID, song);
+        fragmentPlaylistOptionBottomSheet.show(fragmentActivity.getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
     }
 
     private void addToQueue(Song song) {

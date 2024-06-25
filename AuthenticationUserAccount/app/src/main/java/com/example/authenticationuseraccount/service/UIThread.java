@@ -197,7 +197,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     private void updateRecent() {
         int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
         Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
-        if (song.getImageURL() != null) {
+        if (song.getImageURL() != null && FirebaseAuth.getInstance().getCurrentUser() != null) {
             ListenHistory listenHistory = getSongHistory(FirebaseAuth.getInstance().getCurrentUser().getUid(), 0, song);
             triggerAPICall(listenHistory);
             LogUtils.ApplicationLogD("Player is play " + MediaItemHolder.getInstance().getMediaController().getMediaMetadata().title + " at position: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
@@ -374,5 +374,10 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
     public void onUpdateProfileImage() {
         LogUtils.ApplicationLogI("UIThread | onUpdateProfileImage");
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onUpdateProfileImage();
+    }
+
+    public void onUpdateLoveSongSize(int size) {
+        LogUtils.ApplicationLogI("UIThread | onUpdateLoveSongSize");
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onUpdateLoveSongSize(size);
     }
 }

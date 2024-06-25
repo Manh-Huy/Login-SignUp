@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -219,8 +220,16 @@ public class MediaPlayerView {
             @Override
             public void onClick(View v) {
                 if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-                    materialCheckBox.setChecked(false);
-                    ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
+                    materialCheckBox.setChecked(true);
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Set the second image resource after 1 second
+                            materialCheckBox.setChecked(false);
+                            ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
+                        }
+                    }, 500); // 1000 milliseconds = 1 second
+
                 } else {
                     if (materialCheckBox.isChecked()) {
                         ListenHistory listenHistory = getSongHistory(user.getUid(), 3);
@@ -257,9 +266,9 @@ public class MediaPlayerView {
 
         int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
         Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
-        if(song.getImageURL()!= null){
+        if (song.getImageURL() != null) {
             materialCheckBox.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             materialCheckBox.setVisibility(View.INVISIBLE);
         }
         this.m_vTextView_Title.setText(mediaMetadata.title);
@@ -462,6 +471,7 @@ public class MediaPlayerView {
                     public void onComplete() {
                         LogUtils.ApplicationLogE("Call api love song Complete");
                         LogUtils.ApplicationLogE("Count: " + MediaItemHolder.getInstance().getListLoveSong().size());
+                        UIThread.getInstance().onUpdateLoveSongSize(MediaItemHolder.getInstance().getListLoveSong().size());
 
                     }
                 });

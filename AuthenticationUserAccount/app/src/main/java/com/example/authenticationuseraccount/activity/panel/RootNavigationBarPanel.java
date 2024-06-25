@@ -125,5 +125,10 @@ public class RootNavigationBarPanel extends BasePanelView {
         LogUtils.ApplicationLogI("RootNavigationBarPanel | onUpdateProfileImage");
         fragmentProfile.updateUI(FirebaseAuth.getInstance().getCurrentUser());
     }
+
+    public void onUpdateLoveSongSize(int size) {
+        LogUtils.ApplicationLogI("RootNavigationBarPanel | onUpdateLoveSongSize");
+        fragmentProfile.onUpdateLoveSong(size);
+    }
 }
 

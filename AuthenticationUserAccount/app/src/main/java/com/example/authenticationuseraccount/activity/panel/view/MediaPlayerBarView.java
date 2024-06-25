@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Icon;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -86,13 +87,19 @@ public class MediaPlayerBarView {
             @Override
             public void onClick(View v) {
                 if (user == null) {
-                    mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
-                    ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
+                    mImageBtn_Fav.setImageResource(R.drawable.baseline_favorite_24);
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Set the second image resource after 1 second
+                            mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
+                            ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
+                        }
+                    }, 500); // 1000 milliseconds = 1 second
                 } else {
 
                     if (isFavoriteSong) {
                         mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
-
                         Toast.makeText(mRootView.getContext(), "You have unliked the song", Toast.LENGTH_SHORT).show();
                         ListenHistory listenHistory = getSongHistory(user.getUid(), -3);
                         LogUtils.ApplicationLogI("Trigger Call Update History When Click UnLove!");
@@ -132,20 +139,19 @@ public class MediaPlayerBarView {
         if (isLoveSong) {
             isFavoriteSong = true;
             mImageBtn_Fav.setImageResource(R.drawable.baseline_favorite_24);
-        }
-        else {
+        } else {
             isFavoriteSong = false;
             mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
         }
 
         int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
         Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
-        if(song.getImageURL()!= null){
+        if (song.getImageURL() != null) {
             mImageBtn_Fav.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             mImageBtn_Fav.setVisibility(View.INVISIBLE);
         }
-        
+
         //LogUtils.ApplicationLogE("MediaPlayerBarView onUpdateMetadata");
         this.mTextView_SongTitle.setText(mediaMetadata.title);
         this.mTextView_SongArtist.setText(mediaMetadata.artist);
@@ -270,6 +276,7 @@ public class MediaPlayerBarView {
                     LogUtils.ApplicationLogE("Upload Failed");
                 });
     }
+
     private ListenHistory getSongHistory(String uid, int count) {
 
         String currentSongName = (String) mMediaController.getMediaMetadata().title;
@@ -294,13 +301,13 @@ public class MediaPlayerBarView {
         if (count > 0) {
             return new ListenHistory(uid, songID, count, true, formattedDate);
 
-        }
-        else {
+        } else {
             return new ListenHistory(uid, songID, count, false, formattedDate);
 
         }
 
     }
+
     private void getUserLoveSong(String userID) {
         ApiService.apiService.getUserLoveSong(userID)
                 .subscribeOn(Schedulers.io())
@@ -323,6 +330,7 @@ public class MediaPlayerBarView {
                     @Override
                     public void onComplete() {
                         LogUtils.ApplicationLogE("Call api love song Complete");
+                        UIThread.getInstance().onUpdateLoveSongSize(MediaItemHolder.getInstance().getListLoveSong().size());
                     }
                 });
     }
@@ -331,8 +339,7 @@ public class MediaPlayerBarView {
         if (isLove) {
             isFavoriteSong = true;
             mImageBtn_Fav.setImageResource(R.drawable.baseline_favorite_24);
-        }
-        else {
+        } else {
             isFavoriteSong = false;
             mImageBtn_Fav.setImageResource(leveldown.kyle.icon_packs.R.drawable.favorite_24px);
 
@@ -340,6 +347,7 @@ public class MediaPlayerBarView {
     }
 
     private UIThread uiThread;
+
     public void onReceiveUiThread(UIThread uiThread) {
         this.uiThread = uiThread;
     }

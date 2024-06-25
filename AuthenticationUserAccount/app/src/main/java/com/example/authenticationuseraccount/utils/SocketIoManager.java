@@ -61,12 +61,51 @@ public class SocketIoManager {
             listenForRoomEvent();
             listenForChatEvent();
             listenForMusicEvent();
+            listenForMusicControllerEvent();
 
             mSocket.connect();
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+    }
+
+    private void listenForMusicControllerEvent() {
+        mSocket.on("on-play-pause", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = boolean
+                onPlayPauseSong(args);
+            }
+        });
+    }
+
+    public void playPauseSong(String roomID, boolean isPlaying) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomID);
+            data.put("isPlaying", isPlaying); // Directly put the boolean value
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | play-pause: " + data.toString());
+        mSocket.emit("play-pause", data);
+    }
+
+    public void onPlayPauseSong(Object[] args) {
+        boolean isPlaying = (boolean) args[0];
+
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isPlaying) {
+                    MediaItemHolder.getInstance().getMediaController().pause();
+                } else {
+                    MediaItemHolder.getInstance().getMediaController().play();
+                }
+            }
+        });
+
     }
 
     private void listenForMusicEvent() {

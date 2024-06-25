@@ -28,6 +28,8 @@ import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.UIThread;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -187,11 +189,24 @@ public class MediaPlayerBarView {
 
     public void onInit() {
         this.mImageBtn_PlayPause.setOnClickListener((v) -> {
-            if (mMediaController.isPlaying()) {
-                mMediaController.pause();
-            } else {
-                mMediaController.play();
+            //No Room
+            if(ChillCornerRoomManager.getInstance().getCurrentUserId() == null){
+                if (mMediaController.isPlaying()) {
+                    mMediaController.pause();
+                } else {
+                    mMediaController.play();
+                }
+            }else{
+                //Host Room
+                if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                    String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                    SocketIoManager.getInstance().playPauseSong(userID, mMediaController.isPlaying());
+                }else{
+                    //Guest Room
+                    ErrorUtils.showError(getContext(),"Only Host Can Change The Playlist!");
+                }
             }
+
         });
     }
 

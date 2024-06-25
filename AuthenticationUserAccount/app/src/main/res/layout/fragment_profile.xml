@@ -88,10 +88,10 @@
         android:orientation="vertical"
         android:visibility="visible">
 
-        <LinearLayout
+        <ImageButton
             android:layout_width="match_parent"
             android:layout_height="64dp"
-            android:orientation="vertical"></LinearLayout>
+            android:background="@android:color/transparent" />
 
 
         <LinearLayout
@@ -127,8 +127,10 @@
                 android:layout_marginStart="42dp"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="@color/colorPrimary"
+                android:gravity="end"
                 android:text="Sửa hồ sơ"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/black"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <!-- Premium Card -->
@@ -153,7 +155,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <LinearLayout
-                    android:id="@+id/layout_Role"
+                    android:id="@+id/layout_history_song"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -162,24 +164,26 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_premium" />
+                        android:src="@drawable/ic_history" />
 
                     <TextView
-                        android:textColor="@color/black"
                         android:layout_width="wrap_content"
+
                         android:layout_height="wrap_content"
-                        android:text="Role 🙍‍♂️"
+                        android:text="History"
+                        android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:textColor="@color/black"
-
-                        android:id="@+id/tv_Role"
+                        android:id="@+id/tv_num_history"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Free tier"
+                        android:text="0 song"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
+
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -221,11 +225,11 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:textColor="@color/black"
                         android:id="@+id/tv_num_love_song"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 songs"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -241,6 +245,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="@android:color/transparent"
                 android:backgroundTint="@android:color/transparent"
+                android:visibility="gone"
                 app:cardCornerRadius="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/premiumCard">
@@ -258,18 +263,18 @@
                         android:src="@drawable/ic_download" />
 
                     <TextView
-                        android:textColor="@color/black"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Download"
+                        android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:textColor="@color/black"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0 song"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -292,7 +297,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/loveCard">
 
                 <LinearLayout
-                    android:id="@+id/layout_history_song"
+                    android:id="@+id/layout_Role"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -301,24 +306,24 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_history" />
+                        android:src="@drawable/ic_premium" />
 
                     <TextView
-                        android:textColor="@color/black"
-
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="History"
+                        android:text="Role 🙍‍♂️"
+                        android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/tv_num_history"
-                        android:textColor="@color/black"
+                        android:id="@+id/tv_Role"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 song"
+                        android:text="Free tier"
+                        android:textColor="@color/black"
                         android:textSize="12sp" />
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

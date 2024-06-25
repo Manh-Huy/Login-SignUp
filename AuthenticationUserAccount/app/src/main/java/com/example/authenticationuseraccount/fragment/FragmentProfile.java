@@ -42,7 +42,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class FragmentProfile extends Fragment {
     private RelativeLayout layoutLogout;
-    private LinearLayout layoutLoveSong, layoutHistorySong, layoutLogin, layoutRole, layoutDownload;
+    private LinearLayout layoutLoveSong, layoutHistorySong, layoutLogin, layoutRole;
     private Button loginButton, logoutButton, editProfileButton;
     private ImageView profileImage;
     private TextView profileName, tvRole, tvNumLove, tvNumHistory;
@@ -51,7 +51,6 @@ public class FragmentProfile extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        layoutDownload = view.findViewById(R.id.layout_download);
         layoutLogin = view.findViewById(R.id.layout_Login);
         layoutLogout = view.findViewById(R.id.layout_Logout);
         layoutRole = view.findViewById(R.id.layout_Role);
@@ -115,57 +114,33 @@ public class FragmentProfile extends Fragment {
             }
         });
 
-        layoutHistorySong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //No Room
-                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+        layoutHistorySong.setOnClickListener(v -> {
+            //No Room
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                String typeShow = "His";
+                Intent intent = new Intent(getContext(), FavAndHisSongActivity.class);
+                intent.putExtra("type_show", typeShow);
+                startActivity(intent);
+            } else {
+                //Host Room
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                     String typeShow = "His";
                     Intent intent = new Intent(getContext(), FavAndHisSongActivity.class);
                     intent.putExtra("type_show", typeShow);
                     startActivity(intent);
                 } else {
-                    //Host Room
-                    if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
-                        String typeShow = "His";
-                        Intent intent = new Intent(getContext(), FavAndHisSongActivity.class);
-                        intent.putExtra("type_show", typeShow);
-                        startActivity(intent);
-                    } else {
-                        //Guest Room
-                        ErrorUtils.showError(getContext(), "Please Out Your Current Room To Continue!");
-                    }
+                    //Guest Room
+                    ErrorUtils.showError(getContext(), "Please Out Your Current Room To Continue!");
                 }
             }
         });
 
-        layoutRole.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (User.getInstance().getRole().equals(Constants.PREMIUM_USER))
-                    ErrorUtils.showError(getContext(), " 🔥🔥🔥 You Are Premium 🔥🔥🔥");
-                else {
-                    Intent intent = new Intent(getContext(), PremiumActivity.class);
-                    startActivity(intent);
-                }
-            }
-        });
-
-        layoutDownload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //No Room
-                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
-
-                } else {
-                    //Host Room
-                    if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
-
-                    } else {
-                        //Guest Room
-                        ErrorUtils.showError(getContext(), "Please Out Your Current Room To Continue!");
-                    }
-                }
+        layoutRole.setOnClickListener(v -> {
+            if (User.getInstance().getRole().equals(Constants.PREMIUM_USER))
+                ErrorUtils.showError(getContext(), " 🔥🔥🔥 You Are Premium 🔥🔥🔥");
+            else {
+                Intent intent = new Intent(getContext(), PremiumActivity.class);
+                startActivity(intent);
             }
         });
 

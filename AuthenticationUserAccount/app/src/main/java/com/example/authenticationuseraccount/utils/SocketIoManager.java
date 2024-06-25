@@ -78,6 +78,74 @@ public class SocketIoManager {
                 onPlayPauseSong(args);
             }
         });
+
+        mSocket.on("on-song-skipped", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                onSongSkipped();
+            }
+        });
+
+        mSocket.on("3", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                onPreviousSong();
+            }
+        });
+
+        mSocket.on("on-shuffle", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+            }
+        });
+
+        mSocket.on("on-reapeat", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+            }
+        });
+    }
+
+    public void previousSong(String roomID) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomID);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | previousSong: " + data.toString());
+        mSocket.emit("previous-song", data);
+    }
+
+    private void onPreviousSong() {
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().getMediaController().seekToPreviousMediaItem();
+            }
+        });
+    }
+
+    public void skipSong(String roomID) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomID);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | skipSong: " + data.toString());
+        mSocket.emit("skip-song", data);
+    }
+
+    private void onSongSkipped() {
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().getMediaController().seekToNextMediaItem();
+            }
+        });
     }
 
     public void playPauseSong(String roomID, boolean isPlaying) {

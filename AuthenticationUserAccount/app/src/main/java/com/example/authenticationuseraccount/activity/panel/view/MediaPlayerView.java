@@ -1,6 +1,7 @@
 package com.example.authenticationuseraccount.activity.panel.view;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -33,7 +34,9 @@ import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.UIThread;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -74,10 +77,12 @@ public class MediaPlayerView {
     public int m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
     private boolean m_vCanUpdateSeekbar = true;
     private MediaController mMediaController;
+    private Context mContext;
 
     public MediaPlayerView(View rootView) {
         //LogUtils.ApplicationLogE("MediaPlayerView Constructor");
         this.mRootView = rootView;
+        this.mContext = rootView.getContext();
         this.mControlsContainer = findViewById(R.id.media_player_controls_container);
         this.mRootView.setAlpha(0.0F);
         this.mProgressBar = findViewById(R.id.progress_bar);
@@ -187,18 +192,54 @@ public class MediaPlayerView {
         });
 
         this.m_vBtn_Prev.setOnClickListener((v) -> {
-            mMediaController.seekToPreviousMediaItem();
+            //No Room
+            if(ChillCornerRoomManager.getInstance().getCurrentUserId() == null){
+                mMediaController.seekToPreviousMediaItem();
+            }else{
+                //Host Room
+                if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                    String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                    SocketIoManager.getInstance().previousSong(userID);
+                }else{
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
+            }
         });
         this.m_vBtn_PlayPause.setOnClickListener((v) -> {
-            if (mMediaController.isPlaying()) {
-                mMediaController.pause();
-            } else {
-                mMediaController.play();
+            //No Room
+            if(ChillCornerRoomManager.getInstance().getCurrentUserId() == null){
+                if (mMediaController.isPlaying()) {
+                    mMediaController.pause();
+                } else {
+                    mMediaController.play();
+                }
+            }else{
+                //Host Room
+                if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                    String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                    SocketIoManager.getInstance().playPauseSong(userID, mMediaController.isPlaying());
+                }else{
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
             }
 
         });
         this.m_vBtn_Next.setOnClickListener((v) -> {
-            mMediaController.seekToNextMediaItem();
+            //No Room
+            if(ChillCornerRoomManager.getInstance().getCurrentUserId() == null){
+                mMediaController.seekToNextMediaItem();
+            }else{
+                //Host Room
+                if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                    String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                    SocketIoManager.getInstance().skipSong(userID);
+                }else{
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
+            }
         });
         this.m_vBtn_Shuffle.setOnClickListener((v) -> {
             if (mMediaController.getShuffleModeEnabled()) {

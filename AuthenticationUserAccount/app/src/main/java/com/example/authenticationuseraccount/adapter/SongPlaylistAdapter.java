@@ -167,6 +167,7 @@ public class SongPlaylistAdapter extends RecyclerView.Adapter<SongPlaylistAdapte
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
                     LogUtils.ApplicationLogD("Call API Delete Song to Playlist Successfully");
+                    Toast.makeText(mContext, "Deleted song!", Toast.LENGTH_SHORT).show();
                     fragmentSearchOptionBottomSheet.dismiss();
                 }, throwable -> {
                     LogUtils.ApplicationLogE("Call API Delete Song to Playlist Failed");

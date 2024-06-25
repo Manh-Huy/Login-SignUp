@@ -47,7 +47,7 @@ public class AlbumActivity extends AppCompatActivity {
     FirebaseUser user;
     private Disposable mDisposable;
     private TextView playlistTitle, songCount;
-    private ImageButton btnMore, btnPlay, btnLove, btnRandom;
+    private ImageButton btnMore, btnPlay, btnRandom;
     private RecyclerView songRecyclerView;
     private SongAlbumAdapter songAlbumAdapter;
     private List<Song> listSong;
@@ -71,7 +71,6 @@ public class AlbumActivity extends AppCompatActivity {
 
         btnMore = findViewById(R.id.more_button);
         btnPlay = findViewById(R.id.play_button);
-        btnLove = findViewById(R.id.like_button);
         btnRandom = findViewById(R.id.random_button);
 
         Intent intent = getIntent();
@@ -110,23 +109,15 @@ public class AlbumActivity extends AppCompatActivity {
 
     private void clickOpenOptionBottomSheet() {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_playlist, Constants.ACTION_ADD_TO_PLAYLIST));
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_arrow, Constants.ACTION_ADD_TO_QUEUE));
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_heart, Constants.ACTION_LOVE));
         itemSearchOptionList.add(new ItemSearchOption(leveldown.kyle.icon_packs.R.drawable.shuffle_24px, Constants.ACTION_ADD_RANDOM_PLAYLIST));
 
         fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
             @Override
             public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
                 switch (itemSearchOption.getText()) {
-                    case Constants.ACTION_ADD_TO_PLAYLIST:
-                        Toast.makeText(AlbumActivity.this, "Thêm vào danh sách phát clicked", Toast.LENGTH_SHORT).show();
-                        break;
                     case Constants.ACTION_ADD_TO_QUEUE:
                         addPlayListToQueue(listSong);
-                        break;
-                    case Constants.ACTION_LOVE:
-                        Toast.makeText(AlbumActivity.this, "Thích clicked", Toast.LENGTH_SHORT).show();
                         break;
                     case Constants.ACTION_ADD_RANDOM_PLAYLIST:
                         setPlayListRandom(listSong);

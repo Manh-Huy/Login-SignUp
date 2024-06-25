@@ -13,13 +13,6 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <!-- Playlist Image -->
-        <ImageView
-            android:id="@+id/playlist_image"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:src="@drawable/logo"
-            android:scaleType="centerCrop" />
 
         <!-- Playlist Title and Add Icon -->
         <LinearLayout

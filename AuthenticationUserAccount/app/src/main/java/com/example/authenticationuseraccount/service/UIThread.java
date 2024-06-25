@@ -293,4 +293,9 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         LogUtils.ApplicationLogI("UIThread | onUpdateHistory");
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onUpdateHistory(size);
     }
+
+    public void onUpdateProfileImage(){
+        LogUtils.ApplicationLogI("UIThread | onUpdateProfileImage");
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onUpdateProfileImage();
+    }
 }

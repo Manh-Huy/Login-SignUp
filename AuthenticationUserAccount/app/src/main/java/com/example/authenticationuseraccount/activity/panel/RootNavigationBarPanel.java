@@ -19,6 +19,7 @@ import com.example.authenticationuseraccount.fragment.FragmentLibrary;
 import com.example.authenticationuseraccount.fragment.FragmentPlaylist;
 import com.example.authenticationuseraccount.fragment.FragmentProfile;
 import com.example.authenticationuseraccount.model.Message;
+import com.google.firebase.auth.FirebaseAuth;
 import com.realgear.multislidinguppanel.BasePanelView;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 import com.realgear.readable_bottom_bar.ReadableBottomBar;
@@ -118,6 +119,11 @@ public class RootNavigationBarPanel extends BasePanelView {
     public void onUpdateHistory(int size) {
         LogUtils.ApplicationLogI("RootNavigationBarPanel | onUpdateHistory");
         fragmentProfile.onUpdateHistory(size);
+    }
+
+    public void onUpdateProfileImage() {
+        LogUtils.ApplicationLogI("RootNavigationBarPanel | onUpdateProfileImage");
+        fragmentProfile.updateUI(FirebaseAuth.getInstance().getCurrentUser());
     }
 }
 

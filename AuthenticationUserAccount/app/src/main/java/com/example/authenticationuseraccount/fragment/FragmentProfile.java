@@ -173,7 +173,7 @@ public class FragmentProfile extends Fragment {
         });
     }
 
-    private void updateUI(FirebaseUser user) {
+    public void updateUI(FirebaseUser user) {
         if (user == null) {
             layoutLogin.setVisibility(View.GONE);
             layoutLogout.setVisibility(View.VISIBLE);

@@ -24,6 +24,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,8 +34,12 @@ import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.model.business.User;
+import com.example.authenticationuseraccount.service.UIThread;
 import com.example.authenticationuseraccount.utils.RealPathUtil;
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.github.ybq.android.spinkit.style.CubeGrid;
+import com.github.ybq.android.spinkit.style.FadingCircle;
+import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -75,11 +80,15 @@ public class EditProfileActivity extends AppCompatActivity {
     private String imageURLChange;
     private String usernameChange;
 
+    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+        this.mProgressBar = findViewById(R.id.progress_bar_profile);
+        this.mProgressBar.setIndeterminateDrawable(new CubeGrid());
+        this.mProgressBar.setVisibility(View.INVISIBLE);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -134,21 +143,26 @@ public class EditProfileActivity extends AppCompatActivity {
                     return;
                 }
 
+                mProgressBar.setVisibility(View.VISIBLE);
+
+
                 if (mFile == null) {
-                    Toast.makeText(EditProfileActivity.this, "null cmnr", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(EditProfileActivity.this, "Error Open Image!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(EditProfileActivity.this, "có ùi", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(EditProfileActivity.this, "có ùi", Toast.LENGTH_SHORT).show();
                 }
 
                 if (tvUsername.getText().toString().equals(user.getDisplayName())) {
                     usernameChange = null;
                 } else {
                     usernameChange = tvUsername.getText().toString();
-                    Toast.makeText(EditProfileActivity.this, "ten: " + usernameChange, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(EditProfileActivity.this, "ten: " + usernameChange, Toast.LENGTH_SHORT).show();
                     UpdateUsernameInFirebase(usernameChange);
                 }
 
-                updateUserProfile(user.getUid(), usernameChange, mMimeType, mFile);
+                if (mFile != null) {
+                    updateUserProfile(user.getUid(), usernameChange, mMimeType, mFile);
+                }
             }
         });
     }
@@ -281,25 +295,7 @@ public class EditProfileActivity extends AppCompatActivity {
                         LogUtils.ApplicationLogE(t.toString());
                         LogUtils.ApplicationLogE(t.getStackTrace().toString());
                     }
-                });/*enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<String> response) {
-                LogUtils.ApplicationLogD("Call API thanh cong");
-                imageURLChange = response.body();
-                LogUtils.ApplicationLogI("ImgUrl: " + imageURLChange);
-                if (mFile != null) {
-                    UpdateAvatarUserInFirebase(imageURLChange);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                LogUtils.ApplicationLogE("Call API that bai");
-                LogUtils.ApplicationLogE(t.getMessage());
-                LogUtils.ApplicationLogE(t.toString());
-                LogUtils.ApplicationLogE(t.getStackTrace().toString());
-            }
-        });*/
+                });
     }
 
 
@@ -313,6 +309,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
+                            mProgressBar.setVisibility(View.GONE);
                             Toast.makeText(getApplicationContext(), "Update username Successful", Toast.LENGTH_LONG).show();
                         }
                     }
@@ -329,6 +326,9 @@ public class EditProfileActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
+                            mProgressBar.setVisibility(View.GONE);
+                            UIThread.getInstance().onUpdateProfileImage();
+                            finish();
                             Toast.makeText(getApplicationContext(), "Update avatar Successful", Toast.LENGTH_LONG).show();
                         }
                     }

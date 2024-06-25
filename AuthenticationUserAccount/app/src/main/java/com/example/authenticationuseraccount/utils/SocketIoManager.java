@@ -82,14 +82,24 @@ public class SocketIoManager {
         mSocket.on("on-song-skipped", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+                //args = null
                 onSongSkipped();
             }
         });
 
-        mSocket.on("3", new Emitter.Listener() {
+        mSocket.on("on-previous", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
+                //args = null
                 onPreviousSong();
+            }
+        });
+
+        mSocket.on("on-song-seeked", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = int
+                onSongSeek(args);
             }
         });
 
@@ -104,6 +114,28 @@ public class SocketIoManager {
             @Override
             public void call(Object... args) {
 
+            }
+        });
+    }
+
+    public void seekTo(String userID, int seekPosition) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", userID);
+            data.put("position", seekPosition);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | seekTo: " + data.toString());
+        mSocket.emit("song-seek", data);
+    }
+
+    private void onSongSeek(Object[] args) {
+        int seekPosition = (int) args[0];
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().getMediaController().seekTo(seekPosition);
             }
         });
     }
@@ -807,5 +839,6 @@ public class SocketIoManager {
 
         return songList;
     }
+
 
 }

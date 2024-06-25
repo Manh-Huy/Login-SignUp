@@ -142,25 +142,64 @@ public class MediaPlayerView {
                 this.isUser = fromUser;
                 int seekPosition = value * 1000;
                 if (fromUser) {
-                    mMediaController.seekTo(seekPosition);
+                    //No Room
+                    if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                        mMediaController.seekTo(seekPosition);
+                    } else {
+                        //Host Room
+                        if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                            String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                            SocketIoManager.getInstance().seekTo(userID, seekPosition);
+                        } else {
+                            //Guest Room
+                            ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                        }
+                    }
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                if (mMediaController != null)
-                    mMediaController.pause();
-                m_vCanUpdateSeekbar = false;
+                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                    if (mMediaController != null)
+                        mMediaController.pause();
+                    m_vCanUpdateSeekbar = false;
+                } else {
+                    //Host Room
+                    if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                        if (mMediaController != null)
+                            mMediaController.pause();
+                        m_vCanUpdateSeekbar = false;
+                    } else {
+                        //Guest Room
+                        ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                    }
+                }
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (isUser) {
-                    //mMediaController.seekTo(final_value);
-                    if (mMediaController != null)
-                        mMediaController.play();
+
+                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                    if (isUser) {
+                        if (mMediaController != null)
+                            mMediaController.play();
+                    }
+                    m_vCanUpdateSeekbar = true;
+                } else {
+                    //Host Room
+                    if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                        if (isUser) {
+                            if (mMediaController != null)
+                                mMediaController.play();
+                        }
+                        m_vCanUpdateSeekbar = true;
+                    } else {
+                        //Guest Room
+                        ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                    }
                 }
-                m_vCanUpdateSeekbar = true;
+
             }
         });
 
@@ -193,14 +232,14 @@ public class MediaPlayerView {
 
         this.m_vBtn_Prev.setOnClickListener((v) -> {
             //No Room
-            if(ChillCornerRoomManager.getInstance().getCurrentUserId() == null){
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
                 mMediaController.seekToPreviousMediaItem();
-            }else{
+            } else {
                 //Host Room
-                if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                     String userID = ChillCornerRoomManager.getInstance().getRoomId();
                     SocketIoManager.getInstance().previousSong(userID);
-                }else{
+                } else {
                     //Guest Room
                     ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
                 }
@@ -208,18 +247,18 @@ public class MediaPlayerView {
         });
         this.m_vBtn_PlayPause.setOnClickListener((v) -> {
             //No Room
-            if(ChillCornerRoomManager.getInstance().getCurrentUserId() == null){
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
                 if (mMediaController.isPlaying()) {
                     mMediaController.pause();
                 } else {
                     mMediaController.play();
                 }
-            }else{
+            } else {
                 //Host Room
-                if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                     String userID = ChillCornerRoomManager.getInstance().getRoomId();
                     SocketIoManager.getInstance().playPauseSong(userID, mMediaController.isPlaying());
-                }else{
+                } else {
                     //Guest Room
                     ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
                 }
@@ -228,14 +267,14 @@ public class MediaPlayerView {
         });
         this.m_vBtn_Next.setOnClickListener((v) -> {
             //No Room
-            if(ChillCornerRoomManager.getInstance().getCurrentUserId() == null){
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
                 mMediaController.seekToNextMediaItem();
-            }else{
+            } else {
                 //Host Room
-                if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
                     String userID = ChillCornerRoomManager.getInstance().getRoomId();
                     SocketIoManager.getInstance().skipSong(userID);
-                }else{
+                } else {
                     //Guest Room
                     ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
                 }

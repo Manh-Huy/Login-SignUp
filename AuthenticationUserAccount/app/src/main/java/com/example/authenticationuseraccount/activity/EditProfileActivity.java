@@ -41,6 +41,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -53,6 +56,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -132,15 +136,13 @@ public class EditProfileActivity extends AppCompatActivity {
 
                 if (mFile == null) {
                     Toast.makeText(EditProfileActivity.this, "null cmnr", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     Toast.makeText(EditProfileActivity.this, "có ùi", Toast.LENGTH_SHORT).show();
                 }
 
                 if (tvUsername.getText().toString().equals(user.getDisplayName())) {
                     usernameChange = null;
-                }
-                else {
+                } else {
                     usernameChange = tvUsername.getText().toString();
                     Toast.makeText(EditProfileActivity.this, "ten: " + usernameChange, Toast.LENGTH_SHORT).show();
                     UpdateUsernameInFirebase(usernameChange);
@@ -158,17 +160,18 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 User mUser = response.body();
                 LogUtils.ApplicationLogD("Call thanh cong");
-                if (mUser != null)
-                {
+                if (mUser != null) {
                     signInMethodUser = mUser.getSignInMethod();
                 }
 
             }
+
             @Override
             public void onFailure(Call<User> call, Throwable t) {
             }
         });
     }
+
     private ActivityResultLauncher<Intent> mActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -198,6 +201,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             }
     );
+
     private void onClickRequestPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             openGallery();
@@ -245,9 +249,41 @@ public class EditProfileActivity extends AppCompatActivity {
             multipartBodyAvt = MultipartBody.Part.createFormData("imageURL", image.getName(), requestBodyAva);
         }
 
-        ApiService.apiService.updateUserProfile(userID, requestBodyUsername, multipartBodyAvt).enqueue(new Callback<String>() {
+        ApiService.apiService.updateUserProfile(userID, requestBodyUsername, multipartBodyAvt).
+                enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        LogUtils.ApplicationLogD("Call API thanh cong");
+                        String responseBody = null;
+                        String url = "";
+                        try {
+                            responseBody = response.body().string();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        JSONObject jsonObject = null;
+                        try {
+                            jsonObject = new JSONObject(responseBody);
+                            url = jsonObject.getString("String");
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        LogUtils.ApplicationLogI("ImgUrl: " + url);
+                        if (mFile != null) {
+                            UpdateAvatarUserInFirebase(url);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        LogUtils.ApplicationLogE("Call API that bai");
+                        LogUtils.ApplicationLogE(t.getMessage());
+                        LogUtils.ApplicationLogE(t.toString());
+                        LogUtils.ApplicationLogE(t.getStackTrace().toString());
+                    }
+                });/*enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<ResponseBody> call, Response<String> response) {
                 LogUtils.ApplicationLogD("Call API thanh cong");
                 imageURLChange = response.body();
                 LogUtils.ApplicationLogI("ImgUrl: " + imageURLChange);
@@ -257,13 +293,13 @@ public class EditProfileActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 LogUtils.ApplicationLogE("Call API that bai");
                 LogUtils.ApplicationLogE(t.getMessage());
                 LogUtils.ApplicationLogE(t.toString());
                 LogUtils.ApplicationLogE(t.getStackTrace().toString());
             }
-        });
+        });*/
     }
 
 

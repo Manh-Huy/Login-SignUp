@@ -150,7 +150,7 @@ public interface ApiService {
 
     @Multipart
     @PATCH("users/{id}")
-    Call<String> updateUserProfile(@Path("id") String userID, @Part("username")RequestBody username, @Part MultipartBody.Part url);
+    Call<ResponseBody> updateUserProfile(@Path("id") String userID, @Part("username")RequestBody username, @Part MultipartBody.Part url);
 
     @POST("listenHistory/createMultipleHistory")
     Completable mergeListenHistoryLocalToAccount(@Body List<ListenHistory> listListenHistory);
@@ -166,14 +166,13 @@ public interface ApiService {
     Completable addSongToPlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName, @Field("songID") String songID);
 
     @GET("playlists/getSpecificPlaylist")
-    Observable<Playlist> getSpecificPlaylist(@Query("userID") String userID, @Query("playlistName") String playlistName);
+    Observable<List<Song>> getSpecificPlaylist(@Query("userID") String userID, @Query("playlistName") String playlistName);
 
-    @FormUrlEncoded
     @DELETE("playlists")
-    Completable deletePlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName);
+    Completable deletePlaylist(@Query("userID") String userID, @Query("playlistName") String playlistName);
 
     @FormUrlEncoded
-    @PATCH("playlists/addSongToPlaylist")
+    @PATCH("playlists/deleteSongFromPlaylist")
     Completable deleteSongToPlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName, @Field("songID") String songID);
 }
 

@@ -75,10 +75,9 @@ public interface ApiService {
             //.baseUrl("https://mobilebackendtestupload-q7eh.onrender.com/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-            .client(okBuilder.build())
+            //.client(okBuilder.build())
             .build()
             .create(ApiService.class);
-
 
     @GET("songs")
     Observable<List<Song>> getSongs();

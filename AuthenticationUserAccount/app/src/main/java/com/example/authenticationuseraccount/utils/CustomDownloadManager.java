@@ -34,6 +34,7 @@ import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.example.authenticationuseraccount.model.business.User;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.google.gson.Gson;
 
@@ -74,22 +75,27 @@ public class CustomDownloadManager {
     }
 
     public void downloadFile(String fileUrl, String fileName) {
+        if (User.getInstance().getRole().equals(Constants.PREMIUM_USER)){
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(fileUrl));
+            request.setTitle("Downloading " + fileName);
+            //request.setDescription("Downloading " + fileName);
+            //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, fileName + ".mp3");
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
 
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(fileUrl));
-        request.setTitle("Downloading " + fileName);
-        //request.setDescription("Downloading " + fileName);
-        //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_MUSIC, fileName + ".mp3");
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-
-        DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        if (downloadManager != null) {
-            downloadID = downloadManager.enqueue(request);
-            ErrorUtils.showError(context, "Download started");
-        } else {
-            ErrorUtils.showError(context, "Download Manager is not available");
+            DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            if (downloadManager != null) {
+                downloadID = downloadManager.enqueue(request);
+                ErrorUtils.showError(context, "Download started");
+            } else {
+                ErrorUtils.showError(context, "Download Manager is not available");
+            }
         }
+        else {
+         ErrorUtils.showError(context,"Please Upgrade To Premium To Download Music!");
+        }
+
     }
 
     private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {

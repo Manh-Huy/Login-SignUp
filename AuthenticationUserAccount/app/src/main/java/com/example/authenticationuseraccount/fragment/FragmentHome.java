@@ -602,39 +602,6 @@ public class FragmentHome extends Fragment {
 
     }
 
-
-    private void getUserListenHistory(String userID) {
-        ApiService.apiService.getUserListenHistory(userID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Song>>() {
-                    @Override
-                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-                        mDisposable = d;
-                    }
-
-                    @Override
-                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
-                        LogUtils.ApplicationLogI("FragmentHome | getUserListenHistory | api size: " + songs.size());
-                        MediaItemHolder.getInstance().setListRecentSong(songs);
-                    }
-
-                    @Override
-                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                        LogUtils.ApplicationLogE("Call api user history error");
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        LogUtils.ApplicationLogE("Call api listen history complete");
-                        LogUtils.ApplicationLogI("FragmentHome | getUserListenHistory | onComplete | api size: " + MediaItemHolder.getInstance().getListRecentSong().size());
-                        UIThread.getInstance().onUpdateHistory(MediaItemHolder.getInstance().getListRecentSong().size());
-
-                    }
-                });
-    }
-
-
     private ListenHistory getSongHistory(String uid, int count,Song songFromItem) {
         String songID = songFromItem.getSongID();
         String songName = songFromItem.getName();

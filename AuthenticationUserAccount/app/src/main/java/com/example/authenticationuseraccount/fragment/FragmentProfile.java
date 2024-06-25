@@ -25,6 +25,7 @@ import com.example.authenticationuseraccount.activity.EditProfileActivity;
 import com.example.authenticationuseraccount.activity.FavAndHisSongActivity;
 import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
 import com.example.authenticationuseraccount.activity.PremiumActivity;
+import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
@@ -180,7 +181,6 @@ public class FragmentProfile extends Fragment {
         } else {
             layoutLogin.setVisibility(View.VISIBLE);
             layoutLogout.setVisibility(View.GONE);
-
             if (User.getInstance().getRole().equals(Constants.PREMIUM_USER))
                 tvRole.setText(Constants.PREMIUM_USER + " 🔥");
             else {

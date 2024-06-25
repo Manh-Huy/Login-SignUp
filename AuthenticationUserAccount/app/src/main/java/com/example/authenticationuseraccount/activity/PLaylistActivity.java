@@ -15,21 +15,34 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SongAlbumAdapter;
+import com.example.authenticationuseraccount.api.ApiService;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
 import com.example.authenticationuseraccount.model.ItemSearchOption;
 import com.example.authenticationuseraccount.model.business.Playlist;
 import com.example.authenticationuseraccount.model.business.Song;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 public class PLaylistActivity extends AppCompatActivity {
+    private Disposable mDisposable;
+    FirebaseUser user;
     private TextView playlistTitle, songCount;
     private ImageButton btnMore;
     private ImageView imgDeletePlaylist;
     private RecyclerView songRecyclerView;
     private SongAlbumAdapter songAlbumAdapter;
+    private List<Song> playListSong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,20 +57,18 @@ public class PLaylistActivity extends AppCompatActivity {
         btnMore = findViewById(R.id.more_button);
         imgDeletePlaylist = findViewById(R.id.img_delete_playlist);
 
+        playListSong = new ArrayList<>();
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
         Intent intent = getIntent();
         Playlist playlist = (Playlist) intent.getSerializableExtra("playlist");
 
         if (playlist != null) {
             String playlistName = playlist.getPlaylistName();
-            List<Song> playListSong = playlist.getListSong();
-
+            getSpecificPlaylist(user.getUid(), playlistName);
             playlistTitle.setText(playlistName.toUpperCase());
-            String count = playListSong.size() + " bài hát";
+            String count = playlist.getListSong().size() + " bài hát";
             songCount.setText(count);
-
-            FragmentActivity fragmentActivity = PLaylistActivity.this;
-            songAlbumAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, playListSong);
-            songRecyclerView.setAdapter(songAlbumAdapter);
         }
 
         btnMore.setOnClickListener(new View.OnClickListener() {
@@ -108,5 +119,43 @@ public class PLaylistActivity extends AppCompatActivity {
             }
         });
         fragmentSearchOptionBottomSheet.show(getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
+    }
+
+    private void getSpecificPlaylist(String userID, String playlistName) {
+        ApiService.apiService.getSpecificPlaylist(userID, playlistName)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull List<Song> songs) {
+                        playListSong.addAll(songs);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api getSpecificPlaylist error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.ApplicationLogE("Call api getSpecificPlaylist successfully");
+                        FragmentActivity fragmentActivity = PLaylistActivity.this;
+                        songAlbumAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, playListSong);
+                        songRecyclerView.setAdapter(songAlbumAdapter);
+                    }
+                });
+
+    }
+    @Override
+    public void onDestroy() {
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
+        super.onDestroy();
     }
 }

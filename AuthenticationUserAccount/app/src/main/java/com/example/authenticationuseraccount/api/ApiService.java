@@ -164,6 +164,8 @@ public interface ApiService {
     @PATCH("playlists/addSongToPlaylist")
     Completable addSongToPlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName, @Field("songID") String songID);
 
+    @GET("playlists/getSpecificPlaylist")
+    Observable<List<Song>> getSpecificPlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName);
 }
 
 

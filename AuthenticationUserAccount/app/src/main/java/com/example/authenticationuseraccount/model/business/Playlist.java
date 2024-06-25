@@ -4,23 +4,23 @@ import java.io.Serializable;
 import java.util.List;
 
 public class Playlist implements Serializable {
-    private List<Song> listSong;
+    private List<String> listSong;
     private String playlistName;
     private String userID;
     private String username;
 
-    public Playlist(List<Song> listSong, String playlistName, String userID, String username) {
+    public Playlist(List<String> listSong, String playlistName, String userID, String username) {
         this.listSong = listSong;
         this.playlistName = playlistName;
         this.userID = userID;
         this.username = username;
     }
 
-    public List<Song> getListSong() {
+    public List<String> getListSong() {
         return listSong;
     }
 
-    public void setListSong(List<Song> listSong) {
+    public void setListSong(List<String> listSong) {
         this.listSong = listSong;
     }
 

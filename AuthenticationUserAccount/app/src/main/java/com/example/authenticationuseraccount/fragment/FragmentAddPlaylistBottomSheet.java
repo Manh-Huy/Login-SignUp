@@ -59,7 +59,7 @@ public class FragmentAddPlaylistBottomSheet extends BottomSheetDialogFragment {
                     Toast.makeText(getContext(), "Please make name playlist", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    List<Song> listSong = new ArrayList<>();
+                    List<String> listSong = new ArrayList<>();
                     Playlist playlist = new Playlist(listSong, tvAddPlaylist.getText().toString(), userID, username);
                     addPlaylist(playlist);
                 }

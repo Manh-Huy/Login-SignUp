@@ -254,6 +254,14 @@ public class MediaPlayerView {
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap, boolean isLoveSong) {
         this.m_vBtn_Shuffle.setIconResource(mMediaController.getShuffleModeEnabled() ? leveldown.kyle.icon_packs.R.drawable.ic_shuffle_on_24px : R.drawable.ic_shuffle_off);
         this.materialCheckBox.setChecked(isLoveSong);
+
+        int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+        Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
+        if(song.getImageURL()!= null){
+            materialCheckBox.setVisibility(View.VISIBLE);
+        }else{
+            materialCheckBox.setVisibility(View.INVISIBLE);
+        }
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
         this.mProgressBar.setVisibility(View.VISIBLE);

@@ -2,6 +2,7 @@ package com.example.authenticationuseraccount.adapter;
 
 import static com.example.authenticationuseraccount.common.Constants.PERMISSION_REQUEST_CODE;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
@@ -24,24 +25,34 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.AlbumActivity;
+import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
+import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentAddPlaylistBottomSheet;
 import com.example.authenticationuseraccount.fragment.FragmentPlaylistOptionBottomSheet;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
 import com.example.authenticationuseraccount.model.ItemSearchOption;
+import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Playlist;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.service.UIThread;
 import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.CustomDownloadManager;
 import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.SongAlbumViewHolder> {
 
@@ -87,11 +98,13 @@ public class SongAlbumAdapter extends RecyclerView.Adapter<SongAlbumAdapter.Song
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
                     ErrorUtils.showError(mContext, "Clicked");
                     MediaItemHolder.getInstance().setMediaItem(song);
-                    fragmentActivity.finish();
+                    //Update Recent + Trigger Api
+                    /*ListenHistory listenHistory = getSongHistory(FirebaseAuth.getInstance().getCurrentUser().getUid(), 0,song);
+                    triggerAPICall(listenHistory);*/
+
                 } else {
                     //Host Room
                     if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {

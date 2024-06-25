@@ -589,10 +589,6 @@ public class FragmentHome extends Fragment {
             //Set Music
             MediaItemHolder.getInstance().setMediaItem(song);
 
-            //Update Recent + Trigger Api
-            ListenHistory listenHistory = getSongHistory(FirebaseAuth.getInstance().getCurrentUser().getUid(), 0,song);
-            triggerAPICall(listenHistory);
-
         }else{
             //Host Room
             if(ChillCornerRoomManager.getInstance().isCurrentUserHost()){
@@ -605,19 +601,7 @@ public class FragmentHome extends Fragment {
         }
 
     }
-    @SuppressLint("CheckResult")
-    private void triggerAPICall(ListenHistory listenHistory) {
 
-        ApiService.apiService.addUserListenHistory(listenHistory)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    LogUtils.ApplicationLogD("Update User Recent! " + listenHistory.getSongID());
-                    getUserListenHistory(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                }, throwable -> {
-                    LogUtils.ApplicationLogE("Upload User Recent Failed!");
-                });
-    }
 
     private void getUserListenHistory(String userID) {
         ApiService.apiService.getUserListenHistory(userID)
@@ -646,11 +630,6 @@ public class FragmentHome extends Fragment {
                         LogUtils.ApplicationLogI("FragmentHome | getUserListenHistory | onComplete | api size: " + MediaItemHolder.getInstance().getListRecentSong().size());
                         UIThread.getInstance().onUpdateHistory(MediaItemHolder.getInstance().getListRecentSong().size());
 
-                        /*UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                            }
-                        });*/
                     }
                 });
     }

@@ -1,5 +1,6 @@
 package com.example.authenticationuseraccount.service;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -15,18 +16,28 @@ import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.activity.MainActivity;
 import com.example.authenticationuseraccount.activity.panel.RootMediaPlayerPanel;
 import com.example.authenticationuseraccount.activity.panel.RootNavigationBarPanel;
+import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.fragment.FragmentQueueBottomSheet;
+import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.Message;
+import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.theme.AsyncPaletteBuilder;
 import com.example.authenticationuseraccount.theme.interfaces.PaletteStateListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.realgear.multislidinguppanel.MultiSlidingPanelAdapter;
 import com.realgear.multislidinguppanel.MultiSlidingUpPanelLayout;
 
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteStateListener {
     private static UIThread instance;
@@ -147,7 +158,7 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
                 if (playbackState == Player.STATE_READY) {
                     LogUtils.ApplicationLogD("Player is Ready");
                     MediaItemHolder.getInstance().getMediaController().play();
-                    LogUtils.ApplicationLogD("Player is play " + MediaItemHolder.getInstance().getMediaController().getMediaMetadata().title + " at position: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
+                    updateRecent();
                 }
                 if (playbackState == Player.STATE_ENDED) {
                     LogUtils.ApplicationLogD("Player is Ended");
@@ -182,6 +193,72 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onMediaControllerReady(controller);
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).giveUiThreadInstance(this);
     }
+
+    private void updateRecent() {
+        int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+        Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
+        if (song.getImageURL() != null) {
+            ListenHistory listenHistory = getSongHistory(FirebaseAuth.getInstance().getCurrentUser().getUid(), 0, song);
+            triggerAPICall(listenHistory);
+            LogUtils.ApplicationLogD("Player is play " + MediaItemHolder.getInstance().getMediaController().getMediaMetadata().title + " at position: " + MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
+        }else{
+            LogUtils.ApplicationLogI("LocalSong!!!");
+        }
+
+    }
+
+    private ListenHistory getSongHistory(String uid, int count, Song songFromItem) {
+        String songID = songFromItem.getSongID();
+        String songName = songFromItem.getName();
+        LogUtils.ApplicationLogD("Song about to add to recent: " + songName);
+        DateTimeFormatter formatter = null;
+        String formattedDate = "yyyy-MM-dd";
+        return new ListenHistory(uid, songID, count, false, formattedDate);
+    }
+
+    @SuppressLint("CheckResult")
+    private void triggerAPICall(ListenHistory listenHistory) {
+
+        ApiService.apiService.addUserListenHistory(listenHistory)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    LogUtils.ApplicationLogD("Update User Recent! " + listenHistory.getSongID());
+                    getUserListenHistory(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                }, throwable -> {
+                    LogUtils.ApplicationLogE("Upload User Recent Failed!");
+                });
+    }
+
+    private void getUserListenHistory(String userID) {
+        ApiService.apiService.getUserListenHistory(userID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<Song>>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull List<Song> songs) {
+                        LogUtils.ApplicationLogI("FragmentHome | getUserListenHistory | api size: " + songs.size());
+                        MediaItemHolder.getInstance().setListRecentSong(songs);
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        LogUtils.ApplicationLogE("Call api user history error");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        LogUtils.ApplicationLogE("Call api listen history complete");
+                        LogUtils.ApplicationLogI("FragmentHome | getUserListenHistory | onComplete | api size: " + MediaItemHolder.getInstance().getListRecentSong().size());
+                        UIThread.getInstance().onUpdateHistory(MediaItemHolder.getInstance().getListRecentSong().size());
+                    }
+                });
+    }
+
 
     @Override
     public void onUpdateUIOnRestar(MediaController mediaController) {
@@ -289,12 +366,12 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onOutRoom();
     }
 
-    public void onUpdateHistory(int size){
+    public void onUpdateHistory(int size) {
         LogUtils.ApplicationLogI("UIThread | onUpdateHistory");
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onUpdateHistory(size);
     }
 
-    public void onUpdateProfileImage(){
+    public void onUpdateProfileImage() {
         LogUtils.ApplicationLogI("UIThread | onUpdateProfileImage");
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onUpdateProfileImage();
     }

@@ -18,11 +18,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SongAlbumAdapter;
+import com.example.authenticationuseraccount.common.Constants;
+import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.fragment.FragmentSearchOptionBottomSheet;
 import com.example.authenticationuseraccount.model.IClickSearchOptionItemListener;
 import com.example.authenticationuseraccount.model.ItemSearchOption;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -38,7 +42,7 @@ public class FavAndHisSongActivity extends AppCompatActivity {
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private LinearLayout layoutNoData;
     private TextView tvSongTitle, tvUserName;
-    private ImageButton btnMore, btnBack;
+    private ImageButton btnMore, btnBack, btnPlay, btnRandom;
     private ImageView imgProfile;
     private RecyclerView songRecyclerView;
     private SongAlbumAdapter songAdapter;
@@ -48,7 +52,8 @@ public class FavAndHisSongActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fav_and_his_song);
-
+        btnPlay = findViewById(R.id.play_button);
+        btnRandom = findViewById(R.id.random_button);
         layoutNoData = findViewById(R.id.layout_no_data);
         btnMore = findViewById(R.id.more_button);
         btnBack = findViewById(R.id.backButton);
@@ -78,6 +83,20 @@ public class FavAndHisSongActivity extends AppCompatActivity {
             songAdapter = new SongAlbumAdapter(getApplicationContext(), fragmentActivity, listSong);
             songRecyclerView.setAdapter(songAdapter);
         }
+
+        btnPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPlayList(listSong);
+            }
+        });
+
+        btnRandom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPlayListRandom(listSong);
+            }
+        });
 
         btnMore.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,23 +136,20 @@ public class FavAndHisSongActivity extends AppCompatActivity {
 
     private void clickOpenOptionBottomSheet() {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_arrow, "Phát tất cả"));
-        itemSearchOptionList.add(new ItemSearchOption(leveldown.kyle.icon_packs.R.drawable.shuffle_24px, "Phát ngẫu nhiên"));
+        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_arrow, Constants.ACTION_ADD_TO_QUEUE));
+        itemSearchOptionList.add(new ItemSearchOption(leveldown.kyle.icon_packs.R.drawable.shuffle_24px, Constants.ACTION_ADD_RANDOM_PLAYLIST));
 
         FragmentSearchOptionBottomSheet fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
             @Override
             public void clickSearchOptionItem(ItemSearchOption itemSearchOption) {
                 switch (itemSearchOption.getText()) {
-                    case "Phát tất cả":
-                        // Handle "Tải xuống" action
-                        Toast.makeText(FavAndHisSongActivity.this, "Phát tất cả clicked", Toast.LENGTH_SHORT).show();
+                    case Constants.ACTION_ADD_TO_QUEUE:
+                        addPlayListToQueue(listSong);
                         break;
-
-                    case "Phát ngẫu nhiên":
-                        Toast.makeText(FavAndHisSongActivity.this, "Phát ngẫu nhiên clicked", Toast.LENGTH_SHORT).show();
+                    case Constants.ACTION_ADD_RANDOM_PLAYLIST:
+                        setPlayListRandom(listSong);
                         break;
                     default:
-                        // Handle default action
                         Toast.makeText(FavAndHisSongActivity.this, "Unknown option clicked", Toast.LENGTH_SHORT).show();
                         break;
                 }
@@ -143,6 +159,61 @@ public class FavAndHisSongActivity extends AppCompatActivity {
         fragmentSearchOptionBottomSheet.show(getSupportFragmentManager(), fragmentSearchOptionBottomSheet.getTag());
     }
 
+
+    private void setPlayList(List<Song> listSong) {
+        if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+            MediaItemHolder.getInstance().setListAlbumMediaItem(listSong);
+            Toast.makeText(FavAndHisSongActivity.this, "Playlist Added", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            //Host Room
+            if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                SocketIoManager.getInstance().setPlaylist(userID, listSong);
+                finish();
+            } else {
+                //Guest Room
+                ErrorUtils.showError(FavAndHisSongActivity.this, "Only Host Can Change The Playlist!");
+            }
+        }
+    }
+
+    private void addPlayListToQueue(List<Song> listSong) {
+        if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+            MediaItemHolder.getInstance().addListAlbumMediaItem(listSong);
+            Toast.makeText(FavAndHisSongActivity.this, "Playlist Added To Queue", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            //Host Room
+            if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                SocketIoManager.getInstance().addPlaylistToQueue(userID, listSong);
+                finish();
+            } else {
+                //Guest Room
+                ErrorUtils.showError(FavAndHisSongActivity.this, "Only Host Can Change The Playlist!");
+            }
+        }
+
+    }
+
+    private void setPlayListRandom(List<Song> listSong) {
+        if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+            MediaItemHolder.getInstance().setListAlbumMediaItemRandom(listSong);
+            Toast.makeText(FavAndHisSongActivity.this, tvSongTitle.getText() + " Randomly Added", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            //Host Room
+            if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                SocketIoManager.getInstance().setPlaylistRandom(userID, listSong);
+                finish();
+            } else {
+                //Guest Room
+                ErrorUtils.showError(FavAndHisSongActivity.this, "Only Host Can Change The Playlist!");
+            }
+        }
+    }
 
     @Override
     public void onDestroy() {

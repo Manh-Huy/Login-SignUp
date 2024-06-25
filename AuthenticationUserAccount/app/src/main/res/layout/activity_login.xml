@@ -127,6 +127,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogin"
+                android:backgroundTint="#2DBA77"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:text="Login"

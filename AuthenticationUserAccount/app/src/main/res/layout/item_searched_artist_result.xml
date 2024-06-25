@@ -11,6 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#E1C36A"
         android:padding="10dp">
 
         <de.hdodenhof.circleimageview.CircleImageView

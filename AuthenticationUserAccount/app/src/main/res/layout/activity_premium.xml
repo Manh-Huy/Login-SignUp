@@ -136,8 +136,8 @@
                 android:id="@+id/buyVipButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:backgroundTint="#FF2DBA77"
                 android:text="Buy VIP"
-                android:backgroundTint="@color/mcgpalette0_900"
                 android:textColor="@android:color/white"
                 android:layout_marginEnd="8dp" />
 

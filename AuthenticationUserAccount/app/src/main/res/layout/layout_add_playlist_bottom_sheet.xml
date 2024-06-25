@@ -51,7 +51,7 @@
             android:paddingTop="12dp"
             android:paddingRight="24dp"
             android:paddingBottom="12dp"
-            android:backgroundTint="@color/colorPrimary"
+            android:backgroundTint="#FF2DBA77"
             android:textColor="#FFFFFF"
             android:layout_gravity="center"/>
     </LinearLayout>

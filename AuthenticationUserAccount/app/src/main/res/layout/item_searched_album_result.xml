@@ -12,6 +12,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#EC9A5C"
         android:padding="10dp">
 
         <ImageView
@@ -24,10 +25,10 @@
             android:id="@+id/tv_album"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Album"
+            android:layout_marginStart="10dp"
             android:layout_toEndOf="@id/img_album"
 
-            android:layout_marginStart="10dp"
+            android:text="Album"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
@@ -35,10 +36,10 @@
             android:id="@+id/tv_album_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="name Album"
-            android:layout_toEndOf="@id/img_album"
             android:layout_below="@id/tv_album"
             android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/img_album"
+            android:text="name Album"
             android:textColor="@color/white"
             android:textSize="16sp" />
 

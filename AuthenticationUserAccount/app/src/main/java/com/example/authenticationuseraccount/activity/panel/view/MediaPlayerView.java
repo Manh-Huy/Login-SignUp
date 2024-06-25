@@ -204,30 +204,49 @@ public class MediaPlayerView {
         });
 
         this.m_vBtn_Repeat.setOnClickListener((v) -> {
-            if (m_vRepeatType < 2) {
-                m_vRepeatType++;
+            //No Room
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                if (m_vRepeatType < 2) {
+                    m_vRepeatType++;
+                } else {
+                    m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
+                }
+
+                switch (m_vRepeatType) {
+                    case MediaItemHolder.REPEAT_TYPE_NONE:
+                        this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
+                        this.m_vBtn_Repeat.setAlpha(0.25F);
+                        break;
+
+                    case MediaItemHolder.REPEAT_TYPE_ONE:
+                        this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_one_24px);
+                        this.m_vBtn_Repeat.setAlpha(1F);
+                        break;
+
+                    case MediaItemHolder.REPEAT_TYPE_ALL:
+                        this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
+                        this.m_vBtn_Repeat.setAlpha(1F);
+                        break;
+                }
+                MediaItemHolder.getInstance().getMediaController().setRepeatMode(this.m_vRepeatType);
+
             } else {
-                m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
+                //Host Room
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                    if (m_vRepeatType < 2) {
+                        m_vRepeatType++;
+                    } else {
+                        m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
+                    }
+                    String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                    SocketIoManager.getInstance().setRepeatMode(userID, this.m_vRepeatType);
+                } else {
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
             }
 
-            switch (m_vRepeatType) {
-                case MediaItemHolder.REPEAT_TYPE_NONE:
-                    this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
-                    this.m_vBtn_Repeat.setAlpha(0.25F);
-                    break;
 
-                case MediaItemHolder.REPEAT_TYPE_ONE:
-                    this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_one_24px);
-                    this.m_vBtn_Repeat.setAlpha(1F);
-                    break;
-
-                case MediaItemHolder.REPEAT_TYPE_ALL:
-                    this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
-                    this.m_vBtn_Repeat.setAlpha(1F);
-                    break;
-            }
-
-            MediaItemHolder.getInstance().getMediaController().setRepeatMode(this.m_vRepeatType);
         });
 
         this.m_vBtn_Prev.setOnClickListener((v) -> {
@@ -281,13 +300,26 @@ public class MediaPlayerView {
             }
         });
         this.m_vBtn_Shuffle.setOnClickListener((v) -> {
-            if (mMediaController.getShuffleModeEnabled()) {
-                this.m_vBtn_Shuffle.setIconResource(R.drawable.ic_shuffle_off);
-                mMediaController.setShuffleModeEnabled(false);
+
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                if (mMediaController.getShuffleModeEnabled()) {
+                    this.m_vBtn_Shuffle.setIconResource(R.drawable.ic_shuffle_off);
+                    mMediaController.setShuffleModeEnabled(false);
+                } else {
+                    this.m_vBtn_Shuffle.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_shuffle_on_24px);
+                    mMediaController.setShuffleModeEnabled(true);
+                }
             } else {
-                this.m_vBtn_Shuffle.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_shuffle_on_24px);
-                mMediaController.setShuffleModeEnabled(true);
+                //Host Room
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                    ErrorUtils.showError(mContext, "You Can Shuffle When In Room! Playlist Can't Be Synchronized!");
+                } else {
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
             }
+
+
         });
 
         this.mImageViewQueue.setOnClickListener(new View.OnClickListener() {
@@ -330,8 +362,26 @@ public class MediaPlayerView {
         });
     }
 
-    public void onUpdateUI() {
+    public void onUpdateRepeatMode(int repeatMode) {
+        switch (repeatMode) {
+            case MediaItemHolder.REPEAT_TYPE_NONE:
+                this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
+                this.m_vBtn_Repeat.setAlpha(0.25F);
+                break;
 
+            case MediaItemHolder.REPEAT_TYPE_ONE:
+                this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_one_24px);
+                this.m_vBtn_Repeat.setAlpha(1F);
+                break;
+
+            case MediaItemHolder.REPEAT_TYPE_ALL:
+                this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
+                this.m_vBtn_Repeat.setAlpha(1F);
+                break;
+        }
+
+        MediaItemHolder.getInstance().getMediaController().setRepeatMode(repeatMode);
+        ErrorUtils.showError(mContext,"Repeat Mode Has Been Set To: " + repeatMode);
     }
 
     private UIThread uiThread;

@@ -380,4 +380,8 @@ public class UIThread implements MainActivity.OnMediaControllerConnect, PaletteS
         LogUtils.ApplicationLogI("UIThread | onUpdateLoveSongSize");
         UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootNavigationBarPanel.class).onUpdateLoveSongSize(size);
     }
+
+    public void onRepeateModeSet(int repeatMode) {
+        UIThread.this.m_vMultiSlidingPanel.getAdapter().getItem(RootMediaPlayerPanel.class).onRepeateModeSet(repeatMode);
+    }
 }

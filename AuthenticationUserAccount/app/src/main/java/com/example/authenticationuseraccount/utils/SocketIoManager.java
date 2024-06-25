@@ -103,17 +103,33 @@ public class SocketIoManager {
             }
         });
 
-        mSocket.on("on-shuffle", new Emitter.Listener() {
+        mSocket.on("on-repeat-mode-set", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-
+                //args = int;
+                onRepeateModeSet(args);
             }
         });
+    }
 
-        mSocket.on("on-reapeat", new Emitter.Listener() {
+    public void setRepeatMode(String roomID, int repeatMode) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomID);
+            data.put("repeatMode", repeatMode);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | setRepeatMode: " + data.toString());
+        mSocket.emit("set-repeat-mode", data);
+    }
+
+    private void onRepeateModeSet(Object[] args) {
+        int repeatMode = (int) args[0];
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
             @Override
-            public void call(Object... args) {
-
+            public void run() {
+                UIThread.getInstance().onRepeateModeSet(repeatMode);
             }
         });
     }

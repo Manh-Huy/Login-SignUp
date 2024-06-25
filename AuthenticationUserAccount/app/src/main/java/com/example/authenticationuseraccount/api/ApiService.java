@@ -166,7 +166,7 @@ public interface ApiService {
     Completable addSongToPlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName, @Field("songID") String songID);
 
     @GET("playlists/getSpecificPlaylist")
-    Observable<List<Song>> getSpecificPlaylist(@Field("userID") String userID, @Field("playlistName") String playlistName);
+    Observable<Playlist> getSpecificPlaylist(@Query("userID") String userID, @Query("playlistName") String playlistName);
 
     @FormUrlEncoded
     @DELETE("playlists")

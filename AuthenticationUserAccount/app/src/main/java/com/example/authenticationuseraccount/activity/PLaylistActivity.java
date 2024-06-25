@@ -95,7 +95,6 @@ public class PLaylistActivity extends AppCompatActivity {
         List<ItemSearchOption> itemSearchOptionList = new ArrayList<>();
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_add_to_playlist, "Thêm vào danh sách phát"));
         itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_play_arrow, "Phát"));
-        itemSearchOptionList.add(new ItemSearchOption(R.drawable.ic_heart, "Thích"));
         itemSearchOptionList.add(new ItemSearchOption(leveldown.kyle.icon_packs.R.drawable.shuffle_24px, "Phát ngẫu nhiên"));
 
         FragmentSearchOptionBottomSheet fragmentSearchOptionBottomSheet = new FragmentSearchOptionBottomSheet(itemSearchOptionList, new IClickSearchOptionItemListener() {
@@ -107,9 +106,6 @@ public class PLaylistActivity extends AppCompatActivity {
                         break;
                     case "Phát":
                         Toast.makeText(PLaylistActivity.this, "Phát clicked", Toast.LENGTH_SHORT).show();
-                        break;
-                    case "Thích":
-                        Toast.makeText(PLaylistActivity.this, "Thích clicked", Toast.LENGTH_SHORT).show();
                         break;
                     case "Phát ngẫu nhiên":
                         Toast.makeText(PLaylistActivity.this, "Phát ngẫu nhiên clicked", Toast.LENGTH_SHORT).show();

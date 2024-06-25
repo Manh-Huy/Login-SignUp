@@ -162,7 +162,7 @@ public class SongPlaylistAdapter extends RecyclerView.Adapter<SongPlaylistAdapte
 
     @SuppressLint("CheckResult")
     private void deleteSongToPlaylist(String userID, String playlistName, String songID) {
-        ApiService.apiService.addSongToPlaylist(userID, playlistName, songID)
+        ApiService.apiService.deleteSongToPlaylist(userID, playlistName, songID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {

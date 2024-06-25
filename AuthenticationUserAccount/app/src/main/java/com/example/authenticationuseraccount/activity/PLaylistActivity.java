@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.SongPlaylistAdapter;
@@ -35,8 +36,9 @@ import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class PLaylistActivity extends AppCompatActivity {
+public class PLaylistActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     private Disposable mDisposable;
+    private SwipeRefreshLayout swipeRefreshLayout;
     FirebaseUser user;
     private TextView playlistTitle, songCount;
     private ImageButton btnMore;
@@ -59,6 +61,9 @@ public class PLaylistActivity extends AppCompatActivity {
         btnMore = findViewById(R.id.more_button);
         imgDeletePlaylist = findViewById(R.id.img_delete_playlist);
 
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
         playListSong = new ArrayList<>();
         user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -67,10 +72,8 @@ public class PLaylistActivity extends AppCompatActivity {
 
         if (playlist != null) {
             String playlistName = playlist.getPlaylistName();
-            getSpecificPlaylist(user.getUid(), playlistName);
             playlistTitle.setText(playlistName.toUpperCase());
-            String count = playlist.getListSong().size() + " bài hát";
-            songCount.setText(count);
+            getSpecificPlaylist(user.getUid(), playlistName);
         }
 
         btnMore.setOnClickListener(new View.OnClickListener() {
@@ -143,10 +146,16 @@ public class PLaylistActivity extends AppCompatActivity {
                     @Override
                     public void onComplete() {
                         LogUtils.ApplicationLogE("Call api getSpecificPlaylist successfully");
+
+                        String count = playListSong.size() + " bài hát";
+                        songCount.setText(count);
+
                         FragmentActivity fragmentActivity = PLaylistActivity.this;
-                        List<Playlist> playlistList = new ArrayList<>();
                         songAlbumAdapter = new SongPlaylistAdapter(getApplicationContext(), fragmentActivity, playListSong, playlist);
                         songRecyclerView.setAdapter(songAlbumAdapter);
+
+                        swipeRefreshLayout.setRefreshing(false);
+
                     }
                 });
 
@@ -159,6 +168,7 @@ public class PLaylistActivity extends AppCompatActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
                     LogUtils.ApplicationLogD("Call API delete Playlist Successfully");
+                    finish();
                 }, throwable -> {
                     LogUtils.ApplicationLogE("Call API delete Playlist Failed");
                 });
@@ -169,5 +179,13 @@ public class PLaylistActivity extends AppCompatActivity {
             mDisposable.dispose();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onRefresh() {
+        playListSong.clear();
+        String playlistName = playlist.getPlaylistName();
+        getSpecificPlaylist(user.getUid(), playlistName);
+        playlistTitle.setText(playlistName.toUpperCase());
     }
 }

@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.authenticationuseraccount.R;
 import com.example.authenticationuseraccount.adapter.ThumbnailPlaylistAdapter;
@@ -32,13 +33,14 @@ import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class FragmentPlaylist extends Fragment {
+public class FragmentPlaylist extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     FirebaseUser user;
     private TextView playlistCount;
     private ImageView imgAdd;
     private RecyclerView rcvPlaylist;
     private LinearLayout layoutNoData;
     private List<Playlist> playList;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ThumbnailPlaylistAdapter thumbnailPlaylistAdapter;
     @Nullable
     @Override
@@ -52,6 +54,9 @@ public class FragmentPlaylist extends Fragment {
         imgAdd = view.findViewById(R.id.img_add);
         rcvPlaylist = view.findViewById(R.id.rcv_playlist);
         layoutNoData = view.findViewById(R.id.layout_no_data);
+
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         updateUI();
 
@@ -119,6 +124,7 @@ public class FragmentPlaylist extends Fragment {
                         updateUI();
                         thumbnailPlaylistAdapter.setData(playList);
                         rcvPlaylist.setAdapter(thumbnailPlaylistAdapter);
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 });
     }
@@ -131,6 +137,14 @@ public class FragmentPlaylist extends Fragment {
     }
 
 
-
-
+    @Override
+    public void onRefresh() {
+        if (user == null) {
+            updateUI();
+        }
+        else {
+            playList.clear();
+            getPlaylistUserByID(user.getUid());
+        }
+    }
 }

@@ -6,6 +6,16 @@ public class Genre implements Serializable {
     private String genreID;
     private String name;
 
+    private String imageURL;
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
     public Genre(String genreID, String name) {
         this.genreID = genreID;
         this.name = name;

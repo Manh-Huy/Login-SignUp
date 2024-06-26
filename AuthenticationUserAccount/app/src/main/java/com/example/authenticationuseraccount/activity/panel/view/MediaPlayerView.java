@@ -1,9 +1,11 @@
 package com.example.authenticationuseraccount.activity.panel.view;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -32,7 +34,9 @@ import com.example.authenticationuseraccount.model.ListenHistory;
 import com.example.authenticationuseraccount.model.business.Song;
 import com.example.authenticationuseraccount.service.MediaItemHolder;
 import com.example.authenticationuseraccount.service.UIThread;
+import com.example.authenticationuseraccount.utils.ChillCornerRoomManager;
 import com.example.authenticationuseraccount.utils.DataLocalManager;
+import com.example.authenticationuseraccount.utils.SocketIoManager;
 import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -73,10 +77,12 @@ public class MediaPlayerView {
     public int m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
     private boolean m_vCanUpdateSeekbar = true;
     private MediaController mMediaController;
+    private Context mContext;
 
     public MediaPlayerView(View rootView) {
         //LogUtils.ApplicationLogE("MediaPlayerView Constructor");
         this.mRootView = rootView;
+        this.mContext = rootView.getContext();
         this.mControlsContainer = findViewById(R.id.media_player_controls_container);
         this.mRootView.setAlpha(0.0F);
         this.mProgressBar = findViewById(R.id.progress_bar);
@@ -136,77 +142,184 @@ public class MediaPlayerView {
                 this.isUser = fromUser;
                 int seekPosition = value * 1000;
                 if (fromUser) {
-                    mMediaController.seekTo(seekPosition);
+                    //No Room
+                    if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                        mMediaController.seekTo(seekPosition);
+                    } else {
+                        //Host Room
+                        if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                            String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                            SocketIoManager.getInstance().seekTo(userID, seekPosition);
+                        } else {
+                            //Guest Room
+                            ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                        }
+                    }
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                if (mMediaController != null)
-                    mMediaController.pause();
-                m_vCanUpdateSeekbar = false;
+                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                    if (mMediaController != null)
+                        mMediaController.pause();
+                    m_vCanUpdateSeekbar = false;
+                } else {
+                    //Host Room
+                    if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                        if (mMediaController != null)
+                            mMediaController.pause();
+                        m_vCanUpdateSeekbar = false;
+                    } else {
+                        //Guest Room
+                        ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                    }
+                }
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (isUser) {
-                    //mMediaController.seekTo(final_value);
-                    if (mMediaController != null)
-                        mMediaController.play();
+
+                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                    if (isUser) {
+                        if (mMediaController != null)
+                            mMediaController.play();
+                    }
+                    m_vCanUpdateSeekbar = true;
+                } else {
+                    //Host Room
+                    if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                        if (isUser) {
+                            if (mMediaController != null)
+                                mMediaController.play();
+                        }
+                        m_vCanUpdateSeekbar = true;
+                    } else {
+                        //Guest Room
+                        ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                    }
                 }
-                m_vCanUpdateSeekbar = true;
+
             }
         });
 
         this.m_vBtn_Repeat.setOnClickListener((v) -> {
-            if (m_vRepeatType < 2) {
-                m_vRepeatType++;
+            //No Room
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                if (m_vRepeatType < 2) {
+                    m_vRepeatType++;
+                } else {
+                    m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
+                }
+
+                switch (m_vRepeatType) {
+                    case MediaItemHolder.REPEAT_TYPE_NONE:
+                        this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
+                        this.m_vBtn_Repeat.setAlpha(0.25F);
+                        break;
+
+                    case MediaItemHolder.REPEAT_TYPE_ONE:
+                        this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_one_24px);
+                        this.m_vBtn_Repeat.setAlpha(1F);
+                        break;
+
+                    case MediaItemHolder.REPEAT_TYPE_ALL:
+                        this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
+                        this.m_vBtn_Repeat.setAlpha(1F);
+                        break;
+                }
+                MediaItemHolder.getInstance().getMediaController().setRepeatMode(this.m_vRepeatType);
+
             } else {
-                m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
+                //Host Room
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                    if (m_vRepeatType < 2) {
+                        m_vRepeatType++;
+                    } else {
+                        m_vRepeatType = MediaItemHolder.REPEAT_TYPE_NONE;
+                    }
+                    String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                    SocketIoManager.getInstance().setRepeatMode(userID, this.m_vRepeatType);
+                } else {
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
             }
 
-            switch (m_vRepeatType) {
-                case MediaItemHolder.REPEAT_TYPE_NONE:
-                    this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
-                    this.m_vBtn_Repeat.setAlpha(0.25F);
-                    break;
 
-                case MediaItemHolder.REPEAT_TYPE_ONE:
-                    this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_one_24px);
-                    this.m_vBtn_Repeat.setAlpha(1F);
-                    break;
-
-                case MediaItemHolder.REPEAT_TYPE_ALL:
-                    this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
-                    this.m_vBtn_Repeat.setAlpha(1F);
-                    break;
-            }
-
-            MediaItemHolder.getInstance().getMediaController().setRepeatMode(this.m_vRepeatType);
         });
 
         this.m_vBtn_Prev.setOnClickListener((v) -> {
-            mMediaController.seekToPreviousMediaItem();
+            //No Room
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                mMediaController.seekToPreviousMediaItem();
+            } else {
+                //Host Room
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                    String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                    SocketIoManager.getInstance().previousSong(userID);
+                } else {
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
+            }
         });
         this.m_vBtn_PlayPause.setOnClickListener((v) -> {
-            if (mMediaController.isPlaying()) {
-                mMediaController.pause();
+            //No Room
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                if (mMediaController.isPlaying()) {
+                    mMediaController.pause();
+                } else {
+                    mMediaController.play();
+                }
             } else {
-                mMediaController.play();
+                //Host Room
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                    String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                    SocketIoManager.getInstance().playPauseSong(userID, mMediaController.isPlaying());
+                } else {
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
             }
 
         });
         this.m_vBtn_Next.setOnClickListener((v) -> {
-            mMediaController.seekToNextMediaItem();
+            //No Room
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                mMediaController.seekToNextMediaItem();
+            } else {
+                //Host Room
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                    String userID = ChillCornerRoomManager.getInstance().getRoomId();
+                    SocketIoManager.getInstance().skipSong(userID);
+                } else {
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
+            }
         });
         this.m_vBtn_Shuffle.setOnClickListener((v) -> {
-            if (mMediaController.getShuffleModeEnabled()) {
-                this.m_vBtn_Shuffle.setIconResource(R.drawable.ic_shuffle_off);
-                mMediaController.setShuffleModeEnabled(false);
+
+            if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                if (mMediaController.getShuffleModeEnabled()) {
+                    this.m_vBtn_Shuffle.setIconResource(R.drawable.ic_shuffle_off);
+                    mMediaController.setShuffleModeEnabled(false);
+                } else {
+                    this.m_vBtn_Shuffle.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_shuffle_on_24px);
+                    mMediaController.setShuffleModeEnabled(true);
+                }
             } else {
-                this.m_vBtn_Shuffle.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_shuffle_on_24px);
-                mMediaController.setShuffleModeEnabled(true);
+                //Host Room
+                if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                    ErrorUtils.showError(mContext, "You Can Shuffle When In Room! Playlist Can't Be Synchronized!");
+                } else {
+                    //Guest Room
+                    ErrorUtils.showError(mContext, "Only Host Can Change The Playlist!");
+                }
             }
+
+
         });
 
         this.mImageViewQueue.setOnClickListener(new View.OnClickListener() {
@@ -219,8 +332,16 @@ public class MediaPlayerView {
             @Override
             public void onClick(View v) {
                 if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-                    materialCheckBox.setChecked(false);
-                    ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
+                    materialCheckBox.setChecked(true);
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Set the second image resource after 1 second
+                            materialCheckBox.setChecked(false);
+                            ErrorUtils.showError(mRootView.getContext(), "Please Login to Like Song");
+                        }
+                    }, 500); // 1000 milliseconds = 1 second
+
                 } else {
                     if (materialCheckBox.isChecked()) {
                         ListenHistory listenHistory = getSongHistory(user.getUid(), 3);
@@ -241,8 +362,26 @@ public class MediaPlayerView {
         });
     }
 
-    public void onUpdateUI() {
+    public void onUpdateRepeatMode(int repeatMode) {
+        switch (repeatMode) {
+            case MediaItemHolder.REPEAT_TYPE_NONE:
+                this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
+                this.m_vBtn_Repeat.setAlpha(0.25F);
+                break;
 
+            case MediaItemHolder.REPEAT_TYPE_ONE:
+                this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_one_24px);
+                this.m_vBtn_Repeat.setAlpha(1F);
+                break;
+
+            case MediaItemHolder.REPEAT_TYPE_ALL:
+                this.m_vBtn_Repeat.setIconResource(leveldown.kyle.icon_packs.R.drawable.ic_repeat_24px);
+                this.m_vBtn_Repeat.setAlpha(1F);
+                break;
+        }
+
+        MediaItemHolder.getInstance().getMediaController().setRepeatMode(repeatMode);
+        ErrorUtils.showError(mContext, "Repeat Mode Has Been Set To: " + repeatMode);
     }
 
     private UIThread uiThread;
@@ -254,6 +393,14 @@ public class MediaPlayerView {
     public void onUpdateMetadata(MediaMetadata mediaMetadata, Bitmap bitmap, boolean isLoveSong) {
         this.m_vBtn_Shuffle.setIconResource(mMediaController.getShuffleModeEnabled() ? leveldown.kyle.icon_packs.R.drawable.ic_shuffle_on_24px : R.drawable.ic_shuffle_off);
         this.materialCheckBox.setChecked(isLoveSong);
+
+        int currentSongIndex = MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex();
+        Song song = MediaItemHolder.getInstance().getListSongs().get(currentSongIndex);
+        if (song.getImageURL() != null) {
+            materialCheckBox.setVisibility(View.VISIBLE);
+        } else {
+            materialCheckBox.setVisibility(View.INVISIBLE);
+        }
         this.m_vTextView_Title.setText(mediaMetadata.title);
         this.m_vTextView_Artist.setText(mediaMetadata.artist);
         this.mProgressBar.setVisibility(View.VISIBLE);
@@ -293,18 +440,44 @@ public class MediaPlayerView {
         mRootView.post(new Runnable() {
             @Override
             public void run() {
-                int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
-                int totalDuration = (int) (mMediaController.getDuration() / 1000);
-                m_vSeekBar_Main.setProgress(currentPosition);
-                m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
+                //No Room
+                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                    int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                    int totalDuration = (int) (mMediaController.getDuration() / 1000);
+                    m_vSeekBar_Main.setProgress(currentPosition);
+                    m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
 
-                // Update user History
-                boolean isSaveUserHistoryTriggered = MediaItemHolder.getInstance().isSaveUserHistoryTriggered();
-                if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
-                    updateUserHistory();
+                    // Update user History
+                    boolean isSaveUserHistoryTriggered = MediaItemHolder.getInstance().isSaveUserHistoryTriggered();
+                    if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
+                        updateUserHistory();
+                    }
+                    handler.postDelayed(this, 1000);
+                } else {
+                    //Host Room
+                    if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                        int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                        m_vSeekBar_Main.setProgress(currentPosition);
+                        m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
+                        ChillCornerRoomManager.getInstance().setCurrentSongProgress(currentPosition);
+                        handler.postDelayed(this, 1000);
+
+                    } else {
+                        int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                        int totalDuration = (int) (mMediaController.getDuration() / 1000);
+                        m_vSeekBar_Main.setProgress(currentPosition);
+                        m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
+
+                        // Update user History
+                        boolean isSaveUserHistoryTriggered = MediaItemHolder.getInstance().isSaveUserHistoryTriggered();
+                        if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
+                            updateUserHistory();
+                        }
+                        handler.postDelayed(this, 1000);
+                    }
                 }
 
-                handler.postDelayed(this, 1000);
+
             }
         });
     }
@@ -454,6 +627,7 @@ public class MediaPlayerView {
                     public void onComplete() {
                         LogUtils.ApplicationLogE("Call api love song Complete");
                         LogUtils.ApplicationLogE("Count: " + MediaItemHolder.getInstance().getListLoveSong().size());
+                        UIThread.getInstance().onUpdateLoveSongSize(MediaItemHolder.getInstance().getListLoveSong().size());
 
                     }
                 });

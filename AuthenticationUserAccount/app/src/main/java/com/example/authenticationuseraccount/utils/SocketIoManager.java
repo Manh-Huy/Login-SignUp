@@ -1,5 +1,11 @@
 package com.example.authenticationuseraccount.utils;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+
+import androidx.media3.common.MediaItem;
+
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.Message;
@@ -61,12 +67,167 @@ public class SocketIoManager {
             listenForRoomEvent();
             listenForChatEvent();
             listenForMusicEvent();
+            listenForMusicControllerEvent();
 
             mSocket.connect();
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+    }
+
+    private void listenForMusicControllerEvent() {
+        mSocket.on("on-play-pause", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = boolean
+                onPlayPauseSong(args);
+            }
+        });
+
+        mSocket.on("on-song-skipped", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = null
+                onSongSkipped();
+            }
+        });
+
+        mSocket.on("on-previous", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = null
+                onPreviousSong();
+            }
+        });
+
+        mSocket.on("on-song-seeked", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = int
+                onSongSeek(args);
+            }
+        });
+
+        mSocket.on("on-repeat-mode-set", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                //args = int;
+                onRepeateModeSet(args);
+            }
+        });
+    }
+
+    public void setRepeatMode(String roomID, int repeatMode) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomID);
+            data.put("repeatMode", repeatMode);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | setRepeatMode: " + data.toString());
+        mSocket.emit("set-repeat-mode", data);
+    }
+
+    private void onRepeateModeSet(Object[] args) {
+        int repeatMode = (int) args[0];
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                UIThread.getInstance().onRepeateModeSet(repeatMode);
+            }
+        });
+    }
+
+    public void seekTo(String userID, int seekPosition) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", userID);
+            data.put("position", seekPosition);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | seekTo: " + data.toString());
+        mSocket.emit("song-seek", data);
+    }
+
+    private void onSongSeek(Object[] args) {
+        int seekPosition = (int) args[0];
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().getMediaController().seekTo(seekPosition);
+            }
+        });
+    }
+
+    public void previousSong(String roomID) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomID);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | previousSong: " + data.toString());
+        mSocket.emit("previous-song", data);
+    }
+
+    private void onPreviousSong() {
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().getMediaController().seekToPreviousMediaItem();
+            }
+        });
+    }
+
+    public void skipSong(String roomID) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomID);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | skipSong: " + data.toString());
+        mSocket.emit("skip-song", data);
+    }
+
+    private void onSongSkipped() {
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                MediaItemHolder.getInstance().getMediaController().seekToNextMediaItem();
+            }
+        });
+    }
+
+    public void playPauseSong(String roomID, boolean isPlaying) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("roomID", roomID);
+            data.put("isPlaying", isPlaying); // Directly put the boolean value
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        LogUtils.ApplicationLogI("SocketIOManager | play-pause: " + data.toString());
+        mSocket.emit("play-pause", data);
+    }
+
+    public void onPlayPauseSong(Object[] args) {
+        boolean isPlaying = (boolean) args[0];
+
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isPlaying) {
+                    MediaItemHolder.getInstance().getMediaController().pause();
+                } else {
+                    MediaItemHolder.getInstance().getMediaController().play();
+                }
+            }
+        });
+
     }
 
     private void listenForMusicEvent() {
@@ -526,11 +687,18 @@ public class SocketIoManager {
         LogUtils.ApplicationLogI("SocketIOManager | on-get-room-info: User Name: " + userName + ", User ID: " + userID);
 
         SocketUser socketUser = new SocketUser(userID, userName);
-        ChillCornerRoomManager.getInstance().getListUser().add(socketUser);
-        if (MediaItemHolder.getInstance().getListSongs() != null && !MediaItemHolder.getInstance().getListSongs().isEmpty()) {
-            ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
-            ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
-        }
+
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ChillCornerRoomManager.getInstance().getListUser().add(socketUser);
+                if (MediaItemHolder.getInstance().getListSongs() != null && !MediaItemHolder.getInstance().getListSongs().isEmpty()) {
+                    ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
+                    ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
+                }
+            }
+        });
+
         String roomInfoJson = gson.toJson(ChillCornerRoomManager.getInstance());
 
         //data = roomId + ChillCornerRoomManager( List<SocketUser>, List<Song>, CurrentIndex )
@@ -580,6 +748,7 @@ public class SocketIoManager {
 
             if (roomManager.getListSongs() != null && !roomManager.getListSongs().isEmpty()) {
                 ChillCornerRoomManager.getInstance().setListSongs(roomManager.getListSongs());
+                ChillCornerRoomManager.getInstance().setCurrentSongProgress(roomManager.getCurrentSongProgress());
                 LogUtils.ApplicationLogI("SocketIOManager | on-response-room-info: setListSongs: " + roomManager.getListSongs());
             }
 
@@ -606,11 +775,30 @@ public class SocketIoManager {
     private void onUserJoinRoomBroadCast(Object[] args) {
         //args = userName
 
+        if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+            LogUtils.ApplicationLogI("Host here");
+            return;
+        }
         LogUtils.ApplicationLogI("SocketIOManger | onUserJoinRoomBroadCast: user " + args[0].toString() + " has joined room: " + ChillCornerRoomManager.getInstance().getRoomId());
         UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 UIThread.getInstance().onRoomJoined(ChillCornerRoomManager.getInstance().getRoomId());
+
+                if (ChillCornerRoomManager.getInstance().getListSongs() != null && !ChillCornerRoomManager.getInstance().getListSongs().isEmpty()) {
+                    MediaItemHolder.getInstance().setListSongs(ChillCornerRoomManager.getInstance().getListSongs());
+                    Song currentRoomSong = MediaItemHolder.getInstance().getListSongs().get(ChillCornerRoomManager.getInstance().getCurrentPlaySongIndex());
+                    MediaItem mediaItem = MediaItem.fromUri(currentRoomSong.getSongURL());
+                    MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            MediaItemHolder.getInstance().getMediaController().seekTo(ChillCornerRoomManager.getInstance().getCurrentSongProgress() + 2);
+                            LogUtils.ApplicationLogI("SeekTo: " + (ChillCornerRoomManager.getInstance().getCurrentSongProgress() + 4));
+                        }
+                    }, 2000); // 1000 milliseconds = 1 second
+                }
+
                 ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), args[0].toString() + " Has Jumped In! Let's listen together!");
             }
         });
@@ -700,5 +888,6 @@ public class SocketIoManager {
 
         return songList;
     }
+
 
 }

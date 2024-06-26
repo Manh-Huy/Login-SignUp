@@ -18,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.authenticationuseraccount.R;
@@ -25,6 +26,7 @@ import com.example.authenticationuseraccount.activity.EditProfileActivity;
 import com.example.authenticationuseraccount.activity.FavAndHisSongActivity;
 import com.example.authenticationuseraccount.activity.LoginSignUpActivity;
 import com.example.authenticationuseraccount.activity.PremiumActivity;
+import com.example.authenticationuseraccount.api.ApiService;
 import com.example.authenticationuseraccount.common.Constants;
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
@@ -40,17 +42,21 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class FragmentProfile extends Fragment {
+public class FragmentProfile extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
     private RelativeLayout layoutLogout;
     private LinearLayout layoutLoveSong, layoutHistorySong, layoutLogin, layoutRole;
     private Button loginButton, logoutButton, editProfileButton;
     private ImageView profileImage;
     private TextView profileName, tvRole, tvNumLove, tvNumHistory;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(this);
         layoutLogin = view.findViewById(R.id.layout_Login);
         layoutLogout = view.findViewById(R.id.layout_Logout);
         layoutRole = view.findViewById(R.id.layout_Role);
@@ -180,7 +186,6 @@ public class FragmentProfile extends Fragment {
         } else {
             layoutLogin.setVisibility(View.VISIBLE);
             layoutLogout.setVisibility(View.GONE);
-
             if (User.getInstance().getRole().equals(Constants.PREMIUM_USER))
                 tvRole.setText(Constants.PREMIUM_USER + " 🔥");
             else {
@@ -210,6 +215,20 @@ public class FragmentProfile extends Fragment {
 
     public void onUpdateHistory(int size) {
         LogUtils.ApplicationLogI("Fragment Profile | onUpdateHistory | size: " + size);
-        tvNumHistory.setText(size + " songs");
+        if (tvNumHistory != null)
+            tvNumHistory.setText(size + " songs");
+    }
+
+    public void onUpdateLoveSong(int size) {
+        LogUtils.ApplicationLogI("Fragment Profile | onUpdateLoveSong | size: " + size);
+        if (tvNumLove != null)
+            tvNumLove.setText(size + " songs");
+    }
+
+    @Override
+    public void onRefresh() {
+        tvNumLove.setText(MediaItemHolder.getInstance().getListLoveSong().size() + " songs");
+        tvNumHistory.setText(MediaItemHolder.getInstance().getListRecentSong().size() + " songs");
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

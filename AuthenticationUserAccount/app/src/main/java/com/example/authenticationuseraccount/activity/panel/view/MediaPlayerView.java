@@ -381,7 +381,7 @@ public class MediaPlayerView {
         }
 
         MediaItemHolder.getInstance().getMediaController().setRepeatMode(repeatMode);
-        ErrorUtils.showError(mContext,"Repeat Mode Has Been Set To: " + repeatMode);
+        ErrorUtils.showError(mContext, "Repeat Mode Has Been Set To: " + repeatMode);
     }
 
     private UIThread uiThread;
@@ -440,18 +440,44 @@ public class MediaPlayerView {
         mRootView.post(new Runnable() {
             @Override
             public void run() {
-                int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
-                int totalDuration = (int) (mMediaController.getDuration() / 1000);
-                m_vSeekBar_Main.setProgress(currentPosition);
-                m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
+                //No Room
+                if (ChillCornerRoomManager.getInstance().getCurrentUserId() == null) {
+                    int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                    int totalDuration = (int) (mMediaController.getDuration() / 1000);
+                    m_vSeekBar_Main.setProgress(currentPosition);
+                    m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
 
-                // Update user History
-                boolean isSaveUserHistoryTriggered = MediaItemHolder.getInstance().isSaveUserHistoryTriggered();
-                if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
-                    updateUserHistory();
+                    // Update user History
+                    boolean isSaveUserHistoryTriggered = MediaItemHolder.getInstance().isSaveUserHistoryTriggered();
+                    if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
+                        updateUserHistory();
+                    }
+                    handler.postDelayed(this, 1000);
+                } else {
+                    //Host Room
+                    if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+                        int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                        m_vSeekBar_Main.setProgress(currentPosition);
+                        m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
+                        ChillCornerRoomManager.getInstance().setCurrentSongProgress(currentPosition);
+                        handler.postDelayed(this, 1000);
+
+                    } else {
+                        int currentPosition = (int) (mMediaController.getCurrentPosition() / 1000);
+                        int totalDuration = (int) (mMediaController.getDuration() / 1000);
+                        m_vSeekBar_Main.setProgress(currentPosition);
+                        m_vTextView_CurrentDuration.setText(getTimeFormat(mMediaController.getCurrentPosition()));
+
+                        // Update user History
+                        boolean isSaveUserHistoryTriggered = MediaItemHolder.getInstance().isSaveUserHistoryTriggered();
+                        if (currentPosition > totalDuration / 2 && !isSaveUserHistoryTriggered) {
+                            updateUserHistory();
+                        }
+                        handler.postDelayed(this, 1000);
+                    }
                 }
 
-                handler.postDelayed(this, 1000);
+
             }
         });
     }

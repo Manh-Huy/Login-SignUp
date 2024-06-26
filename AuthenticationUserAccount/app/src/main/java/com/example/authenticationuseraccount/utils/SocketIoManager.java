@@ -1,5 +1,11 @@
 package com.example.authenticationuseraccount.utils;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+
+import androidx.media3.common.MediaItem;
+
 import com.example.authenticationuseraccount.common.ErrorUtils;
 import com.example.authenticationuseraccount.common.LogUtils;
 import com.example.authenticationuseraccount.model.Message;
@@ -681,11 +687,18 @@ public class SocketIoManager {
         LogUtils.ApplicationLogI("SocketIOManager | on-get-room-info: User Name: " + userName + ", User ID: " + userID);
 
         SocketUser socketUser = new SocketUser(userID, userName);
-        ChillCornerRoomManager.getInstance().getListUser().add(socketUser);
-        if (MediaItemHolder.getInstance().getListSongs() != null && !MediaItemHolder.getInstance().getListSongs().isEmpty()) {
-            ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
-            ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
-        }
+
+        UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ChillCornerRoomManager.getInstance().getListUser().add(socketUser);
+                if (MediaItemHolder.getInstance().getListSongs() != null && !MediaItemHolder.getInstance().getListSongs().isEmpty()) {
+                    ChillCornerRoomManager.getInstance().setListSongs(MediaItemHolder.getInstance().getListSongs());
+                    ChillCornerRoomManager.getInstance().setCurrentPlaySongIndex(MediaItemHolder.getInstance().getMediaController().getCurrentMediaItemIndex());
+                }
+            }
+        });
+
         String roomInfoJson = gson.toJson(ChillCornerRoomManager.getInstance());
 
         //data = roomId + ChillCornerRoomManager( List<SocketUser>, List<Song>, CurrentIndex )
@@ -735,6 +748,7 @@ public class SocketIoManager {
 
             if (roomManager.getListSongs() != null && !roomManager.getListSongs().isEmpty()) {
                 ChillCornerRoomManager.getInstance().setListSongs(roomManager.getListSongs());
+                ChillCornerRoomManager.getInstance().setCurrentSongProgress(roomManager.getCurrentSongProgress());
                 LogUtils.ApplicationLogI("SocketIOManager | on-response-room-info: setListSongs: " + roomManager.getListSongs());
             }
 
@@ -761,11 +775,30 @@ public class SocketIoManager {
     private void onUserJoinRoomBroadCast(Object[] args) {
         //args = userName
 
+        if (ChillCornerRoomManager.getInstance().isCurrentUserHost()) {
+            LogUtils.ApplicationLogI("Host here");
+            return;
+        }
         LogUtils.ApplicationLogI("SocketIOManger | onUserJoinRoomBroadCast: user " + args[0].toString() + " has joined room: " + ChillCornerRoomManager.getInstance().getRoomId());
         UIThread.getInstance().getM_vMainActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 UIThread.getInstance().onRoomJoined(ChillCornerRoomManager.getInstance().getRoomId());
+
+                if (ChillCornerRoomManager.getInstance().getListSongs() != null && !ChillCornerRoomManager.getInstance().getListSongs().isEmpty()) {
+                    MediaItemHolder.getInstance().setListSongs(ChillCornerRoomManager.getInstance().getListSongs());
+                    Song currentRoomSong = MediaItemHolder.getInstance().getListSongs().get(ChillCornerRoomManager.getInstance().getCurrentPlaySongIndex());
+                    MediaItem mediaItem = MediaItem.fromUri(currentRoomSong.getSongURL());
+                    MediaItemHolder.getInstance().getMediaController().setMediaItem(mediaItem);
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            MediaItemHolder.getInstance().getMediaController().seekTo(ChillCornerRoomManager.getInstance().getCurrentSongProgress() + 2);
+                            LogUtils.ApplicationLogI("SeekTo: " + (ChillCornerRoomManager.getInstance().getCurrentSongProgress() + 4));
+                        }
+                    }, 2000); // 1000 milliseconds = 1 second
+                }
+
                 ErrorUtils.showError(UIThread.getInstance().getM_vMainActivity(), args[0].toString() + " Has Jumped In! Let's listen together!");
             }
         });

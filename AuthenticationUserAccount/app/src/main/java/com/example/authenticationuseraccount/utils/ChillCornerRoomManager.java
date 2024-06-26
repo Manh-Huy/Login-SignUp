@@ -16,6 +16,16 @@ public class ChillCornerRoomManager {
     private List<SocketUser> listUser;
     private List<Song> listSongs;
 
+    private int currentSongProgress;
+
+    public int getCurrentSongProgress() {
+        return currentSongProgress;
+    }
+
+    public void setCurrentSongProgress(int currentSongProgress) {
+        this.currentSongProgress = currentSongProgress;
+    }
+
     private ChillCornerRoomManager() {
         listUser = new ArrayList<>();
         isCreated = false;
